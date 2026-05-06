@@ -31,6 +31,18 @@ export async function rateLimit(key: string, limit: number, windowMs: number): P
   } catch (e) {
     // Allow on any Redis error rather than block legitimate users, but surface it
     console.error("[rateLimit] Redis error — failing open for key", key, e);
+    if (process.env.NODE_ENV === "production") {
+      try {
+        const Sentry = await import("@sentry/nextjs");
+        Sentry.captureException(e, {
+          level: "warning",
+          tags: { source: "rateLimit" },
+          extra: { key },
+        });
+      } catch {
+        // Don't let Sentry import failure break the rate limiter
+      }
+    }
     return true;
   }
 }
