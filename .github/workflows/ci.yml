@@ -22,6 +22,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          JWT_RESET_SECRET: ci-placeholder-do-not-use-in-prod
           NEXT_PUBLIC_APP_URL: https://we-move-ny-shift-swap.vercel.app
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: placeholder
           RESEND_API_KEY: placeholder
