@@ -1,8 +1,36 @@
-# We Move NY — Changelog
+# TWU Local 106 Connect — Changelog
 
 ---
 
-## 🚀 Latest Release — April 2026
+## TWU Local 106 Connect — Layer A Rebrand
+
+This is a forked codebase. The fork point was 2026-05-06 from
+`we-move-new-york-shift-swap@2e9d0ca`. From this point forward, this repo is
+TWU Local 106 Connect, the official member portal for TWU Local 106
+(Transit Supervisors Organization).
+
+### Layer A: Surface branding (this batch)
+
+- Centralized brand identity in `config/brand.ts` (single source of truth)
+- Replaced all user-visible WMNY / We Move NY references
+- New brand colors extracted from TSO logo (navy `#1A1F4D` + red `#AD1B27` + white)
+- Replaced PWA icons with TSO logo (full size set + maskable + apple-touch)
+- Updated email templates with Local 106 copy and colors
+- Service worker cache renamed (`wmny-shell-v1` → `local106-shell-v1`)
+- Invite code prefix changed (`WMNY-` → `L106-`; full removal in Layer C)
+- Internal event names + sessionStorage keys renamed (`wmny:*` → `local106:*`)
+- Static legal pages updated (terms, privacy, disclaimer)
+- Print agreement page reflects Local 106 footer
+
+### Layers still pending
+
+- **Layer B**: Depot → Division entity rename (~580 lines, structural)
+- **Layer C**: Schema additions (Division/SubUnit/News/Document), role refactor,
+  registration flow change (admin approval), drop InviteCode model
+
+---
+
+## 🚀 Latest Release — April 2026 (We Move NY history below this line)
 
 ### ✨ New Features
 
@@ -71,7 +99,7 @@ Union stewards and depot reps get a dedicated dashboard with swap activity chart
 The app launched with English and Spanish. Chinese (中文) added in the latest release.
 
 ### Admin Tools
-Admins can manage users, assign roles, send broadcast messages to all operators or a specific depot, suspend accounts, and view a full audit log.
+Admins can manage users, assign roles, send broadcast messages to all members or a specific depot, suspend accounts, and view a full audit log.
 
 ---
 
