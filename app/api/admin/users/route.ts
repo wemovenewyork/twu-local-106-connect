@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
   if (!dbUser || !["superAdmin", "localAdmin"].includes(dbUser.role)) return err("Forbidden", 403);
 
-  const isSubAdmin = dbUser.role === "localAdmin";
+  const isLocalAdmin = dbUser.role === "localAdmin";
   const url = new URL(req.url);
   const q = url.searchParams.get("q") ?? "";
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       OR: [
         { firstName: { contains: q, mode: "insensitive" } },
         { lastName: { contains: q, mode: "insensitive" } },
-        ...(!isSubAdmin ? [{ email: { contains: q, mode: "insensitive" as const } }] : []),
+        ...(!isLocalAdmin ? [{ email: { contains: q, mode: "insensitive" as const } }] : []),
       ],
     } : undefined,
     orderBy: { createdAt: "desc" },
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     select: {
       id: true, firstName: true, lastName: true,
       // subAdmin does not see email addresses
-      ...(isSubAdmin ? {} : { email: true }),
+      ...(isLocalAdmin ? {} : { email: true }),
       role: true, createdAt: true, lastActiveAt: true, suspendedUntil: true,
       division: { select: { name: true, code: true } },
     },

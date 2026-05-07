@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const admin = await prisma.user.findUnique({ where: { id: token.userId } });
   if (!admin || !["superAdmin", "localAdmin"].includes(admin.role)) return err("Forbidden", 403);
 
-  const isSubAdmin = admin.role === "localAdmin";
+  const isLocalAdmin = admin.role === "localAdmin";
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   if (!text?.trim()) return err("Message text required", 400);
   if (text.trim().length > 1000) return err("Max 1000 characters", 400);
   if (!["all", "user", "division"].includes(target)) return err("Invalid target", 400);
-  if (isSubAdmin && target === "all") return err("SubAdmins cannot broadcast to all users", 403);
+  if (isLocalAdmin && target === "all") return err("Local Admins cannot broadcast to all users", 403);
 
   const trimmed = text.trim();
 

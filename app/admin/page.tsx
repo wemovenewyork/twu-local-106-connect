@@ -241,7 +241,7 @@ export default function AdminPage() {
     } finally { setBusy(null); }
   };
 
-  const isSubAdmin = user?.role === "localAdmin";
+  const isLocalAdmin = user?.role === "localAdmin";
   if (!user || !["superAdmin", "localAdmin"].includes(user.role)) return null;
 
   const statCards = stats ? [
@@ -262,7 +262,7 @@ export default function AdminPage() {
         </button>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: C.white }}>Admin Dashboard</div>
-          <div style={{ fontSize: 10, color: isSubAdmin ? "#F97316" : PURPLE, letterSpacing: 2, textTransform: "uppercase" }}>{isSubAdmin ? "Sub Admin" : "System Overview"}</div>
+          <div style={{ fontSize: 10, color: isLocalAdmin ? "#F97316" : PURPLE, letterSpacing: 2, textTransform: "uppercase" }}>{isLocalAdmin ? "Local Admin" : "System Overview"}</div>
         </div>
         <div style={{ width: 36, height: 36, borderRadius: 10, background: PURPLE + "18", border: `1px solid ${PURPLE}33`, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="shield" s={18} c={PURPLE} />
@@ -284,7 +284,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         {(() => {
-          const tabs = ["reports", "users", ...(isSubAdmin ? [] : ["audit"]), "broadcast"] as const;
+          const tabs = ["reports", "users", ...(isLocalAdmin ? [] : ["audit"]), "broadcast"] as const;
           return (
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${tabs.length}, 1fr)`, gap: 4, background: C.s, borderRadius: 12, padding: 4, marginBottom: 16 }}>
               {tabs.map(t => (
@@ -349,7 +349,7 @@ export default function AdminPage() {
             </div>
 
             {/* Bulk action toolbar */}
-            {!isSubAdmin && users.length > 0 && (
+            {!isLocalAdmin && users.length > 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, padding: "10px 14px", borderRadius: 12, background: selectedUsers.size > 0 ? PURPLE + "12" : "rgba(255,255,255,.03)", border: `1px solid ${selectedUsers.size > 0 ? PURPLE + "44" : C.bd}`, transition: "all .2s" }}>
                 <input
                   type="checkbox"
@@ -409,7 +409,7 @@ export default function AdminPage() {
                 return (
                   <div key={u.id} style={{ background: isConfirming ? C.red + "08" : isSelected ? PURPLE + "08" : "rgba(255,255,255,.03)", borderRadius: 14, border: `1px solid ${isConfirming ? C.red + "33" : isSelected ? PURPLE + "44" : C.bd}`, padding: "14px 16px", transition: "all .2s" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      {!isSubAdmin && !isSelf && (
+                      {!isLocalAdmin && !isSelf && (
                         <input
                           type="checkbox"
                           checked={isSelected}
@@ -428,7 +428,7 @@ export default function AdminPage() {
                               <span style={{ fontSize: 9, fontWeight: 700, color: C.red, background: C.red + "18", border: `1px solid ${C.red}33`, padding: "2px 6px", borderRadius: 6, textTransform: "uppercase", letterSpacing: 1 }}>Suspended</span>
                             )}
                           </div>
-                          {!isSubAdmin && u.email && <div style={{ fontSize: 11, color: C.m, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.email}</div>}
+                          {!isLocalAdmin && u.email && <div style={{ fontSize: 11, color: C.m, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.email}</div>}
                           {u.division && <div style={{ fontSize: 10, color: C.gold, marginTop: 2 }}>{u.division.name}</div>}
                           {u.lastActiveAt && (
                             <div style={{ fontSize: 10, color: C.m, marginTop: 2 }}>
@@ -438,7 +438,7 @@ export default function AdminPage() {
                         </div>
                       </button>
                       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
-                        {!isSubAdmin && (
+                        {!isLocalAdmin && (
                           <select
                             value={u.role}
                             disabled={isBusy || isConfirming}
@@ -453,7 +453,7 @@ export default function AdminPage() {
                             <option value="superAdmin">Super Admin</option>
                           </select>
                         )}
-                        {isSubAdmin && (
+                        {isLocalAdmin && (
                           <span style={{ padding: "4px 10px", borderRadius: 8, background: rc + "18", border: `1px solid ${rc}33`, fontSize: 11, fontWeight: 700, color: rc }}>{u.role}</span>
                         )}
                         {u.role === "divisionAdmin" && u.division && pendingDivision[u.id] === undefined && (
@@ -478,7 +478,7 @@ export default function AdminPage() {
                             </button>
                           </div>
                         )}
-                        {!isSubAdmin && !isSelf && pendingDivision[u.id] === undefined && (
+                        {!isLocalAdmin && !isSelf && pendingDivision[u.id] === undefined && (
                           <button
                             onClick={() => handleSuspend(u.id)}
                             disabled={busy === u.id + "_suspend" || isConfirming || !!(u.suspendedUntil && new Date(u.suspendedUntil) > new Date())}
@@ -487,7 +487,7 @@ export default function AdminPage() {
                             {u.suspendedUntil && new Date(u.suspendedUntil) > new Date() ? "Suspended" : "Suspend"}
                           </button>
                         )}
-                        {!isSubAdmin && !isSelf && !pendingDivision[u.id] !== undefined && (
+                        {!isLocalAdmin && !isSelf && pendingDivision[u.id] === undefined && (
                           <button
                             onClick={() => setDeleteConfirm(isConfirming ? null : u.id)}
                             disabled={isBusy}
@@ -535,7 +535,7 @@ export default function AdminPage() {
             <div>
               <label style={lb}>Send To</label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                {(["all", "division", "user"] as const).filter(t => !(isSubAdmin && t === "all")).map(t => (
+                {(["all", "division", "user"] as const).filter(t => !(isLocalAdmin && t === "all")).map(t => (
                   <button
                     key={t}
                     onClick={() => setBcTarget(t)}
@@ -710,7 +710,7 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <div style={{ fontSize: 17, fontWeight: 800, color: C.white }}>{profileData.firstName} {profileData.lastName}</div>
-                      {profileData.email && !isSubAdmin && <div style={{ fontSize: 12, color: C.m, marginTop: 2 }}>{profileData.email}</div>}
+                      {profileData.email && !isLocalAdmin && <div style={{ fontSize: 12, color: C.m, marginTop: 2 }}>{profileData.email}</div>}
                       <span style={{ display: "inline-block", marginTop: 4, padding: "2px 10px", borderRadius: 8, background: rc + "18", border: `1px solid ${rc}33`, fontSize: 11, fontWeight: 700, color: rc }}>
                         {profileData.role}
                       </span>

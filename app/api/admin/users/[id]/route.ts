@@ -36,13 +36,13 @@ export async function GET(
     reviews: reviews.map(r => r.rating),
   });
 
-  const isSubAdmin = admin.role === "localAdmin";
+  const isLocalAdmin = admin.role === "localAdmin";
 
   return ok({
     id: u.id,
     firstName: u.firstName,
     lastName: u.lastName,
-    email: isSubAdmin ? null : u.email,
+    email: isLocalAdmin ? null : u.email,
     role: u.role,
     createdAt: u.createdAt,
     division: u.division,
