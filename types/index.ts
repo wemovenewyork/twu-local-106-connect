@@ -130,6 +130,41 @@ export interface Message {
   swap?: { id: string; details: string; category: string };
 }
 
+export type OfficerScope = "local" | "division" | "staff";
+
+export interface Officer {
+  id: string;
+  name: string;
+  title: string;
+  scope: OfficerScope;
+  divisionId: string | null;
+  displayOrder: number;
+  bio: string | null;
+  photoUrl: string | null;
+  contactEmail: string | null;
+  contactFormEnabled: boolean;
+  termStart: string | null;
+  termEnd: string | null;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+  division?: { id: string; code: string; name: string } | null;
+}
+
+export interface Page {
+  id: string;
+  slug: string;
+  title: string;
+  body: string;
+  metaDescription: string | null;
+  published: boolean;
+  publishedAt: string | null;
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+  author?: { id: string; firstName: string; lastName: string };
+}
+
 export type NewsStatus = "draft" | "inReview" | "published" | "archived";
 
 export interface News {
