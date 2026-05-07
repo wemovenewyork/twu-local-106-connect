@@ -270,6 +270,16 @@ export default function AdminPage() {
       </div>
 
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 640, margin: "0 auto", padding: "20px 16px" }}>
+        <div style={{ marginBottom: 16 }}>
+          <button
+            onClick={() => router.push("/admin/registrations")}
+            style={{ width: "100%", padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: `1px solid ${C.bd}`, color: C.white, fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}
+          >
+            <span>Registration approvals</span>
+            <span style={{ color: C.gold, fontSize: 12 }}>Review queue →</span>
+          </button>
+        </div>
+
         {/* Stats grid */}
         {stats && (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginBottom: 20 }}>
