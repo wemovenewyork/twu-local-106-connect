@@ -7,30 +7,30 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
-  passwordHash   String   @map("password_hash")
-  firstName      String   @map("first_name")
-  lastName       String   @map("last_name")
-  depotId        String?  @map("depot_id")
-  role           UserRole @default(operator)
-  language       String   @default("en")
-  avatarUrl      String?  @map("avatar_url")
-  verified            Boolean   @default(false)
-  emailVerifyToken    String?   @map("email_verify_token")
-  emailVerifyExpires  DateTime? @map("email_verify_expires")
-  flexibleMode      Boolean   @default(false) @map("flexible_mode")
-  flexibleSince     DateTime? @map("flexible_since")
-  invitedBy         String?   @map("invited_by")
-  termsAcceptedAt   DateTime? @map("terms_accepted_at")
-  termsVersion      String?   @map("terms_version")
-  loginAttempts     Int       @default(0) @map("login_attempts")
-  lockedUntil       DateTime? @map("locked_until")
-  suspendedUntil    DateTime? @map("suspended_until")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  passwordHash       String    @map("password_hash")
+  firstName          String    @map("first_name")
+  lastName           String    @map("last_name")
+  divisionId         String?   @map("division_id")
+  role               UserRole  @default(operator)
+  language           String    @default("en")
+  avatarUrl          String?   @map("avatar_url")
+  verified           Boolean   @default(false)
+  emailVerifyToken   String?   @map("email_verify_token")
+  emailVerifyExpires DateTime? @map("email_verify_expires")
+  flexibleMode       Boolean   @default(false) @map("flexible_mode")
+  flexibleSince      DateTime? @map("flexible_since")
+  invitedBy          String?   @map("invited_by")
+  termsAcceptedAt    DateTime? @map("terms_accepted_at")
+  termsVersion       String?   @map("terms_version")
+  loginAttempts      Int       @default(0) @map("login_attempts")
+  lockedUntil        DateTime? @map("locked_until")
+  suspendedUntil     DateTime? @map("suspended_until")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
-  depot              Depot?             @relation(fields: [depotId], references: [id])
+  division           Division?          @relation(fields: [divisionId], references: [id])
   inviter            User?              @relation("Invites", fields: [invitedBy], references: [id])
   invitees           User[]             @relation("Invites")
   swaps              Swap[]
@@ -51,43 +51,41 @@ model User {
   savedSwaps         SavedSwap[]
   blocksGiven        Block[]            @relation("BlocksGiven")
   blocksReceived     Block[]            @relation("BlocksReceived")
-  lastActiveAt       DateTime? @map("last_active_at")
-  jobTitle          String?   @map("job_title")
-  depotSetAt        DateTime? @map("depot_set_at")
-  verifiedOperator    Boolean   @default(false) @map("verified_operator")
-  dispatcherVerified  Boolean   @default(false) @map("dispatcher_verified")
-  dispatcherBadge     String?   @map("dispatcher_badge")
+  lastActiveAt       DateTime?          @map("last_active_at")
+  jobTitle           String?            @map("job_title")
+  divisionSetAt      DateTime?          @map("division_set_at")
+  verifiedOperator   Boolean            @default(false) @map("verified_operator")
+  dispatcherVerified Boolean            @default(false) @map("dispatcher_verified")
+  dispatcherBadge    String?            @map("dispatcher_badge")
 
   @@map("users")
 }
 
-model Depot {
-  id       String  @id @default(uuid())
-  name     String
-  code     String  @unique
-  borough  String
-  operator String
-  logoUrl  String? @map("logo_url")
+model Division {
+  id          String  @id @default(uuid())
+  name        String
+  code        String  @unique
+  description String?
 
   users         User[]
   swaps         Swap[]
   announcements Announcement[]
 
-  @@map("depots")
+  @@map("divisions")
 }
 
 model Announcement {
-  id        String    @id @default(uuid())
-  depotId   String    @map("depot_id")
-  authorId  String    @map("author_id")
-  body      String    @db.VarChar(600)
-  pinned    Boolean   @default(false)
-  expiresAt DateTime? @map("expires_at")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id         String    @id @default(uuid())
+  divisionId String    @map("division_id")
+  authorId   String    @map("author_id")
+  body       String    @db.VarChar(600)
+  pinned     Boolean   @default(false)
+  expiresAt  DateTime? @map("expires_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
 
-  depot  Depot @relation(fields: [depotId], references: [id], onDelete: Cascade)
-  author User  @relation(fields: [authorId], references: [id])
+  division Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id])
 
   @@map("announcements")
 }
@@ -95,7 +93,7 @@ model Announcement {
 model Swap {
   id           String       @id @default(uuid())
   userId       String       @map("user_id")
-  depotId      String       @map("depot_id")
+  divisionId   String       @map("division_id")
   category     SwapCategory
   status       SwapStatus   @default(open)
   date         DateTime?    @db.Date
@@ -118,14 +116,14 @@ model Swap {
   updatedAt    DateTime     @updatedAt @map("updated_at")
 
   user       User            @relation(fields: [userId], references: [id])
-  depot      Depot           @relation(fields: [depotId], references: [id])
+  division   Division        @relation(fields: [divisionId], references: [id])
   messages   Message[]
   reviews    Review[]
   reports    Report[]
   agreements SwapAgreement[]
   savedBy    SavedSwap[]
 
-  @@index([depotId, status, createdAt(sort: Desc)])
+  @@index([divisionId, status, createdAt(sort: Desc)])
   @@map("swaps")
 }
 
@@ -136,6 +134,7 @@ model SavedSwap {
   createdAt DateTime @default(now()) @map("created_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   swap      Swap     @relation(fields: [swapId], references: [id], onDelete: Cascade)
+
   @@unique([userId, swapId])
   @@index([userId])
   @@map("saved_swaps")
