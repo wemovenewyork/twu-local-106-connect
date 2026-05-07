@@ -227,3 +227,19 @@ a:focus-visible { outline: 2px solid #AD1B27; outline-offset: 2px; }
 /* Soft press depth on tap */
 @keyframes tapPress { 0%{transform:scale(1)} 40%{transform:scale(.96)} 100%{transform:scale(1)} }
 .tap-press:active { animation: tapPress .18s ease; }
+
+/* Public-site markdown rendering (light theme) */
+.prose-public h1 { font-size: 1.85rem; font-weight: 800; color: #1A1F4D; margin: 1.6rem 0 0.7rem; letter-spacing: -0.5px; }
+.prose-public h2 { font-size: 1.45rem; font-weight: 700; color: #1A1F4D; margin: 1.6rem 0 0.7rem; letter-spacing: -0.25px; }
+.prose-public h3 { font-size: 1.15rem; font-weight: 700; color: #1A1F4D; margin: 1.4rem 0 0.5rem; }
+.prose-public p { margin: 0 0 1rem; }
+.prose-public ul, .prose-public ol { padding-left: 1.4rem; margin: 0 0 1rem; }
+.prose-public li { margin-bottom: 0.4rem; }
+.prose-public li > p { margin-bottom: 0.4rem; }
+.prose-public a { color: #AD1B27; text-decoration: underline; text-underline-offset: 2px; }
+.prose-public a:hover { text-decoration: none; }
+.prose-public strong { color: #1A1F4D; font-weight: 700; }
+.prose-public hr { border: 0; border-top: 1px solid #E5E7EB; margin: 2rem 0; }
+.prose-public blockquote { margin: 1.2rem 0; padding: 0.4rem 0 0.4rem 1rem; border-left: 3px solid #AD1B27; color: #4b5563; }
+.prose-public code { background: #F1F4F9; padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.92em; }
+.prose-public img { max-width: 100%; height: auto; border-radius: 8px; margin: 1rem 0; }
