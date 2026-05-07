@@ -121,7 +121,7 @@ export default function AdminNewsPage() {
                     key={n.id}
                     news={n}
                     canManage={manage}
-                    onClick={() => router.push(manage ? `/admin/news/${n.id}` : `/news/${n.id}`)}
+                    onClick={() => router.push(manage ? `/admin/news/${n.id}` : `/portal/news/${n.id}`)}
                   />
                 );
               })}

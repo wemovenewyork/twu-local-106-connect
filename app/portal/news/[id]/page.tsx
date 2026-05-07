@@ -42,7 +42,7 @@ export default function NewsDetailPage() {
       <main style={{ padding: "40px 24px", maxWidth: 720, margin: "0 auto", color: C.m, textAlign: "center" }}>
         <div style={{ fontSize: 18, color: C.white, fontWeight: 700, marginBottom: 8 }}>News not found</div>
         <div style={{ fontSize: 13, marginBottom: 20 }}>{error}</div>
-        <button onClick={() => router.push("/divisions")} style={{ padding: "10px 18px", borderRadius: 10, border: `1px solid ${C.bd}`, background: "transparent", color: C.white, fontSize: 13, cursor: "pointer" }}>
+        <button onClick={() => router.push("/dashboard")} style={{ padding: "10px 18px", borderRadius: 10, border: `1px solid ${C.bd}`, background: "transparent", color: C.white, fontSize: 13, cursor: "pointer" }}>
           Back home
         </button>
       </main>

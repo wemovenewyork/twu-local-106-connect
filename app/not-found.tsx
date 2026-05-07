@@ -53,11 +53,11 @@ export default function NotFound() {
             lineHeight: 1.6,
           }}
         >
-          This page doesn&apos;t exist or was moved. Head back to the swap
-          board.
+          This page doesn&apos;t exist or was moved. Head back to the
+          dashboard.
         </p>
         <Link
-          href="/divisions"
+          href="/dashboard"
           style={{
             display: "block",
             padding: "14px 20px",

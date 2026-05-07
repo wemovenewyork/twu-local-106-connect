@@ -101,7 +101,7 @@ export default function NewsFeed() {
           return (
             <button
               key={n.id}
-              onClick={() => router.push(`/news/${n.id}`)}
+              onClick={() => router.push(`/portal/news/${n.id}`)}
               style={{
                 textAlign: "left",
                 padding: 16,

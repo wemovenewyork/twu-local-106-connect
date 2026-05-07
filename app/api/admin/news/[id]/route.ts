@@ -95,7 +95,7 @@ async function notifyAudience(newsId: string, params: {
     {
       title,
       body: preview,
-      url: `/news/${newsId}`,
+      url: `/portal/news/${newsId}`,
     },
     "news",
   );
