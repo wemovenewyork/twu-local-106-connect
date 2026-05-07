@@ -28,6 +28,7 @@ export default function NewDocumentPage() {
   const [visibility, setVisibility] = useState<Visibility>("selfOnly");
   const [divisionId, setDivisionId] = useState<string>("");
   const [subUnitId, setSubUnitId] = useState<string>("");
+  const [publiclyVisible, setPubliclyVisible] = useState(false);
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [subUnits, setSubUnits] = useState<SubUnitLite[]>([]);
   const [busy, setBusy] = useState(false);
@@ -108,6 +109,7 @@ export default function NewDocumentPage() {
         const sub = subUnits.find(s => s.id === subUnitId);
         if (sub) fd.append("divisionId", sub.divisionId);
       }
+      if (isLocalSuper && publiclyVisible) fd.append("publiclyVisible", "true");
 
       const res = await fetch("/api/admin/documents", {
         method: "POST",
@@ -244,6 +246,29 @@ export default function NewDocumentPage() {
             </div>
           )}
         </Field>
+
+        {isLocalSuper && (
+          <div style={{ padding: 12, borderRadius: 10, border: `1px solid ${C.bd}`, background: "rgba(255,255,255,.02)" }}>
+            <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: "pointer" }}>
+              <input
+                type="checkbox"
+                checked={publiclyVisible}
+                onChange={e => setPubliclyVisible(e.target.checked)}
+                style={{ marginTop: 3, width: 16, height: 16 }}
+              />
+              <span style={{ fontSize: 13, color: C.white, lineHeight: 1.5 }}>
+                <strong style={{ display: "block", marginBottom: 2 }}>
+                  Visible to public (no login required)
+                </strong>
+                <span style={{ color: C.m, fontSize: 12 }}>
+                  When checked, this document will appear at /resources/documents
+                  on the public twu106.org site, available without sign-in.
+                  Local/super admins only.
+                </span>
+              </span>
+            </label>
+          </div>
+        )}
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 6 }}>
           <button

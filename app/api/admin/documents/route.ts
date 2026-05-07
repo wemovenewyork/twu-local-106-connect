@@ -107,10 +107,18 @@ export async function POST(req: NextRequest) {
   const divisionId = typeof divisionIdRaw === "string" && divisionIdRaw ? divisionIdRaw : null;
   const subUnitIdRaw = formData.get("subUnitId");
   const subUnitId = typeof subUnitIdRaw === "string" && subUnitIdRaw ? subUnitIdRaw : null;
+  const publiclyVisibleRaw = formData.get("publiclyVisible");
+  const publiclyVisible = publiclyVisibleRaw === "true" || publiclyVisibleRaw === "1";
 
   // Authorization by visibility
   const isAdminTier = (ADMIN_ROLES as readonly string[]).includes(caller.role);
   const isLocalSuper = isLocalAdmin(caller);
+
+  // Public visibility (visible without login on twu106.org) is a local-wide
+  // editorial decision — only local/super admins can set it.
+  if (publiclyVisible && !isLocalSuper) {
+    return err("Only local/super admins can publish public documents", 403);
+  }
 
   if (visibility === "all") {
     if (!isLocalSuper) return err("Only local/super admins can post all-members documents", 403);
@@ -165,6 +173,7 @@ export async function POST(req: NextRequest) {
       subUnitId: visibility === "subUnit" ? subUnitId : null,
       ownerUserId: visibility === "selfOnly" ? caller.id : null,
       uploaderId: caller.id,
+      publiclyVisible,
     },
     include: DOC_INCLUDE,
   });
