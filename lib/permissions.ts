@@ -78,3 +78,38 @@ export function getManageableDivisions(user: RoleLike): "all" | string[] {
   if (user.role === "divisionAdmin" && user.divisionId) return [user.divisionId];
   return [];
 }
+
+/**
+ * Authorize manage actions on a news record.
+ *
+ *   - localAdmin / superAdmin: any news, any status
+ *   - divisionAdmin: news in their division (or all-divisions news matching
+ *     null divisionId is local/super only — div admins don't get to manage
+ *     all-divisions content)
+ *   - editor: only their own drafts in their division
+ *
+ * Async signature is forward-compatible: future versions may consult the DB
+ * to extend manage rights to sub-unit officers.
+ */
+type NewsLike = { authorId: string; divisionId: string | null; status: string };
+export async function canManageNews(
+  user: RoleLike & { id: string },
+  news: NewsLike
+): Promise<boolean> {
+  if (isLocalOrSuperAdmin(user)) return true;
+
+  if (user.role === "divisionAdmin" && news.divisionId && news.divisionId === user.divisionId) {
+    return true;
+  }
+
+  if (
+    user.role === "editor" &&
+    news.authorId === user.id &&
+    news.status === "draft" &&
+    news.divisionId === user.divisionId
+  ) {
+    return true;
+  }
+
+  return false;
+}

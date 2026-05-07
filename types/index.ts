@@ -129,3 +129,21 @@ export interface Message {
   fromUser?: { id: string; firstName: string; lastName: string };
   swap?: { id: string; details: string; category: string };
 }
+
+export type NewsStatus = "draft" | "inReview" | "published" | "archived";
+
+export interface News {
+  id: string;
+  title: string;
+  body: string;
+  status: NewsStatus;
+  divisionId: string | null;
+  authorId: string;
+  reviewerId: string | null;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  division?: { id: string; code: string; name: string } | null;
+  author?: { id: string; firstName: string; lastName: string };
+  reviewer?: { id: string; firstName: string; lastName: string } | null;
+}
