@@ -3,7 +3,6 @@ import { Poppins } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
-import MeshBackground from "@/components/ui/MeshBackground";
 import OfflineBanner from "@/components/ui/OfflineBanner";
 import AnalyticsProvider from "@/components/ui/AnalyticsProvider";
 import RegistrationGuard from "@/components/RegistrationGuard";
@@ -49,17 +48,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           gtag('js', new Date());
           gtag('config', 'G-RJV2G8G06H');
         `}</Script>
-        <MeshBackground />
-        <header>
-          <a href="#main-content" className="skip-link">Skip to main content</a>
-          <OfflineBanner />
-        </header>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+        <OfflineBanner />
         <AuthProvider>
           <AnalyticsProvider>
             <RegistrationGuard />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              {children}
-            </div>
+            {children}
           </AnalyticsProvider>
         </AuthProvider>
         <Analytics />
