@@ -32,3 +32,49 @@ export function canEditContent(user: RoleLike, divisionId?: string | null): bool
   if (!divisionId) return true;
   return user.divisionId === divisionId;
 }
+
+/**
+ * True if the user holds any admin tier (division/local/super).
+ */
+export function isAdmin(user: RoleLike): boolean {
+  return (
+    user.role === "divisionAdmin" ||
+    user.role === "localAdmin" ||
+    user.role === "superAdmin"
+  );
+}
+
+/**
+ * True if the user can manage all divisions (localAdmin or superAdmin).
+ * Alias for isLocalOrSuperAdmin — kept for readability at call sites.
+ */
+export function isLocalAdmin(user: RoleLike): boolean {
+  return isLocalOrSuperAdmin(user);
+}
+
+/**
+ * True if the user can manage the given division.
+ *
+ *   - localAdmin / superAdmin: any division
+ *   - divisionAdmin: only when their divisionId matches targetDivisionId
+ *   - everyone else: false
+ */
+export function canManageDivision(user: RoleLike, targetDivisionId: string): boolean {
+  if (isLocalOrSuperAdmin(user)) return true;
+  if (user.role === "divisionAdmin" && user.divisionId === targetDivisionId) return true;
+  return false;
+}
+
+/**
+ * Returns the divisions a user can manage:
+ *   - "all" for localAdmin / superAdmin
+ *   - [divisionId] for divisionAdmin scoped to a division
+ *   - [] for non-admins, or divisionAdmin without a divisionId
+ *
+ * Used by feature-area queries to filter to the admin's scope.
+ */
+export function getManageableDivisions(user: RoleLike): "all" | string[] {
+  if (isLocalOrSuperAdmin(user)) return "all";
+  if (user.role === "divisionAdmin" && user.divisionId) return [user.divisionId];
+  return [];
+}
