@@ -466,6 +466,10 @@ model RegistrationApproval {
   reviewer        User?              @relation("RegistrationReviewer", fields: [reviewerId], references: [id])
   rejectionReason String?            @map("rejection_reason")
 
+  reminderSent12h Boolean            @default(false) @map("reminder_sent_12h")
+  reminderSent24h Boolean            @default(false) @map("reminder_sent_24h")
+  reminderSent72h Boolean            @default(false) @map("reminder_sent_72h")
+
   createdAt       DateTime           @default(now()) @map("created_at")
   updatedAt       DateTime           @updatedAt @map("updated_at")
 
