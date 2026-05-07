@@ -4,6 +4,8 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { isLocalOrSuperAdmin } from "@/lib/permissions";
+import { writeAuditLog } from "@/lib/audit";
+import { clientIp } from "@/lib/rateLimit";
 
 const NEWS_INCLUDE = {
   division: { select: { id: true, code: true, name: true } },
@@ -109,6 +111,16 @@ export async function POST(req: NextRequest) {
       },
       include: NEWS_INCLUDE,
     });
+
+    writeAuditLog({
+      adminId: caller.id,
+      action: "newsCreate",
+      targetId: created.id,
+      targetType: "news",
+      detail: `Created draft "${title}" in ${divisionId === null ? "All Divisions" : created.division?.code ?? divisionId}`,
+      ip: clientIp(req),
+    });
+
     return ok({ news: created }, 201);
   } catch (e) {
     Sentry.captureException(e, { tags: { source: "news-create" } });

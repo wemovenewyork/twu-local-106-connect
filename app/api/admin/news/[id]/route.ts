@@ -5,6 +5,16 @@ import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { canManageNews, isLocalOrSuperAdmin } from "@/lib/permissions";
 import { notifyMany } from "@/lib/notifyUser";
+import { writeAuditLog } from "@/lib/audit";
+import { clientIp } from "@/lib/rateLimit";
+
+const TRANSITION_ACTIONS: Record<string, string> = {
+  submitForReview: "newsSubmitForReview",
+  approveAndPublish: "newsApproveAndPublish",
+  sendBackToDraft: "newsSendBackToDraft",
+  archive: "newsArchive",
+  restore: "newsRestore",
+};
 
 function stripMarkdown(s: string): string {
   return s
@@ -242,6 +252,28 @@ export async function PATCH(
       include: NEWS_INCLUDE,
     });
 
+    // Audit log: status transitions get a dedicated action; pure field
+    // edits log as newsUpdate.
+    if (transitioned) {
+      writeAuditLog({
+        adminId: caller.id,
+        action: TRANSITION_ACTIONS[action!] ?? "newsUpdate",
+        targetId: updated.id,
+        targetType: "news",
+        detail: `${updated.title} · ${transitioned.from} → ${transitioned.to}`,
+        ip: clientIp(req),
+      });
+    } else if (Object.keys(data).length > 0) {
+      writeAuditLog({
+        adminId: caller.id,
+        action: "newsUpdate",
+        targetId: updated.id,
+        targetType: "news",
+        detail: `Edited "${updated.title}" (status ${updated.status})`,
+        ip: clientIp(req),
+      });
+    }
+
     // Fire notifications on key transitions. Non-fatal — never block the
     // response on push delivery.
     if (transitioned?.to === "inReview") {
@@ -299,6 +331,14 @@ export async function DELETE(
 
   try {
     await prisma.news.delete({ where: { id: news.id } });
+    writeAuditLog({
+      adminId: caller.id,
+      action: "newsDelete",
+      targetId: news.id,
+      targetType: "news",
+      detail: `Deleted draft "${news.title}"`,
+      ip: clientIp(req),
+    });
     return ok({ deleted: true });
   } catch (e) {
     Sentry.captureException(e, { tags: { source: "news-delete" }, extra: { newsId: news.id } });
