@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
       where: allowlist ? { code: { in: allowlist } } : undefined,
       orderBy: { name: "asc" },
       include: withSubUnits
-        ? { subUnits: { select: { code: true, name: true }, orderBy: { name: "asc" } } }
+        ? { subUnits: { select: { id: true, code: true, name: true }, orderBy: { name: "asc" } } }
         : undefined,
     });
     const counts = await prisma.swap.groupBy({
