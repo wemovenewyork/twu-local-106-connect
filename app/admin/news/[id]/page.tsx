@@ -29,10 +29,12 @@ export default function NewsEditorPage() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [divisionId, setDivisionId] = useState<string | null>("");
+  const [publiclyVisible, setPubliclyVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [banner, setBanner] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
   const isAuthorized = !!user && ["editor", "divisionAdmin", "localAdmin", "superAdmin"].includes(user.role);
+  const canSetPublic = !!user && isLocalOrSuperAdmin(user);
 
   useEffect(() => {
     if (!loading && (!user || !isAuthorized)) router.replace("/");
@@ -52,6 +54,7 @@ export default function NewsEditorPage() {
         setTitle(r.news.title);
         setBody(r.news.body);
         setDivisionId(r.news.divisionId);
+        setPubliclyVisible(r.news.publiclyVisible ?? false);
       })
       .catch(e => setBanner({ kind: "err", text: e instanceof Error ? e.message : "Failed to load" }));
   }, [id, isNew, isAuthorized]);
@@ -82,19 +85,21 @@ export default function NewsEditorPage() {
   const showError = (e: unknown) =>
     setBanner({ kind: "err", text: e instanceof Error ? e.message : "Action failed" });
 
+  const editPayload = () => {
+    const payload: Record<string, unknown> = { title, body, divisionId };
+    if (canSetPublic) payload.publiclyVisible = publiclyVisible;
+    return payload;
+  };
+
   const saveDraft = async () => {
     setBusy(true); setBanner(null);
     try {
       if (isNew) {
-        const created = await api.post<{ news: News }>(`/admin/news`, {
-          title, body, divisionId,
-        });
+        const created = await api.post<{ news: News }>(`/admin/news`, editPayload());
         setBanner({ kind: "ok", text: "Draft saved" });
         router.replace(`/admin/news/${created.news.id}`);
       } else {
-        const r = await api.patch<{ news: News }>(`/admin/news/${id}`, {
-          title, body, divisionId,
-        });
+        const r = await api.patch<{ news: News }>(`/admin/news/${id}`, editPayload());
         setNews(r.news);
         setBanner({ kind: "ok", text: "Draft saved" });
       }
@@ -107,10 +112,10 @@ export default function NewsEditorPage() {
     try {
       let workingId = id;
       if (isNew) {
-        const created = await api.post<{ news: News }>(`/admin/news`, { title, body, divisionId });
+        const created = await api.post<{ news: News }>(`/admin/news`, editPayload());
         workingId = created.news.id;
       } else {
-        await api.patch(`/admin/news/${id}`, { title, body, divisionId });
+        await api.patch(`/admin/news/${id}`, editPayload());
       }
       const r = await api.patch<{ news: News }>(`/admin/news/${workingId}`, { action: "submitForReview" });
       setNews(r.news);
@@ -125,7 +130,7 @@ export default function NewsEditorPage() {
     try {
       // For approveAndPublish or sendBackToDraft, also persist any edits made.
       if ((action === "approveAndPublish" || action === "sendBackToDraft") && !isNew) {
-        await api.patch(`/admin/news/${id}`, { title, body, divisionId });
+        await api.patch(`/admin/news/${id}`, editPayload());
       }
       const r = await api.patch<{ news: News }>(`/admin/news/${id}`, { action });
       setNews(r.news);
@@ -211,6 +216,28 @@ export default function NewsEditorPage() {
             ))}
           </select>
         </div>
+
+        {canSetPublic && (
+          <div style={{ padding: 12, borderRadius: 10, border: `1px solid ${C.bd}`, background: "rgba(255,255,255,.02)" }}>
+            <label style={{ display: "flex", alignItems: "flex-start", gap: 10, cursor: canEdit ? "pointer" : "not-allowed" }}>
+              <input
+                type="checkbox"
+                checked={publiclyVisible}
+                disabled={!canEdit}
+                onChange={e => setPubliclyVisible(e.target.checked)}
+                style={{ marginTop: 3, width: 16, height: 16 }}
+              />
+              <span style={{ fontSize: 13, color: C.white, lineHeight: 1.5 }}>
+                <strong style={{ display: "block", marginBottom: 2 }}>Make public</strong>
+                <span style={{ color: C.m, fontSize: 12 }}>
+                  When checked and published, this post will appear on the
+                  public twu106.org news feed at <code>/news/{news?.publicSlug ?? "<auto-slug-from-title>"}</code>{" "}
+                  — visible without login. Local/super admins only.
+                </span>
+              </span>
+            </label>
+          </div>
+        )}
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, alignItems: "stretch" }}>

@@ -7,6 +7,7 @@ import { canManageNews, isLocalOrSuperAdmin } from "@/lib/permissions";
 import { notifyMany } from "@/lib/notifyUser";
 import { writeAuditLog } from "@/lib/audit";
 import { clientIp } from "@/lib/rateLimit";
+import { buildUniquePublicSlug } from "@/lib/news";
 
 const TRANSITION_ACTIONS: Record<string, string> = {
   submitForReview: "newsSubmitForReview",
@@ -179,6 +180,7 @@ export async function PATCH(
     body?: unknown;
     divisionId?: unknown;
     action?: unknown;
+    publiclyVisible?: unknown;
   };
   try { body = await req.json(); } catch { return err("Invalid JSON", 400); }
 
@@ -214,6 +216,22 @@ export async function PATCH(
         return err("Cannot move news outside your division", 403);
       }
       data.divisionId = body.divisionId;
+    }
+  }
+  if (body.publiclyVisible !== undefined) {
+    if (typeof body.publiclyVisible !== "boolean") {
+      return err("publiclyVisible must be a boolean", 400);
+    }
+    if (!isLocalOrSuperAdmin(caller)) {
+      return err("Only local/super admins can change public visibility", 403);
+    }
+    data.publiclyVisible = body.publiclyVisible;
+    // If turning ON public visibility and no slug yet, generate one from the
+    // (possibly-updated) title. Slug is preserved across toggles so that a
+    // re-published post keeps its URL.
+    if (body.publiclyVisible === true && !news.publicSlug) {
+      const titleForSlug = (typeof data.title === "string" ? data.title : news.title) as string;
+      data.publicSlug = await buildUniquePublicSlug(titleForSlug, news.id);
     }
   }
 

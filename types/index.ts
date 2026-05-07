@@ -141,6 +141,8 @@ export interface News {
   authorId: string;
   reviewerId: string | null;
   publishedAt: string | null;
+  publiclyVisible: boolean;
+  publicSlug: string | null;
   createdAt: string;
   updatedAt: string;
   division?: { id: string; code: string; name: string } | null;

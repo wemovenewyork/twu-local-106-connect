@@ -6,6 +6,7 @@ import { ok, err } from "@/lib/apiResponse";
 import { isLocalOrSuperAdmin } from "@/lib/permissions";
 import { writeAuditLog } from "@/lib/audit";
 import { clientIp } from "@/lib/rateLimit";
+import { buildUniquePublicSlug } from "@/lib/news";
 
 const NEWS_INCLUDE = {
   division: { select: { id: true, code: true, name: true } },
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
   const allowedRoles = ["editor", "divisionAdmin", "localAdmin", "superAdmin"];
   if (!allowedRoles.includes(caller.role)) return err("Forbidden", 403);
 
-  let body: { title?: unknown; body?: unknown; divisionId?: unknown };
+  let body: { title?: unknown; body?: unknown; divisionId?: unknown; publiclyVisible?: unknown };
   try { body = await req.json(); } catch { return err("Invalid JSON", 400); }
 
   const title = typeof body.title === "string" ? body.title.trim() : "";
@@ -100,6 +101,21 @@ export async function POST(req: NextRequest) {
     divisionId = caller.divisionId;
   }
 
+  let publiclyVisible = false;
+  let publicSlug: string | null = null;
+  if (body.publiclyVisible !== undefined) {
+    if (typeof body.publiclyVisible !== "boolean") {
+      return err("publiclyVisible must be a boolean", 400);
+    }
+    if (body.publiclyVisible && !isLocalOrSuperAdmin(caller)) {
+      return err("Only local/super admins can change public visibility", 403);
+    }
+    publiclyVisible = body.publiclyVisible;
+    if (publiclyVisible) {
+      publicSlug = await buildUniquePublicSlug(title);
+    }
+  }
+
   try {
     const created = await prisma.news.create({
       data: {
@@ -108,6 +124,8 @@ export async function POST(req: NextRequest) {
         status: "draft",
         divisionId,
         authorId: caller.id,
+        publiclyVisible,
+        publicSlug,
       },
       include: NEWS_INCLUDE,
     });
