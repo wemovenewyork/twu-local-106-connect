@@ -51,6 +51,10 @@ model User {
   savedSwaps         SavedSwap[]
   blocksGiven        Block[]            @relation("BlocksGiven")
   blocksReceived     Block[]            @relation("BlocksReceived")
+  newsAuthored       News[]             @relation("NewsAuthor")
+  newsReviewed       News[]             @relation("NewsReviewer")
+  documentsUploaded  Document[]         @relation("DocumentUploader")
+  documentsOwned     Document[]         @relation("DocumentOwner")
   lastActiveAt       DateTime?          @map("last_active_at")
   jobTitle           String?            @map("job_title")
   divisionSetAt      DateTime?          @map("division_set_at")
@@ -71,6 +75,8 @@ model Division {
   swaps         Swap[]
   announcements Announcement[]
   subUnits      SubUnit[]
+  news          News[]
+  documents     Document[]
 
   @@map("divisions")
 }
@@ -85,6 +91,7 @@ model SubUnit {
 
   users       User[]
   swaps       Swap[]
+  documents   Document[]
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -348,4 +355,79 @@ enum AuditAction {
   report_review
   user_delete
   account_delete
+}
+
+enum NewsStatus {
+  draft
+  inReview
+  published
+  archived
+}
+
+model News {
+  id          String     @id @default(cuid())
+  title       String
+  body        String
+  status      NewsStatus @default(draft)
+  divisionId  String?    @map("division_id")
+  division    Division?  @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+
+  authorId    String     @map("author_id")
+  author      User       @relation("NewsAuthor", fields: [authorId], references: [id])
+  reviewerId  String?    @map("reviewer_id")
+  reviewer    User?      @relation("NewsReviewer", fields: [reviewerId], references: [id])
+
+  publishedAt DateTime?  @map("published_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  @@map("news")
+  @@index([divisionId])
+  @@index([status])
+  @@index([publishedAt])
+}
+
+enum DocumentVisibility {
+  all
+  division
+  subUnit
+  selfOnly
+}
+
+model Document {
+  id          String             @id @default(cuid())
+  title       String
+  description String?
+  fileUrl     String             @map("file_url")
+  fileSize    Int?               @map("file_size")
+  mimeType    String?            @map("mime_type")
+
+  visibility  DocumentVisibility @default(division)
+  divisionId  String?            @map("division_id")
+  division    Division?          @relation(fields: [divisionId], references: [id], onDelete: SetNull)
+  subUnitId   String?            @map("sub_unit_id")
+  subUnit     SubUnit?           @relation(fields: [subUnitId], references: [id], onDelete: SetNull)
+  ownerUserId String?            @map("owner_user_id")
+  owner       User?              @relation("DocumentOwner", fields: [ownerUserId], references: [id], onDelete: SetNull)
+
+  uploaderId  String             @map("uploader_id")
+  uploader    User               @relation("DocumentUploader", fields: [uploaderId], references: [id])
+
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+
+  @@map("documents")
+  @@index([divisionId])
+  @@index([visibility])
+  @@index([ownerUserId])
+}
+
+enum NotificationCategory {
+  contract
+  safety
+  rally
+  news
+  benefit
+  swapMatch
+  systemAlert
 }
