@@ -40,6 +40,7 @@ export default function NewsFeed() {
   const router = useRouter();
   const [news, setNews] = useState<News[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [pushState, setPushState] = useState<"unknown" | "unsupported" | "blocked" | "off" | "on">("unknown");
 
   useEffect(() => {
     api.get<{ news: News[] }>("/news")
@@ -48,8 +49,28 @@ export default function NewsFeed() {
       .finally(() => setLoaded(true));
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      setPushState("unsupported");
+      return;
+    }
+    if (Notification.permission === "denied") {
+      setPushState("blocked");
+      return;
+    }
+    navigator.serviceWorker.getRegistration().then(reg => {
+      if (!reg) { setPushState("off"); return; }
+      reg.pushManager.getSubscription().then(sub => {
+        setPushState(sub ? "on" : "off");
+      });
+    }).catch(() => setPushState("unsupported"));
+  }, []);
+
   if (!loaded) return null;
   if (news.length === 0) return null;
+
+  const showPushPrompt = pushState === "off";
 
   return (
     <section style={{ marginBottom: 28 }}>
@@ -58,6 +79,20 @@ export default function NewsFeed() {
           Union News
         </h2>
       </div>
+      {showPushPrompt && (
+        <button
+          onClick={() => router.push("/settings/notifications")}
+          style={{
+            width: "100%", textAlign: "left", padding: "10px 14px", borderRadius: 12, marginBottom: 10,
+            background: "rgba(2,73,181,.10)", border: `1px solid rgba(2,73,181,.35)`,
+            color: C.white, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
+          }}
+        >
+          <span style={{ flex: 1 }}>
+            Get notified about new posts. <strong>Enable push notifications →</strong>
+          </span>
+        </button>
+      )}
       <div style={{ display: "grid", gap: 10 }}>
         {news.map(n => {
           const preview = stripMarkdown(n.body).slice(0, PREVIEW_CHARS);
