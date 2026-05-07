@@ -41,19 +41,25 @@ export async function GET(req: NextRequest) {
   });
   if (!caller) return err("Unauthorized", 401);
 
-  const orClauses: Record<string, unknown>[] = [
-    { visibility: "all" },
-    { visibility: "selfOnly", ownerUserId: caller.id },
-  ];
-  if (caller.divisionId) {
-    orClauses.push({ visibility: "division", divisionId: caller.divisionId });
-  }
-  if (caller.subUnitId) {
-    orClauses.push({ visibility: "subUnit", subUnitId: caller.subUnitId });
-  }
+  // Local/super admins see everything. Others see by-visibility OR clauses.
+  const where: Record<string, unknown> = isLocalAdmin(caller)
+    ? {}
+    : (() => {
+        const orClauses: Record<string, unknown>[] = [
+          { visibility: "all" },
+          { visibility: "selfOnly", ownerUserId: caller.id },
+        ];
+        if (caller.divisionId) {
+          orClauses.push({ visibility: "division", divisionId: caller.divisionId });
+        }
+        if (caller.subUnitId) {
+          orClauses.push({ visibility: "subUnit", subUnitId: caller.subUnitId });
+        }
+        return { OR: orClauses };
+      })();
 
   const documents = await prisma.document.findMany({
-    where: { OR: orClauses },
+    where,
     include: DOC_INCLUDE,
     orderBy: { createdAt: "desc" },
     take: 100,
