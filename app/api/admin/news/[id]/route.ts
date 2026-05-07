@@ -4,6 +4,91 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { canManageNews, isLocalOrSuperAdmin } from "@/lib/permissions";
+import { notifyMany } from "@/lib/notifyUser";
+
+function stripMarkdown(s: string): string {
+  return s
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/_([^_]+)_/g, "$1")
+    .replace(/^>\s?/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    .replace(/\n+/g, " ")
+    .trim();
+}
+
+async function notifyReviewers(newsId: string, params: {
+  authorId: string;
+  authorName: string;
+  title: string;
+  divisionId: string | null;
+  divisionName: string | null;
+}) {
+  const { authorId, authorName, title, divisionId, divisionName } = params;
+
+  // Eligible reviewers:
+  //   - division-scoped news: divisionAdmin in that division + all local/super
+  //   - all-divisions news: local/super only
+  // Excludes the author (two-person rule).
+  const where: Record<string, unknown> = divisionId === null
+    ? { role: { in: ["localAdmin", "superAdmin"] } }
+    : {
+        OR: [
+          { role: { in: ["localAdmin", "superAdmin"] } },
+          { role: "divisionAdmin", divisionId },
+        ],
+      };
+
+  const reviewers = await prisma.user.findMany({
+    where: { ...where, id: { not: authorId } },
+    select: { id: true },
+  });
+  if (!reviewers.length) return;
+
+  await notifyMany(reviewers.map(r => r.id), {
+    title: "News awaiting your review",
+    body: `${authorName} submitted "${title}" for review in ${divisionName ?? "All Divisions"}`,
+    url: `/admin/news/${newsId}`,
+  });
+}
+
+async function notifyAudience(newsId: string, params: {
+  title: string;
+  body: string;
+  divisionId: string | null;
+}) {
+  const { title, body, divisionId } = params;
+
+  // Audience: members in the division (or everyone for all-divisions news).
+  // Limit to verified+approved roles (anyone who can sign in counts —
+  // we keep the gate light since downstream notifyMany handles fan-out).
+  const where: Record<string, unknown> = divisionId === null
+    ? {}
+    : { divisionId };
+
+  const audience = await prisma.user.findMany({
+    where: {
+      ...where,
+      verified: true,
+      // Don't blast suspended/deleted accounts.
+      email: { not: { endsWith: "@deleted.invalid" } },
+    },
+    select: { id: true },
+  });
+  if (!audience.length) return;
+
+  const preview = stripMarkdown(body).slice(0, 150);
+  await notifyMany(audience.map(u => u.id), {
+    title,
+    body: preview,
+    url: `/news/${newsId}`,
+  });
+}
 
 const NEWS_INCLUDE = {
   division: { select: { id: true, code: true, name: true } },
@@ -156,6 +241,33 @@ export async function PATCH(
       data,
       include: NEWS_INCLUDE,
     });
+
+    // Fire notifications on key transitions. Non-fatal — never block the
+    // response on push delivery.
+    if (transitioned?.to === "inReview") {
+      try {
+        await notifyReviewers(updated.id, {
+          authorId: updated.authorId,
+          authorName: updated.author ? `${updated.author.firstName} ${updated.author.lastName}` : "An editor",
+          title: updated.title,
+          divisionId: updated.divisionId,
+          divisionName: updated.division?.name ?? null,
+        });
+      } catch (e) {
+        Sentry.captureException(e, { tags: { source: "news-notify-reviewers" }, extra: { newsId: updated.id } });
+      }
+    } else if (transitioned?.to === "published") {
+      try {
+        await notifyAudience(updated.id, {
+          title: updated.title,
+          body: updated.body,
+          divisionId: updated.divisionId,
+        });
+      } catch (e) {
+        Sentry.captureException(e, { tags: { source: "news-notify-audience" }, extra: { newsId: updated.id } });
+      }
+    }
+
     return ok({ news: updated, transitioned });
   } catch (e) {
     Sentry.captureException(e, { tags: { source: "news-update" }, extra: { newsId: news.id } });
