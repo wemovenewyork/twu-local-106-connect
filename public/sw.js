@@ -1,7 +1,7 @@
-// WMNY Shift Swap — Service Worker
+// TWU Local 106 Connect — Service Worker
 // Handles push notifications and offline app shell caching
 
-const CACHE_NAME = "wmny-shell-v1";
+const CACHE_NAME = "local106-shell-v1";
 
 // App shell: routes and static assets that must load offline
 const SHELL_URLS = [
@@ -103,7 +103,7 @@ self.addEventListener("fetch", (event) => {
 // ─── Push notifications ───────────────────────────────────────────────────────
 self.addEventListener("push", (event) => {
   if (!event.data) return;
-  let payload = { title: "WMNY Shift Swap", body: "New update", url: "/" };
+  let payload = { title: "TWU Local 106 Connect", body: "New update", url: "/" };
   try {
     payload = event.data.json();
   } catch {

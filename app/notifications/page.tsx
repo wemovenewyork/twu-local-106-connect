@@ -120,7 +120,7 @@ export default function NotificationsPage() {
       {/* Header */}
       <div style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(1,0,40,.85)", backdropFilter: "blur(24px)",
+        background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)",
         borderBottom: `1px solid ${C.bd}`, padding: "14px 20px",
         display: "flex", alignItems: "center", gap: 12,
       }}>

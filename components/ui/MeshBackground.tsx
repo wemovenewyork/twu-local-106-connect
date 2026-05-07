@@ -56,7 +56,7 @@ export default function MeshBackground() {
         {/* Orb 2 — gold, top-right */}
         <div style={orbStyle({
           width: "55vw", height: "55vw",
-          background: "radial-gradient(circle, rgba(209,173,56,.3) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(173,27,39,.3) 0%, transparent 70%)",
           top: "-10%", right: "-10%",
           animation: "meshOrb2 22s ease-in-out infinite",
           filter: "blur(50px)",
@@ -80,7 +80,7 @@ export default function MeshBackground() {
         {/* Orb 5 — gold accent, bottom-right */}
         <div style={orbStyle({
           width: "45vw", height: "45vw",
-          background: "radial-gradient(circle, rgba(209,173,56,.2) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(173,27,39,.2) 0%, transparent 70%)",
           bottom: "5%", right: "-5%",
           animation: "meshOrb5 24s ease-in-out infinite",
           filter: "blur(45px)",

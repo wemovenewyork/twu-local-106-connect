@@ -10,7 +10,7 @@ interface Particle {
   life: number;
 }
 
-const COLORS = ["#D1AD38", "#0249B5", "#ffffff", "#00C9A7", "#F59E0B", "#D1AD38", "#D1AD38"];
+const COLORS = ["#AD1B27", "#0249B5", "#ffffff", "#00C9A7", "#F59E0B", "#AD1B27", "#AD1B27"];
 
 export default function Confetti({ onDone }: { onDone?: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

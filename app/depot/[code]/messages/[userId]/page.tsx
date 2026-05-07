@@ -68,7 +68,7 @@ export default function ThreadPage() {
       api.post(`/notifications/mark-read-by-url`, {
         url: `/depot/${code}/messages/${counterpartId}`,
       }).then(() => {
-        window.dispatchEvent(new Event("wmny:notifications-changed"));
+        window.dispatchEvent(new Event("local106:notifications-changed"));
       }).catch(() => {});
       // Derive counterpart info from messages
       const cp = msgs.find(m => m.fromUserId === counterpartId)?.fromUser
@@ -205,7 +205,7 @@ export default function ThreadPage() {
         ) : "↓ Pull to refresh"}
       </div>
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(1,0,40,.9)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.9)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <button onClick={() => router.push(`/depot/${code}/messages`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
@@ -310,7 +310,7 @@ export default function ThreadPage() {
       </main>
 
       {/* Reply input */}
-      <div style={{ position: "sticky", bottom: 0, background: "rgba(1,0,40,.9)", backdropFilter: "blur(24px)", borderTop: `1px solid ${C.bd}`, padding: "12px 16px", maxWidth: 560, width: "100%", margin: "0 auto", boxSizing: "border-box" }}>
+      <div style={{ position: "sticky", bottom: 0, background: "rgba(26,31,77,.9)", backdropFilter: "blur(24px)", borderTop: `1px solid ${C.bd}`, padding: "12px 16px", maxWidth: 560, width: "100%", margin: "0 auto", boxSizing: "border-box" }}>
         {/* Quick reply templates */}
         {!text && (
           <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, scrollbarWidth: "none" }}>
@@ -369,7 +369,7 @@ export default function ThreadPage() {
       </div>
 
       {toast && (
-        <div style={{ position: "fixed", bottom: 80, left: "50%", transform: "translateX(-50%)", background: toast.type === "error" ? "rgba(255,71,87,.15)" : "rgba(1,0,40,.95)", backdropFilter: "blur(16px)", border: `1px solid ${toast.type === "error" ? "rgba(255,71,87,.3)" : C.bd}`, borderRadius: 14, padding: "10px 18px", fontSize: 13, fontWeight: 600, color: C.white, zIndex: 500 }}>
+        <div style={{ position: "fixed", bottom: 80, left: "50%", transform: "translateX(-50%)", background: toast.type === "error" ? "rgba(255,71,87,.15)" : "rgba(26,31,77,.95)", backdropFilter: "blur(16px)", border: `1px solid ${toast.type === "error" ? "rgba(255,71,87,.3)" : C.bd}`, borderRadius: 14, padding: "10px 18px", fontSize: 13, fontWeight: 600, color: C.white, zIndex: 500 }}>
           {toast.message}
         </div>
       )}

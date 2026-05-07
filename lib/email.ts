@@ -1,6 +1,8 @@
+import { brand } from "@/config/brand";
+
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_ADDRESS = process.env.EMAIL_FROM ?? "noreply@wmnyshiftswap.com";
-const REPLY_TO = process.env.EMAIL_REPLY_TO;
+const FROM_ADDRESS = process.env.EMAIL_FROM ?? brand.emailFrom;
+const REPLY_TO = process.env.EMAIL_REPLY_TO ?? brand.emailReplyTo;
 
 export async function sendEmail(to: string, subject: string, html: string, text?: string): Promise<void> {
   if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not set");

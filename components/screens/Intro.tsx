@@ -50,7 +50,7 @@ export default function Intro({ onDone }: { onDone: () => void }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: `radial-gradient(ellipse at 40% 30%, #000070 0%, #010028 55%, #000010 100%)`,
+        background: `radial-gradient(ellipse at 40% 30%, #000070 0%, #1A1F4D 55%, #000010 100%)`,
         opacity: exiting ? 0 : 1,
         transition: "opacity .65s ease",
         cursor: "pointer",

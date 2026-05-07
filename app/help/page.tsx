@@ -9,15 +9,15 @@ import Icon from "@/components/ui/Icon";
 const faqs = [
   {
     q: "How do I post a swap?",
-    a: "Tap \"Post a Swap\", choose your swap type, fill in your shift details, and submit. Your swap will be visible to all operators at your depot.",
+    a: "Tap \"Post a Swap\", choose your swap type, fill in your shift details, and submit. Your swap will be visible to all members at your depot.",
   },
   {
-    q: "What happens after both operators confirm?",
+    q: "What happens after both members confirm?",
     a: "Once both parties tap \"Agree to Swap\", the agreement is locked and you can print a confirmation PDF to bring to your supervisor. The swap still requires supervisor approval.",
   },
   {
     q: "Can my supervisor override this?",
-    a: "Yes. WMNY is a coordination tool only. All swaps must comply with your depot's official procedures and receive supervisor approval.",
+    a: "Yes. TWU Local 106 Connect is a coordination tool only. All swaps must comply with your depot's official procedures and receive supervisor approval.",
   },
   {
     q: "How do Mutual Matches work?",
@@ -36,7 +36,7 @@ const faqs = [
 function AccordionItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderRadius: 14, border: `1px solid ${open ? "rgba(209,173,56,.3)" : C.bd}`, background: open ? "rgba(209,173,56,.04)" : "rgba(255,255,255,.025)", marginBottom: 8, overflow: "hidden", transition: "all .2s" }}>
+    <div style={{ borderRadius: 14, border: `1px solid ${open ? "rgba(173,27,39,.3)" : C.bd}`, background: open ? "rgba(173,27,39,.04)" : "rgba(255,255,255,.025)", marginBottom: 8, overflow: "hidden", transition: "all .2s" }}>
       <button
         onClick={() => setOpen(o => !o)}
         style={{ width: "100%", padding: "16px 18px", background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, textAlign: "left" }}
@@ -58,7 +58,7 @@ export default function HelpPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(1,0,40,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <button
           onClick={() => router.back()}
           aria-label="Go back"
@@ -72,7 +72,7 @@ export default function HelpPage() {
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 520, margin: "0 auto", padding: "28px 20px 100px" }}>
         <div style={{ marginBottom: 28 }}>
           <h1 style={{ fontSize: 26, fontWeight: 800, background: `linear-gradient(135deg,${C.white},${C.gold}88)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 6 }}>Frequently Asked Questions</h1>
-          <p style={{ fontSize: 13, color: C.m, lineHeight: 1.6, marginBottom: 16 }}>Everything you need to know about using WMNY Shift Swap.</p>
+          <p style={{ fontSize: 13, color: C.m, lineHeight: 1.6, marginBottom: 16 }}>Everything you need to know about using TWU Local 106 Connect.</p>
           <button
             onClick={() => router.push("/how-it-works")}
             style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px", borderRadius: 14, border: `1px solid ${C.gold}33`, background: `${C.gold}08`, cursor: "pointer", width: "100%" }}

@@ -1,4 +1,5 @@
 import { randomBytes } from "crypto";
+import { brand } from "@/config/brand";
 
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -8,5 +9,5 @@ export function genInviteCode(): string {
   for (const byte of bytes) {
     suffix += CHARS[byte % CHARS.length];
   }
-  return `WMNY-${suffix}`;
+  return `${brand.inviteCodePrefix}-${suffix}`;
 }

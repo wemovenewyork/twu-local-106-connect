@@ -75,7 +75,7 @@ export default function PushBanner() {
       margin: "0 0 12px",
       borderRadius: 16,
       border: `1px solid ${isBlocked ? C.red + "44" : C.gold + "33"}`,
-      background: isBlocked ? "rgba(239,68,68,.06)" : "rgba(209,173,56,.06)",
+      background: isBlocked ? "rgba(239,68,68,.06)" : "rgba(173,27,39,.06)",
       padding: "14px 16px",
       display: "flex",
       alignItems: "center",
@@ -83,7 +83,7 @@ export default function PushBanner() {
     }}>
       <div style={{
         width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-        background: isBlocked ? "rgba(239,68,68,.12)" : "rgba(209,173,56,.12)",
+        background: isBlocked ? "rgba(239,68,68,.12)" : "rgba(173,27,39,.12)",
         border: `1px solid ${isBlocked ? C.red + "33" : C.gold + "33"}`,
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>

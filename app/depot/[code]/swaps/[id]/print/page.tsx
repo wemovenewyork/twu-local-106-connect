@@ -106,7 +106,7 @@ export default function PrintAgreementPage() {
 
       <div className="page">
         <div className="header-bar">
-          <div className="logo">WE MOVE NEW YORK</div>
+          <div className="logo">TWU LOCAL 106</div>
           <div style={{ fontSize: 11, color: "#888" }}>Shift Swap Agreement</div>
         </div>
 
@@ -243,12 +243,12 @@ export default function PrintAgreementPage() {
         </div>
 
         <div className="footer">
-          WMNY Shift Swap — Unofficial peer-to-peer shift swap tool — Not affiliated with the MTA or any transit union<br />
-          Generated from wmnyshiftswap.com · Swap ID: {swap.id}
+          TWU Local 106 Connect — Official member portal of TWU Local 106 (Transit Supervisors Organization) — Not affiliated with the MTA, MaBSTOA, or MTA Bus<br />
+          Generated from twu-local-106-connect.vercel.app · Swap ID: {swap.id}
         </div>
 
         <div className="no-print" style={{ marginTop: 32, textAlign: "center" }}>
-          <button onClick={() => window.print()} style={{ padding: "12px 28px", borderRadius: 12, border: "none", background: "#010028", color: "#D1AD38", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
+          <button onClick={() => window.print()} style={{ padding: "12px 28px", borderRadius: 12, border: "none", background: "#1A1F4D", color: "#AD1B27", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
             Save / Print PDF
           </button>
         </div>

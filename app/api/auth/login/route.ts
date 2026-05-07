@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       user.depotId &&
       !isDepotInSoftLaunch(user.depot?.code)
     ) {
-      return err(`WMNY Shift Swap is currently in limited soft launch. We'll be at your depot soon!`, 403);
+      return err(`TWU Local 106 Connect is currently in limited soft launch. We'll be at your depot soon!`, 403);
     }
 
     const payload = { userId: user.id, email: user.email };

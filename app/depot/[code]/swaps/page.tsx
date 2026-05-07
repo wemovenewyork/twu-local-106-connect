@@ -287,7 +287,7 @@ export default function BrowsePage() {
           <span style={{ display: "inline-block", width: 14, height: 14, border: `2px solid ${C.m}`, borderTopColor: "transparent", borderRadius: "50%", animation: "rotateLogo 0.6s linear infinite", verticalAlign: "middle" }} />
         ) : "↓ Pull to refresh"}
       </div>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(1,0,40,.75)", borderBottom: `1px solid ${C.bd}`, padding: "12px 12px", display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "12px 12px", display: "flex", alignItems: "center", gap: 6 }}>
         <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon n="back" s={15} /></button>
         <DepotBadge depot={depot} size={32} />
         <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: C.white, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{depot.name}</div>
@@ -306,7 +306,7 @@ export default function BrowsePage() {
             </button>
           </>
         )}
-        <button onClick={() => { playClick(); router.push(`/depot/${code}/post`); }} style={{ padding: "7px 12px", borderRadius: 10, border: "none", cursor: "pointer", background: "#D1AD38", fontSize: 12, fontWeight: 700, color: "#010028", flexShrink: 0 }}>+ Post</button>
+        <button onClick={() => { playClick(); router.push(`/depot/${code}/post`); }} style={{ padding: "7px 12px", borderRadius: 10, border: "none", cursor: "pointer", background: "#AD1B27", fontSize: 12, fontWeight: 700, color: "#1A1F4D", flexShrink: 0 }}>+ Post</button>
       </div>
 
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 720, margin: "0 auto", padding: "0 20px" }}>

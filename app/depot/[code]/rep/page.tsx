@@ -31,8 +31,8 @@ function ActivityChart({ data }: { data: DayData[] }) {
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: 72 }} aria-label="30-day activity chart" role="img">
       <defs>
         <linearGradient id="rc-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#D1AD38" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#D1AD38" stopOpacity="0" />
+          <stop offset="0%" stopColor="#AD1B27" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#AD1B27" stopOpacity="0" />
         </linearGradient>
         <linearGradient id="rc-teal" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#00C9A7" stopOpacity="0.2" />
@@ -41,7 +41,7 @@ function ActivityChart({ data }: { data: DayData[] }) {
       </defs>
       <path d={areaPath("posted")} fill="url(#rc-gold)" />
       <path d={areaPath("agreements")} fill="url(#rc-teal)" />
-      <path d={linePath("posted")} fill="none" stroke="#D1AD38" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d={linePath("posted")} fill="none" stroke="#AD1B27" strokeWidth="1.5" strokeLinejoin="round" />
       <path d={linePath("agreements")} fill="none" stroke="#00C9A7" strokeWidth="1.5" strokeLinejoin="round" strokeDasharray="4 2" />
       <line x1="0" y1={H - padB} x2={W} y2={H - padB} stroke="rgba(255,255,255,.06)" strokeWidth="1" />
       {labelIdxs.map(i => data[i] ? (
@@ -138,7 +138,7 @@ export default function RepDashboardPage() {
   return (
     <div style={{ minHeight: "100vh", paddingBottom: 40 }}>
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(1,0,40,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
@@ -274,10 +274,10 @@ export default function RepDashboardPage() {
                 value={`${appUrl}/login?invite=${qrCode}`}
                 size={200}
                 bgColor="#ffffff"
-                fgColor="#010028"
+                fgColor="#1A1F4D"
                 level="M"
               />
-              <div style={{ fontSize: 11, color: "#010028", fontWeight: 700, letterSpacing: 2 }}>{qrCode}</div>
+              <div style={{ fontSize: 11, color: "#1A1F4D", fontWeight: 700, letterSpacing: 2 }}>{qrCode}</div>
               <div style={{ fontSize: 10, color: "#666", textAlign: "center" }}>Scan to register with this invite code pre-filled</div>
             </div>
           )}

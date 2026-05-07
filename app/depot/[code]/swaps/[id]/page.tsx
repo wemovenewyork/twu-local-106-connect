@@ -49,7 +49,7 @@ export default function SwapDetailPage() {
     const url = window.location.href;
     const text = `Check out this swap: ${swap?.details?.slice(0, 80)}`;
     if (navigator.share) {
-      await navigator.share({ title: "WMNY Shift Swap", text, url }).catch(() => {});
+      await navigator.share({ title: "TWU Local 106 Connect", text, url }).catch(() => {});
     } else {
       await navigator.clipboard.writeText(url).catch(() => {});
       showToast("Link copied!");
@@ -82,7 +82,7 @@ export default function SwapDetailPage() {
     api.post(`/notifications/mark-read-by-url`, {
       url: `/depot/${code}/swaps/${id}`,
     }).then(() => {
-      window.dispatchEvent(new Event("wmny:notifications-changed"));
+      window.dispatchEvent(new Event("local106:notifications-changed"));
     }).catch(() => {});
   }, [id, user, code, router]);
 
@@ -144,7 +144,7 @@ export default function SwapDetailPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(1,0,40,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <button onClick={() => router.push(`/depot/${code}/swaps`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid " + C.bd, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
         <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>Swap Details</div>
         <button onClick={handleShare} aria-label="Share this swap" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>

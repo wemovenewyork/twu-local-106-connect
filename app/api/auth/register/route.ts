@@ -9,6 +9,7 @@ import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { parseBody, BODY_4KB } from "@/lib/parseBody";
 import { sendEmail } from "@/lib/email";
 import { escapeHtml } from "@/lib/escapeHtml";
+import { brand } from "@/config/brand";
 
 export async function POST(req: NextRequest) {
   // Validate env at the top — if this throws after user creation (old position) it
@@ -137,18 +138,18 @@ export async function POST(req: NextRequest) {
   try {
     await sendEmail(
       user.email,
-      "Verify your WMNY Shift Swap email",
-      `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#010028;color:#fff;border-radius:16px">
+      `Verify your ${brand.name} email`,
+      `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:${brand.colors.navy};color:#fff;border-radius:16px">
         <h1 style="font-size:22px;font-weight:800;margin-bottom:8px">Verify your email</h1>
         <p style="color:rgba(255,255,255,.6);font-size:14px;line-height:1.6;margin-bottom:24px">
-          Hi ${safeFirstName}, thanks for joining WMNY Shift Swap! Please verify your email address to activate your account.
+          Hi ${safeFirstName}, thanks for joining ${brand.name}! Please verify your email address to activate your account.
           This link expires in 24 hours.
         </p>
-        <a href="${verifyLink}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:#D1AD38;color:#010028;font-weight:700;font-size:15px;text-decoration:none">
+        <a href="${verifyLink}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:${brand.colors.red};color:#fff;font-weight:700;font-size:15px;text-decoration:none">
           Verify Email
         </a>
         <p style="color:rgba(255,255,255,.4);font-size:12px;margin-top:24px">
-          If you didn't create a WMNY Shift Swap account, you can safely ignore this email.
+          If you didn't create a ${brand.name} account, you can safely ignore this email.
         </p>
       </div>`
     );

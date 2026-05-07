@@ -21,12 +21,12 @@ export default function GlobalError({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>WMNY Shift Swap — Error</title>
+        <title>TWU Local 106 Connect — Error</title>
       </head>
       <body
         style={{
           margin: 0,
-          background: "#010028",
+          background: "#1A1F4D",
           fontFamily: "system-ui, sans-serif",
           display: "flex",
           minHeight: "100vh",
@@ -44,9 +44,9 @@ export default function GlobalError({
             color: "#fff",
           }}
         >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🚌</div>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>👷</div>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 12px" }}>
-            WMNY Shift Swap is having trouble
+            TWU Local 106 Connect is having trouble
           </h1>
           <p
             style={{
@@ -66,10 +66,10 @@ export default function GlobalError({
               borderRadius: 14,
               border: "none",
               cursor: "pointer",
-              background: "#D1AD38",
+              background: "#AD1B27",
               fontSize: 15,
               fontWeight: 700,
-              color: "#010028",
+              color: "#FFFFFF",
             }}
           >
             Refresh

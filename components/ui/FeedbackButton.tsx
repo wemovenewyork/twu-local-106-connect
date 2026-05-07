@@ -26,7 +26,7 @@ export default function FeedbackButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        style={{ position: "fixed", bottom: 80, right: 16, zIndex: 200, width: 40, height: 40, borderRadius: "50%", border: `1px solid ${C.bd}`, background: "rgba(1,0,40,.9)", backdropFilter: "blur(12px)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.m, boxShadow: "0 4px 16px rgba(0,0,0,.3)" }}
+        style={{ position: "fixed", bottom: 80, right: 16, zIndex: 200, width: 40, height: 40, borderRadius: "50%", border: `1px solid ${C.bd}`, background: "rgba(26,31,77,.9)", backdropFilter: "blur(12px)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.m, boxShadow: "0 4px 16px rgba(0,0,0,.3)" }}
         aria-label="Send feedback"
         title="Send feedback"
       >

@@ -7,7 +7,7 @@ interface ToastProps { message: string; type?: "success" | "error" | "info"; }
 export default function Toast({ message, type = "success" }: ToastProps) {
   const styles = {
     success: {
-      background: "rgba(1,0,40,.9)",
+      background: "rgba(26,31,77,.9)",
       borderColor: C.gold,
       iconColor: C.gold,
       icon: (

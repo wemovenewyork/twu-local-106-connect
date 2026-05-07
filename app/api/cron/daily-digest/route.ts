@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     const success = await sendPush(
       { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
       {
-        title: "WMNY Shift Swap — Daily Digest",
+        title: "TWU Local 106 Connect — Daily Digest",
         body: `${count} new swap${count === 1 ? "" : "s"} posted at your depot today.`,
         url: "/depots",
       }

@@ -12,7 +12,7 @@ const STEPS = [
     n: "01",
     color: C.gold,
     title: "Get Your Invite",
-    desc: "WMNY Shift Swap is operator-to-operator. Every new member joins with an invite code from a fellow operator. No management, no gatekeeping.",
+    desc: "TWU Local 106 Connect is supervisor-to-supervisor. Every new member joins with an invite code from a fellow Local 106 member. No management, no gatekeeping.",
     detail: "When you join, you automatically receive 3 invite codes to share with colleagues at your depot.",
     visual: <InviteVisual />,
   },
@@ -20,7 +20,7 @@ const STEPS = [
     n: "02",
     color: C.blue,
     title: "Set Your Depot",
-    desc: "Pick your home depot. Your swap board is shared only with operators at your location — keeping everything relevant and local.",
+    desc: "Pick your home depot. Your swap board is shared only with members at your location — keeping everything relevant and local.",
     detail: "You can update your depot once every 7 days if you transfer.",
     visual: <DepotVisual />,
   },
@@ -36,7 +36,7 @@ const STEPS = [
     n: "04",
     color: "#C084FC",
     title: "Get Matched",
-    desc: "Browse open swaps from your depot. Our auto-matcher also scans the board and flags operators whose schedules complement yours.",
+    desc: "Browse open swaps from your depot. Our auto-matcher also scans the board and flags members whose schedules complement yours.",
     detail: "A Mutual Match means both your schedules work for each other — the hardest part is already done.",
     visual: <MatchVisual />,
   },
@@ -44,16 +44,16 @@ const STEPS = [
     n: "05",
     color: C.gold,
     title: "Message & Agree",
-    desc: "Message the other operator directly to confirm details. When you're both ready, submit a formal swap agreement — one tap each.",
-    detail: "Messages are private between the two of you. The agreement records both operators' names and the swap details.",
+    desc: "Message the other member directly to confirm details. When you're both ready, submit a formal swap agreement — one tap each.",
+    detail: "Messages are private between the two of you. The agreement records both members' names and the swap details.",
     visual: <AgreementVisual />,
   },
   {
     n: "06",
     color: "#2ED573",
     title: "Print & Present",
-    desc: "Once both operators confirm, a timestamped agreement is generated. Print it or show it on your phone to your dispatcher.",
-    detail: "The agreement still requires supervisor approval per your depot's procedures — WMNY Shift Swap coordinates the swap, it doesn't replace management sign-off.",
+    desc: "Once both members confirm, a timestamped agreement is generated. Print it or show it on your phone to your dispatcher.",
+    detail: "The agreement still requires supervisor approval per your depot's procedures — TWU Local 106 Connect coordinates the swap, it doesn't replace management sign-off.",
     visual: <PrintVisual />,
   },
 ];
@@ -63,11 +63,11 @@ const STEPS = [
 function InviteVisual() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
-      <div style={{ padding: "10px 20px", borderRadius: 12, background: `${C.gold}18`, border: `1px solid ${C.gold}44`, fontFamily: "monospace", fontSize: 15, fontWeight: 800, color: C.gold, letterSpacing: 3 }}>WMNY-K7X4</div>
+      <div style={{ padding: "10px 20px", borderRadius: 12, background: `${C.gold}18`, border: `1px solid ${C.gold}44`, fontFamily: "monospace", fontSize: 15, fontWeight: 800, color: C.gold, letterSpacing: 3 }}>L106-K7X4</div>
       <div style={{ fontSize: 11, color: C.m }}>Your invite code</div>
       <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
         {["K4J2","M9P1","R3N8"].map(c => (
-          <div key={c} style={{ padding: "5px 10px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: `1px solid rgba(255,255,255,.08)`, fontSize: 11, color: "rgba(255,255,255,.4)", letterSpacing: 1 }}>WMNY-{c}</div>
+          <div key={c} style={{ padding: "5px 10px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: `1px solid rgba(255,255,255,.08)`, fontSize: 11, color: "rgba(255,255,255,.4)", letterSpacing: 1 }}>L106-{c}</div>
         ))}
       </div>
       <div style={{ fontSize: 11, color: C.m, marginTop: 2 }}>3 codes to share with colleagues</div>
@@ -247,7 +247,7 @@ export default function HowItWorksPage() {
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(1,0,40,.85)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <button
           onClick={() => router.back()}
           style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}
@@ -263,7 +263,7 @@ export default function HowItWorksPage() {
         {/* Hero */}
         <div style={{ textAlign: "center", padding: "48px 16px 40px" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-            <Image src="/bus-logo.png" alt="We Move NY" width={200} height={95} style={{ width: 200, height: "auto" }} />
+            <Image src="/bus-logo.png" alt="TWU Local 106" width={200} height={95} style={{ width: 200, height: "auto" }} />
           </div>
           <h1 style={{
             fontSize: "clamp(26px,5vw,36px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 14,

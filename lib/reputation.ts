@@ -28,7 +28,7 @@ export function calcScore(r: RepData): RepScore {
 
   let label = "Caution";
   let color = "#FF4757";
-  if (score >= 90) { label = "Elite"; color = "#D1AD38"; }
+  if (score >= 90) { label = "Elite"; color = "#AD1B27"; }
   else if (score >= 75) { label = "Trusted"; color = "#2ED573"; }
   else if (score >= 50) { label = "Active"; color = "#0249B5"; }
 

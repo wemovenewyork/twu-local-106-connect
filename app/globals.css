@@ -3,12 +3,12 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-size: 19px; }
 body {
-  background: #010028;
+  background: #1A1F4D;
   font-family: 'Poppins', sans-serif;
   overflow-x: hidden;
   color: #fff;
 }
-::selection { background: #D1AD38; color: #010028; }
+::selection { background: #AD1B27; color: #FFFFFF; }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
@@ -34,15 +34,15 @@ input[type="date"] {
 select {
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23D1AD38' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23AD1B27' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
   padding-right: 44px;
 }
 input:focus, textarea:focus, select:focus {
-  border-color: rgba(209,173,56,.45);
+  border-color: rgba(173,27,39,.45);
   background: rgba(255,255,255,.06);
-  box-shadow: 0 0 0 3px rgba(209,173,56,.08);
+  box-shadow: 0 0 0 3px rgba(173,27,39,.08);
 }
 input::placeholder, textarea::placeholder { color: rgba(255,255,255,.3); }
 /* Hide native browser password reveal icons so custom Show/Hide button is visible */
@@ -52,9 +52,9 @@ input[type="password"]::-webkit-contacts-auto-fill-button,
 input[type="password"]::-webkit-credentials-auto-fill-button { display: none !important; }
 button { font-family: 'Poppins', sans-serif; transition: all .2s ease; }
 button:active { transform: scale(.97); filter: brightness(1.1); }
-button:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
-input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
-a:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
+button:focus-visible { outline: 2px solid #AD1B27; outline-offset: 2px; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #AD1B27; outline-offset: 2px; }
+a:focus-visible { outline: 2px solid #AD1B27; outline-offset: 2px; }
 
 .skip-link {
   position: absolute;
@@ -71,8 +71,8 @@ a:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
   width: auto;
   height: auto;
   padding: 12px 20px;
-  background: #D1AD38;
-  color: #010028;
+  background: #AD1B27;
+  color: #FFFFFF;
   font-weight: 700;
   font-size: 14px;
   z-index: 9999;
@@ -148,7 +148,7 @@ a:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
 @keyframes rippleOut { from{transform:scale(0);opacity:.5} to{transform:scale(2.5);opacity:0} }
 
 /* Pulse badge */
-@keyframes pulseBadge { 0%,100%{box-shadow:0 0 0 0 rgba(209,173,56,.4)} 50%{box-shadow:0 0 0 6px rgba(209,173,56,0)} }
+@keyframes pulseBadge { 0%,100%{box-shadow:0 0 0 0 rgba(173,27,39,.4)} 50%{box-shadow:0 0 0 6px rgba(173,27,39,0)} }
 
 /* Logo rotate */
 @keyframes rotateLogo { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
@@ -165,7 +165,7 @@ a:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
 /* Shimmer skeleton */
 @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
 .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(209,173,56,.12) 50%, rgba(255,255,255,.04) 75%);
+  background: linear-gradient(90deg, rgba(255,255,255,.04) 25%, rgba(173,27,39,.12) 50%, rgba(255,255,255,.04) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.8s infinite;
   border-radius: 10px;
@@ -186,8 +186,8 @@ a:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
 
 /* Glow border pulse */
 @keyframes glowBorder {
-  0%,100% { box-shadow: 0 0 0 0 rgba(209,173,56,0); }
-  50%      { box-shadow: 0 0 24px 4px rgba(209,173,56,.35), 0 0 60px 8px rgba(209,173,56,.1); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(173,27,39,0); }
+  50%      { box-shadow: 0 0 24px 4px rgba(173,27,39,.35), 0 0 60px 8px rgba(173,27,39,.1); }
 }
 .glow-border { animation: glowBorder 2.5s ease-in-out infinite; }
 
@@ -209,8 +209,8 @@ a:focus-visible { outline: 2px solid #D1AD38; outline-offset: 2px; }
 
 /* Tab indicator glow */
 @keyframes tabGlow {
-  0%,100% { box-shadow: 0 0 8px rgba(209,173,56,.5); }
-  50%      { box-shadow: 0 0 18px rgba(209,173,56,.9); }
+  0%,100% { box-shadow: 0 0 8px rgba(173,27,39,.5); }
+  50%      { box-shadow: 0 0 18px rgba(173,27,39,.9); }
 }
 
 /* Fade-scale (modal/overlay entrance) */

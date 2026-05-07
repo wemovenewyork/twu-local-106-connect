@@ -132,8 +132,8 @@ export default function OnboardingChecklist({ userId, depotCode }: Props) {
                 gap: 10,
                 padding: "8px 10px",
                 borderRadius: 10,
-                background: isFirst && !done ? "rgba(209,173,56,.08)" : "rgba(255,255,255,.03)",
-                border: `1px solid ${isFirst && !done ? "rgba(209,173,56,.2)" : "rgba(255,255,255,.06)"}`,
+                background: isFirst && !done ? "rgba(173,27,39,.08)" : "rgba(255,255,255,.03)",
+                border: `1px solid ${isFirst && !done ? "rgba(173,27,39,.2)" : "rgba(255,255,255,.06)"}`,
                 opacity: done ? 0.5 : 1,
               }}>
                 <div style={{

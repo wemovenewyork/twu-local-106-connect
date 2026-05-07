@@ -66,8 +66,8 @@ export default function LandingPage() {
           to   { opacity: 1; transform: translateX(0)    scale(1); }
         }
         @keyframes busGlow {
-          0%,100% { filter: drop-shadow(0 12px 28px rgba(0,102,204,0.35)) drop-shadow(0 0 0px rgba(209,173,56,0)); }
-          50%      { filter: drop-shadow(0 20px 48px rgba(0,102,204,0.55)) drop-shadow(0 0 24px rgba(209,173,56,0.2)); }
+          0%,100% { filter: drop-shadow(0 12px 28px rgba(0,102,204,0.35)) drop-shadow(0 0 0px rgba(173,27,39,0)); }
+          50%      { filter: drop-shadow(0 20px 48px rgba(0,102,204,0.55)) drop-shadow(0 0 24px rgba(173,27,39,0.2)); }
         }
         @keyframes spinSlow {
           to { transform: translate(-50%, -55%) rotate(360deg); }
@@ -102,7 +102,7 @@ export default function LandingPage() {
       }}>
         <Image
           src="/bus-logo.png"
-          alt="We Move New York bus"
+          alt="TWU Local 106"
           width={640}
           height={304}
           style={{ width: "100%", height: "auto", display: "block" }}

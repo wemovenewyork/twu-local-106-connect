@@ -6,7 +6,7 @@ import Icon from "@/components/ui/Icon";
 
 const s = {
   page: { minHeight: "100vh", color: C.white } as React.CSSProperties,
-  header: { position: "sticky" as const, top: 0, zIndex: 100, background: "rgba(1,0,40,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 },
+  header: { position: "sticky" as const, top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 },
   content: { maxWidth: 680, margin: "0 auto", padding: "32px 24px 80px" },
   h1: { fontSize: 26, fontWeight: 800, color: C.white, marginBottom: 6 },
   updated: { fontSize: 12, color: C.m, marginBottom: 36 },
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>1. Overview</h2>
-          <p style={s.p}>We Move New York ("WMNY," "we," "us") is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your data. By using the App, you agree to the practices described in this policy.</p>
+          <p style={s.p}>TWU Local 106 Connect ("we," "us") is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your data. By using the App, you agree to the practices described in this policy.</p>
         </div>
 
         <hr style={s.divider} />
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
           <ul style={{ listStyle: "disc", paddingLeft: 24, marginBottom: 12 }}>
             <li style={s.li}>To operate and maintain the swap coordination platform.</li>
             <li style={s.li}>To display your profile, reputation, and listings to other verified users.</li>
-            <li style={s.li}>To send you messages from other operators about your swap posts.</li>
+            <li style={s.li}>To send you messages from other supervisors about your swap posts.</li>
             <li style={s.li}>To enforce our Terms of Use and investigate reported content.</li>
             <li style={s.li}>To improve the App&apos;s features and user experience.</li>
           </ul>

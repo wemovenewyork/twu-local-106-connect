@@ -6,6 +6,7 @@ import { ok, err } from "@/lib/apiResponse";
 import { notifyUserWithEmailFallback } from "@/lib/notifyUser";
 import { parseBody, BODY_4KB } from "@/lib/parseBody";
 import { escapeHtml } from "@/lib/escapeHtml";
+import { brand } from "@/config/brand";
 
 export async function GET(req: NextRequest) {
   let user;
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
       url: threadUrl,
     },
     `New message from ${safeSenderName}`,
-    `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#010028;color:#fff;border-radius:16px">
+    `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:${brand.colors.navy};color:#fff;border-radius:16px">
       <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">New message from ${safeSenderName}</h2>
       <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6">${safeText}</p>
     </div>`

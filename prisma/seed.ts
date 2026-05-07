@@ -39,7 +39,7 @@ const DEPOTS = [
 
 function genCode(): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "WMNY-";
+  let code = "L106-";
   for (let i = 0; i < 5; i++) {
     code += chars[Math.floor(Math.random() * chars.length)];
   }
@@ -59,10 +59,10 @@ async function main() {
   console.log("Seeding seed invite codes...");
   // Create a system user to own seed codes
   const systemUser = await prisma.user.upsert({
-    where: { email: "system@wemoveny.internal" },
+    where: { email: "system@local106.internal" },
     update: {},
     create: {
-      email: "system@wemoveny.internal",
+      email: "system@local106.internal",
       passwordHash: await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10),
       firstName: "System",
       lastName: "Admin",
@@ -70,7 +70,7 @@ async function main() {
     },
   });
 
-  const seedCodes = ["WMNY-2024A", "WMNY-2024B", "WMNY-2024C"];
+  const seedCodes = ["L106-2024A", "L106-2024B", "L106-2024C"];
   for (const code of seedCodes) {
     await prisma.inviteCode.upsert({
       where: { code },
@@ -80,7 +80,7 @@ async function main() {
   }
 
   console.log("Seeding admin account...");
-  const adminHash = await bcrypt.hash("WMNYshiftswap0334", 10);
+  const adminHash = await bcrypt.hash("L106connect0334", 10);
   await prisma.user.upsert({
     where: { email: "wemovenewyork.net@gmail.com" },
     update: {},
@@ -88,7 +88,7 @@ async function main() {
       email: "wemovenewyork.net@gmail.com",
       passwordHash: adminHash,
       firstName: "Admin",
-      lastName: "WeMoveNY",
+      lastName: "Local106",
       verified: true,
       role: "admin",
     },

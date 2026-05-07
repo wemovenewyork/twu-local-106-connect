@@ -42,7 +42,7 @@ function IllustrationPost() {
       <style>{`
         @keyframes cardIn { from{opacity:0;transform:translateY(20px) scale(.95)} to{opacity:1;transform:translateY(0) scale(1)} }
         @keyframes fieldAppear { from{opacity:0;maxHeight:0} to{opacity:1;maxHeight:40px} }
-        @keyframes btnGlow { 0%,100%{box-shadow:0 0 0 0 rgba(209,173,56,0)} 50%{box-shadow:0 0 20px 4px rgba(209,173,56,.35)} }
+        @keyframes btnGlow { 0%,100%{box-shadow:0 0 0 0 rgba(173,27,39,0)} 50%{box-shadow:0 0 20px 4px rgba(173,27,39,.35)} }
         @keyframes cursor { 0%,100%{opacity:1} 50%{opacity:0} }
       `}</style>
       <div style={{ borderRadius: 16, border: `1px solid rgba(255,255,255,.1)`, background: "rgba(255,255,255,.04)", padding: 16, animation: "cardIn .5s ease both" }}>
@@ -143,7 +143,7 @@ const STEPS = [
   {
     color: C.gold,
     title: "Swapping Shifts\nMade Simple",
-    body: "WMNY Shift Swap is the fastest way for bus operators to swap work days, days off, and vacation weeks — peer to peer, no paperwork.",
+    body: "TWU Local 106 Connect is the fastest way for supervisors to swap work days, days off, and vacation weeks — peer to peer, no paperwork.",
     Illustration: IllustrationSwap,
   },
   {
@@ -198,7 +198,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       aria-label="App onboarding"
       style={{
         position: "fixed", inset: 0, zIndex: 9000,
-        background: "rgba(1,0,40,.98)",
+        background: "rgba(26,31,77,.98)",
         display: "flex", flexDirection: "column",
         overflow: "hidden",
       }}

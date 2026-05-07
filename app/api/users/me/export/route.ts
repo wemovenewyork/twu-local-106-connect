@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
   return new Response(JSON.stringify(payload, null, 2), {
     headers: {
       "Content-Type": "application/json",
-      "Content-Disposition": `attachment; filename="wmny-shift-swap-export-${date}.json"`,
+      "Content-Disposition": `attachment; filename="twu-local-106-connect-export-${date}.json"`,
     },
   });
 }

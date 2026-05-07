@@ -6,7 +6,7 @@ import Icon from "@/components/ui/Icon";
 
 const s = {
   page: { minHeight: "100vh", color: C.white } as React.CSSProperties,
-  header: { position: "sticky" as const, top: 0, zIndex: 100, background: "rgba(1,0,40,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 },
+  header: { position: "sticky" as const, top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 },
   content: { maxWidth: 680, margin: "0 auto", padding: "32px 24px 80px" },
   h1: { fontSize: 26, fontWeight: 800, color: C.white, marginBottom: 6 },
   updated: { fontSize: 12, color: C.m, marginBottom: 36 },
@@ -34,16 +34,16 @@ export default function TermsPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>1. Acceptance of Terms</h2>
-          <p style={s.p}>By accessing or using We Move New York ("the App," "WMNY"), you agree to be bound by these Terms of Use. If you do not agree to these terms, do not use the App. These terms apply to all users of the platform.</p>
+          <p style={s.p}>By accessing or using TWU Local 106 Connect ("the App"), you agree to be bound by these Terms of Use. If you do not agree to these terms, do not use the App. These terms apply to all users of the platform.</p>
         </div>
 
         <hr style={s.divider} />
 
         <div style={s.section}>
           <h2 style={s.h2}>2. Who Can Use This App</h2>
-          <p style={s.p}>We Move New York is intended exclusively for active NYC bus operators. Access requires a valid invite code issued by an existing member. By registering, you confirm that:</p>
+          <p style={s.p}>TWU Local 106 Connect is intended exclusively for active members of TWU Local 106 (the Transit Supervisors Organization). Access requires a valid invite code issued by an existing member. By registering, you confirm that:</p>
           <ul style={{ listStyle: "disc", paddingLeft: 24, marginBottom: 12 }}>
-            <li style={s.li}>You are a current bus operator.</li>
+            <li style={s.li}>You are a current TWU Local 106 member.</li>
             <li style={s.li}>The information you provide is accurate and truthful.</li>
             <li style={s.li}>You will not share your account credentials with others.</li>
             <li style={s.li}>You are at least 18 years of age.</li>
@@ -54,8 +54,8 @@ export default function TermsPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>3. Shift Swap Coordination</h2>
-          <p style={s.p}>We Move New York is a coordination tool only. It does not replace, supersede, or conflict with any MTA, TWU, or union collective bargaining agreements. All shift swaps must be conducted in accordance with your depot&apos;s official procedures and with supervisor approval.</p>
-          <p style={s.p}>WMNY makes no guarantee that a swap listed on the platform will be approved by management. Users are solely responsible for ensuring their swap complies with all applicable rules and agreements.</p>
+          <p style={s.p}>TWU Local 106 Connect is a coordination tool only. It does not replace, supersede, or conflict with any MTA, TWU, or union collective bargaining agreements. All shift swaps must be conducted in accordance with your depot&apos;s official procedures and with supervisor approval.</p>
+          <p style={s.p}>TWU Local 106 Connect makes no guarantee that a swap listed on the platform will be approved by management. Users are solely responsible for ensuring their swap complies with all applicable rules and agreements.</p>
         </div>
 
         <hr style={s.divider} />
@@ -78,7 +78,7 @@ export default function TermsPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>5. Reporting and Blocking</h2>
-          <p style={s.p}>We Move New York includes tools to help you manage unwanted contact:</p>
+          <p style={s.p}>TWU Local 106 Connect includes tools to help you manage unwanted contact:</p>
           <ul style={{ listStyle: "disc", paddingLeft: 24, marginBottom: 12 }}>
             <li style={s.li}>You may block any other user at any time from within the app. Blocked users will not be able to send you direct messages or contact you about your swap posts.</li>
             <li style={s.li}>You may report users who violate these Terms, including users engaged in harassment, fraud, or other prohibited conduct.</li>
@@ -97,14 +97,14 @@ export default function TermsPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>7. Invite Codes</h2>
-          <p style={s.p}>Each registered user receives invite codes to share with fellow operators. You are responsible for who you invite. Do not share invite codes publicly or with non-MTA personnel. Misuse of invite codes may result in suspension of your account and the invited account.</p>
+          <p style={s.p}>Each registered user receives invite codes to share with fellow Local 106 members. You are responsible for who you invite. Do not share invite codes publicly or with non-members. Misuse of invite codes may result in suspension of your account and the invited account.</p>
         </div>
 
         <hr style={s.divider} />
 
         <div style={s.section}>
           <h2 style={s.h2}>8. Disclaimer of Liability</h2>
-          <p style={s.p}>We Move New York is provided &quot;as is&quot; without warranties of any kind. We are not responsible for any disputes, missed shifts, denied swaps, or disciplinary actions arising from the use of this platform. Use at your own discretion and in accordance with your employer&apos;s policies.</p>
+          <p style={s.p}>TWU Local 106 Connect is provided &quot;as is&quot; without warranties of any kind. We are not responsible for any disputes, missed shifts, denied swaps, or disciplinary actions arising from the use of this platform. Use at your own discretion and in accordance with your employer&apos;s policies.</p>
         </div>
 
         <hr style={s.divider} />

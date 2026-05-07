@@ -23,12 +23,12 @@ export default function NotifIcon() {
     // bell badge updates instantly instead of waiting up to 30s for the next
     // poll. See app/depot/[code]/messages/[userId]/page.tsx and
     // app/depot/[code]/swaps/[id]/page.tsx.
-    window.addEventListener("wmny:notifications-changed", poll);
+    window.addEventListener("local106:notifications-changed", poll);
     return () => {
       clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("focus", poll);
-      window.removeEventListener("wmny:notifications-changed", poll);
+      window.removeEventListener("local106:notifications-changed", poll);
     };
   }, []);
 

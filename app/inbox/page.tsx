@@ -68,7 +68,7 @@ export default function InboxPage() {
       {/* Header */}
       <div style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(1,0,40,.85)", backdropFilter: "blur(24px)",
+        background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)",
         borderBottom: `1px solid ${C.bd}`, padding: "14px 20px",
         display: "flex", alignItems: "center", gap: 12,
       }}>
@@ -155,7 +155,7 @@ export default function InboxPage() {
                       {hasUnread && (
                         <span style={{
                           position: "absolute", top: -2, right: -2, width: 18, height: 18,
-                          borderRadius: "50%", background: C.red, border: "2px solid #010028",
+                          borderRadius: "50%", background: C.red, border: "2px solid #1A1F4D",
                           fontSize: 9, fontWeight: 700, color: "#fff",
                           display: "flex", alignItems: "center", justifyContent: "center",
                         }}>

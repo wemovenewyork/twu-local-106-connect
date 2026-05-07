@@ -23,7 +23,7 @@ export default function ErrorPage({
         alignItems: "center",
         justifyContent: "center",
         padding: "40px 20px",
-        background: "#010028",
+        background: "#1A1F4D",
         fontFamily: "var(--font-poppins, sans-serif)",
       }}
     >
@@ -87,10 +87,10 @@ export default function ErrorPage({
               borderRadius: 14,
               border: "none",
               cursor: "pointer",
-              background: "linear-gradient(135deg,#D1AD38,#D1AD38dd)",
+              background: "linear-gradient(135deg,#AD1B27,#AD1B27dd)",
               fontSize: 15,
               fontWeight: 700,
-              color: "#010028",
+              color: "#FFFFFF",
               width: "100%",
             }}
           >

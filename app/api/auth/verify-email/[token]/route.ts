@@ -5,6 +5,7 @@ import { ok, err } from "@/lib/apiResponse";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { sendEmail } from "@/lib/email";
 import { escapeHtml } from "@/lib/escapeHtml";
+import { brand } from "@/config/brand";
 
 export async function GET(
   req: NextRequest,
@@ -41,86 +42,89 @@ export async function GET(
     // The verify token is now cleared, so this branch can never fire twice
     // for the same user. Non-fatal: a failed send doesn't roll back verification,
     // it just gets reported to Sentry so we know if Resend is degraded.
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://wmnyshiftswap.com";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? brand.primaryUrl;
     const safeFirstName = escapeHtml(user.firstName);
-    const welcomeHtml = `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#010028;color:#fff;border-radius:16px">
-  <h1 style="font-size:22px;font-weight:800;margin:0 0 8px">Welcome aboard, ${safeFirstName} 🚌</h1>
+    const welcomeHtml = `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:${brand.colors.navy};color:#fff;border-radius:16px">
+  <h1 style="font-size:22px;font-weight:800;margin:0 0 8px">Welcome to ${brand.name}, ${safeFirstName} 👷</h1>
   <p style="color:rgba(255,255,255,.65);font-size:14px;line-height:1.6;margin:0 0 24px">
-    WMNY Shift Swap was built by operators, for operators — and you're now part of it.
+    Built for and by ${brand.unionName} supervisors — and you're now part of it.
   </p>
 
-  <a href="${appUrl}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:#D1AD38;color:#010028;font-weight:700;font-size:15px;text-decoration:none;margin-bottom:28px">
-    Open WMNY Shift Swap
+  <a href="${appUrl}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:${brand.colors.red};color:#fff;font-weight:700;font-size:15px;text-decoration:none;margin-bottom:28px">
+    Open ${brand.appShortName}
   </a>
 
-  <h2 style="font-size:14px;font-weight:700;color:#D1AD38;text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">The point</h2>
+  <h2 style="font-size:14px;font-weight:700;color:${brand.colors.red};text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">The point</h2>
   <p style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.7;margin:0 0 20px">
-    Coordinating swaps over group texts and bulletin boards is a mess. WMNY Shift Swap puts every available swap in one place where you can find it, message the operator directly, and lock the agreement in. Works for daily work swaps, RDOs, and vacation weeks.
+    Coordinating swaps over group texts and bulletin boards is a mess. ${brand.name} puts every available swap in one place where you can find it, message another supervisor directly, and lock the agreement in. Works for daily work swaps, RDOs, and vacation weeks.
   </p>
 
-  <h2 style="font-size:14px;font-weight:700;color:#D1AD38;text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">Two things to keep in mind</h2>
+  <h2 style="font-size:14px;font-weight:700;color:${brand.colors.red};text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">Two things to keep in mind</h2>
   <p style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.7;margin:0 0 20px">
-    WMNY Shift Swap is independent — not affiliated with the MTA or any union. And it doesn't change your swap process — every swap still goes through your dispatcher the normal way. We just help you find the swap faster.
+    ${brand.name} coordinates swaps but doesn't approve them — every swap still has to go through MTA / MaBSTOA / MTA Bus official approval procedures the normal way. The union does not approve or process shift swaps either. We just help you find the swap faster.
   </p>
 
-  <h2 style="font-size:14px;font-weight:700;color:#D1AD38;text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">Getting started</h2>
+  <h2 style="font-size:14px;font-weight:700;color:${brand.colors.red};text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">Getting started</h2>
   <ol style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.8;margin:0 0 20px;padding-left:20px">
     <li><strong style="color:#fff">Pick your depot.</strong> This is your home base — you'll see swaps from your depot first.</li>
-    <li><strong style="color:#fff">Post a swap or browse.</strong> Need a Saturday off? Post it. Looking to pick up a Tuesday run? Browse.</li>
-    <li><strong style="color:#fff">Message, agree, print.</strong> Talk it out in-app, confirm with the other operator, print the agreement, hand it to your dispatcher.</li>
+    <li><strong style="color:#fff">Post a swap or browse.</strong> Need a Saturday off? Post it. Looking to pick up a Tuesday shift? Browse.</li>
+    <li><strong style="color:#fff">Message, agree, print.</strong> Talk it out in-app, confirm with the other supervisor, print the agreement, follow your depot's normal approval steps.</li>
   </ol>
 
-  <h2 style="font-size:14px;font-weight:700;color:#D1AD38;text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">3 invite codes are waiting for you</h2>
+  <h2 style="font-size:14px;font-weight:700;color:${brand.colors.red};text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">Almost done</h2>
   <p style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.7;margin:0 0 12px">
-    Each new operator gets 3 invite codes to share. We grow this thing one trusted operator at a time. Find your codes in your profile — only share them with operators you'd vouch for.
+    Once your division admin approves your registration, you'll have full access.
   </p>
-  <a href="${appUrl}/profile" style="color:#D1AD38;font-size:13px;font-weight:600;text-decoration:underline">View my invite codes →</a>
 
-  <h2 style="font-size:14px;font-weight:700;color:#D1AD38;text-transform:uppercase;letter-spacing:1.5px;margin:28px 0 8px">Stuck on something?</h2>
+  <h2 style="font-size:14px;font-weight:700;color:${brand.colors.red};text-transform:uppercase;letter-spacing:1.5px;margin:28px 0 8px">Stuck on something?</h2>
   <p style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.7;margin:0 0 24px">
-    Email <a href="mailto:wemovenewyork.net@gmail.com" style="color:#D1AD38;text-decoration:underline">wemovenewyork.net@gmail.com</a> — real human, real fast response.
+    Email <a href="mailto:${brand.contactEmail}" style="color:${brand.colors.red};text-decoration:underline">${brand.contactEmail}</a> — real human, real fast response.
   </p>
 
-  <p style="color:rgba(255,255,255,.55);font-size:13px;line-height:1.6;margin:0 0 4px">Drive safe.</p>
-  <p style="color:#fff;font-size:14px;font-weight:700;margin:0">👊 We Move New York</p>
+  <p style="color:rgba(255,255,255,.55);font-size:13px;line-height:1.6;margin:0 0 4px">Stay safe.</p>
+  <p style="color:#fff;font-size:14px;font-weight:700;margin:0 0 18px">— ${brand.unionName}</p>
+
+  <p style="color:rgba(255,255,255,.4);font-size:11px;line-height:1.5;margin:0;border-top:1px solid rgba(255,255,255,.08);padding-top:14px">
+    ${brand.affiliationNotice}
+  </p>
 </div>`;
 
-    const welcomeText = `Welcome aboard, ${user.firstName}!
+    const welcomeText = `Welcome to ${brand.name}, ${user.firstName}!
 
-WMNY Shift Swap was built by operators, for operators — and you're now part of it.
+Built for and by ${brand.unionName} supervisors — and you're now part of it.
 
 Open the app: ${appUrl}
 
 THE POINT
 
-Coordinating swaps over group texts and bulletin boards is a mess. WMNY Shift Swap puts every available swap in one place where you can find it, message the operator directly, and lock the agreement in. Works for daily work swaps, RDOs, and vacation weeks.
+Coordinating swaps over group texts and bulletin boards is a mess. ${brand.name} puts every available swap in one place where you can find it, message another supervisor directly, and lock the agreement in. Works for daily work swaps, RDOs, and vacation weeks.
 
 TWO THINGS TO KEEP IN MIND
 
-WMNY Shift Swap is independent — not affiliated with the MTA or any union. And it doesn't change your swap process — every swap still goes through your dispatcher the normal way. We just help you find the swap faster.
+${brand.name} coordinates swaps but doesn't approve them — every swap still has to go through MTA / MaBSTOA / MTA Bus official approval procedures the normal way. The union does not approve or process shift swaps either. We just help you find the swap faster.
 
 GETTING STARTED
 
 1. Pick your depot. This is your home base — you'll see swaps from your depot first.
-2. Post a swap or browse. Need a Saturday off? Post it. Looking to pick up a Tuesday run? Browse.
-3. Message, agree, print. Talk it out in-app, confirm with the other operator, print the agreement, hand it to your dispatcher.
+2. Post a swap or browse. Need a Saturday off? Post it. Looking to pick up a Tuesday shift? Browse.
+3. Message, agree, print. Talk it out in-app, confirm with the other supervisor, print the agreement, follow your depot's normal approval steps.
 
-3 INVITE CODES ARE WAITING FOR YOU
+ALMOST DONE
 
-Each new operator gets 3 invite codes to share. We grow this thing one trusted operator at a time. Find your codes in your profile — only share them with operators you'd vouch for.
-
-View your invite codes: ${appUrl}/profile
+Once your division admin approves your registration, you'll have full access.
 
 STUCK ON SOMETHING?
 
-Email wemovenewyork.net@gmail.com — real human, real fast response.
+Email ${brand.contactEmail} — real human, real fast response.
 
-Drive safe.
+Stay safe.
 
-— We Move New York`;
+— ${brand.unionName}
+
+${brand.affiliationNotice}`;
 
     try {
-      await sendEmail(user.email, "You're in — welcome to WMNY Shift Swap", welcomeHtml, welcomeText);
+      await sendEmail(user.email, `You're in — welcome to ${brand.name}`, welcomeHtml, welcomeText);
     } catch (e) {
       Sentry.captureException(e, {
         tags: { source: "verify-email-welcome" },

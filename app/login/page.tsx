@@ -22,7 +22,7 @@ function pwStrength(pw: string): { score: number; label: string; color: string }
     { label: "", color: "transparent" },
     { label: "Weak", color: "#FF4757" },
     { label: "Fair", color: "#FB923C" },
-    { label: "Good", color: "#D1AD38" },
+    { label: "Good", color: "#AD1B27" },
     { label: "Strong", color: "#2ED573" },
   ];
   return { score, ...levels[score] };
@@ -56,7 +56,7 @@ export default function LoginPage() {
   const [acceptingTerms, setAcceptingTerms] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
-    return sessionStorage.getItem("wmny-pending-verify-email");
+    return sessionStorage.getItem("local106-pending-verify-email");
   });
   const [needsVerification, setNeedsVerification] = useState(false);
   const [resendStatus, setResendStatus] = useState<"" | "sending" | "sent">("");
@@ -105,7 +105,7 @@ export default function LoginPage() {
     try {
       const data = await api.post<{ user: { id: string; firstName: string; lastName: string; email: string; depotId?: string | null; language: string } }>("/auth/login", { email: em, password: pw });
       // Clear any stale "pending verification" state on successful login
-      sessionStorage.removeItem("wmny-pending-verify-email");
+      sessionStorage.removeItem("local106-pending-verify-email");
       login(data.user as Parameters<typeof login>[0]);
       setShowConsentFlow(true);
     } catch (e: unknown) {
@@ -141,7 +141,7 @@ export default function LoginPage() {
       );
       // No auto-login: user must verify email first. Show the "check your inbox" screen.
       const normalized = em.trim().toLowerCase();
-      sessionStorage.setItem("wmny-pending-verify-email", normalized);
+      sessionStorage.setItem("local106-pending-verify-email", normalized);
       setRegisteredEmail(normalized);
     } catch (e: unknown) {
       setErrWithShake(e instanceof Error ? e.message : "Registration failed");
@@ -166,8 +166,8 @@ export default function LoginPage() {
             Click the link in that email to verify your account, then come back here to sign in. The link expires in 24 hours.
           </p>
           <div style={{
-            background: "rgba(209,173,56,.10)",
-            border: "1px solid rgba(209,173,56,.35)",
+            background: "rgba(173,27,39,.10)",
+            border: "1px solid rgba(173,27,39,.35)",
             borderRadius: 12,
             padding: "12px 14px",
             marginBottom: 20,
@@ -187,13 +187,13 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => {
-              sessionStorage.removeItem("wmny-pending-verify-email");
+              sessionStorage.removeItem("local106-pending-verify-email");
               setRegisteredEmail(null);
               setMode("signin");
               setEm(registeredEmail);
               setPw("");
             }}
-            style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.m, color: "#010028", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}
+            style={{ width: "100%", padding: "14px 20px", borderRadius: 14, background: C.m, color: "#1A1F4D", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}
           >
             Go to Sign In
           </button>
@@ -208,11 +208,11 @@ export default function LoginPage() {
         <style>{`
           @keyframes loginBusFloat { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
           @keyframes loginBusDriveIn { from { opacity:0; transform: translateX(-40px) scale(0.9); } to { opacity:1; transform: translateX(0) scale(1); } }
-          @keyframes loginBusGlow { 0%,100% { filter: drop-shadow(0 8px 20px rgba(0,102,204,0.4)); } 50% { filter: drop-shadow(0 14px 36px rgba(0,102,204,0.65)) drop-shadow(0 0 18px rgba(209,173,56,0.18)); } }
+          @keyframes loginBusGlow { 0%,100% { filter: drop-shadow(0 8px 20px rgba(0,102,204,0.4)); } 50% { filter: drop-shadow(0 14px 36px rgba(0,102,204,0.65)) drop-shadow(0 0 18px rgba(173,27,39,0.18)); } }
         `}</style>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <div style={{ animation: "loginBusDriveIn .7s cubic-bezier(.34,1.2,.64,1) both, loginBusFloat 5s ease-in-out 0.8s infinite, loginBusGlow 4s ease-in-out 0.8s infinite", display: "inline-block", marginBottom: 10 }}>
-            <Image src="/bus-logo.png" alt="We Move New York" width={320} height={152} style={{ width: 220, height: "auto", display: "block" }} priority />
+            <Image src="/bus-logo.png" alt="TWU Local 106" width={320} height={152} style={{ width: 220, height: "auto", display: "block" }} priority />
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: C.white }}>{mode === "signin" ? "Sign In" : "Create Account"}</h1>
         </div>
@@ -233,7 +233,7 @@ export default function LoginPage() {
         {err && <div role="alert" aria-live="assertive" style={{ padding: "10px 14px", borderRadius: 12, background: C.red + "15", border: `1px solid ${C.red}33`, marginBottom: 14, fontSize: 13, color: C.red }}>{err}</div>}
 
         {needsVerification && mode === "signin" && (
-          <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(209,173,56,.08)", border: "1px solid rgba(209,173,56,.25)", marginBottom: 14, fontSize: 13, color: "rgba(255,255,255,.85)" }}>
+          <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(173,27,39,.08)", border: "1px solid rgba(173,27,39,.25)", marginBottom: 14, fontSize: 13, color: "rgba(255,255,255,.85)" }}>
             <p style={{ marginBottom: 10, lineHeight: 1.5 }}>Didn&apos;t get the verification email, or did the link expire?</p>
             {resendStatus === "sent" ? (
               <div>
@@ -245,7 +245,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={doResendVerification}
                 disabled={resendStatus === "sending" || !em.trim()}
-                style={{ padding: "8px 14px", borderRadius: 10, background: C.m, color: "#010028", fontWeight: 700, fontSize: 13, border: "none", cursor: resendStatus === "sending" ? "wait" : "pointer", opacity: !em.trim() ? 0.5 : 1 }}
+                style={{ padding: "8px 14px", borderRadius: 10, background: C.m, color: "#1A1F4D", fontWeight: 700, fontSize: 13, border: "none", cursor: resendStatus === "sending" ? "wait" : "pointer", opacity: !em.trim() ? 0.5 : 1 }}
               >
                 {resendStatus === "sending" ? "Sending…" : "Resend verification email"}
               </button>
@@ -330,10 +330,10 @@ export default function LoginPage() {
             </div>
             <div>
               <label htmlFor="reg-invite" style={lb}>Invite Code</label>
-              <input id="reg-invite" value={invCode} onChange={e => { setInvCode(e.target.value.toUpperCase()); setFieldErrs(p => ({ ...p, inv: "" })); }} placeholder="e.g. WMNY-DEMO1" style={{ letterSpacing: 2, textTransform: "uppercase", ...(fieldErrs.inv ? { borderColor: C.red + "88" } : {}) }} />
+              <input id="reg-invite" value={invCode} onChange={e => { setInvCode(e.target.value.toUpperCase()); setFieldErrs(p => ({ ...p, inv: "" })); }} placeholder="e.g. L106-DEMO1" style={{ letterSpacing: 2, textTransform: "uppercase", ...(fieldErrs.inv ? { borderColor: C.red + "88" } : {}) }} />
               {fieldErrs.inv
                 ? <div style={{ fontSize: 11, color: C.red, marginTop: 3 }}>{fieldErrs.inv}</div>
-                : <div style={{ fontSize: 11, color: C.m, marginTop: 4 }}>Ask a fellow operator for their invite code</div>
+                : <div style={{ fontSize: 11, color: C.m, marginTop: 4 }}>Ask a fellow Local 106 member for their invite code</div>
               }
             </div>
             <MagneticButton onClick={doRegister} disabled={submitting} style={{ padding: 16, borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 16, fontWeight: 700, color: C.bg, opacity: submitting ? 0.7 : 1, width: "100%" }}>
@@ -349,7 +349,7 @@ export default function LoginPage() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="disclaimer-title"
-          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(1,0,40,.97)", backdropFilter: "blur(24px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 28px calc(40px + env(safe-area-inset-bottom, 0px)) 28px", overflowY: "auto" }}
+          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(26,31,77,.97)", backdropFilter: "blur(24px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 28px calc(40px + env(safe-area-inset-bottom, 0px)) 28px", overflowY: "auto" }}
         >
           <div style={{ maxWidth: 400, width: "100%", maxHeight: "calc(100dvh - 80px - env(safe-area-inset-bottom, 0px))", overflowY: "auto" }}>
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: C.gold + "18", border: `1.5px solid ${C.gold}44`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
@@ -365,16 +365,16 @@ export default function LoginPage() {
 
             <div style={{ background: "rgba(255,255,255,.04)", border: `1px solid rgba(255,255,255,.08)`, borderRadius: 16, padding: "20px 18px", marginBottom: 24, fontSize: 13, color: C.m, lineHeight: 1.75 }}>
               <p style={{ margin: "0 0 12px" }}>
-                <strong style={{ color: C.white }}>WMNY Shift Swap</strong> is an unofficial peer-to-peer tool for MTA bus operators to coordinate shift swaps among themselves.
+                <strong style={{ color: C.white }}>TWU Local 106 Connect</strong> is the official member portal of TWU Local 106 (the Transit Supervisors Organization), built for supervisors to coordinate shift swaps among themselves.
               </p>
               <p style={{ margin: "0 0 12px" }}>
-                This platform is <strong style={{ color: C.white }}>not affiliated with, endorsed by, or operated by the MTA</strong>, any transit agency, or any labor union.
+                Local 106 is the union, but this platform is <strong style={{ color: C.white }}>not affiliated with the MTA, MaBSTOA, or MTA Bus Company</strong>.
               </p>
               <p style={{ margin: "0 0 12px" }}>
-                All swap agreements are <strong style={{ color: C.white }}>between operators only</strong>. It is your responsibility to ensure any swap complies with your collective bargaining agreement, depot rules, and all applicable MTA policies before submitting to your dispatcher.
+                All swap agreements are <strong style={{ color: C.white }}>between members only</strong>. It is your responsibility to ensure any swap complies with your collective bargaining agreement, depot rules, and all applicable MTA / MaBSTOA / MTA Bus policies before submitting it for official approval.
               </p>
               <p style={{ margin: 0 }}>
-                By continuing, you confirm you are an authorized bus operator and agree to use this app in accordance with your employment obligations.
+                By continuing, you confirm you are an active TWU Local 106 member and agree to use this app in accordance with your employment obligations.
               </p>
             </div>
 
@@ -394,7 +394,7 @@ export default function LoginPage() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="terms-title"
-          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(1,0,40,.97)", backdropFilter: "blur(24px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "28px 20px calc(28px + env(safe-area-inset-bottom)) 20px" }}
+          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(26,31,77,.97)", backdropFilter: "blur(24px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "28px 20px calc(28px + env(safe-area-inset-bottom)) 20px" }}
         >
           <div style={{ maxWidth: 440, width: "100%", display: "flex", flexDirection: "column", maxHeight: "calc(100dvh - 56px - env(safe-area-inset-bottom, 0px))" }}>
             <div style={{ textAlign: "center", marginBottom: 18 }}>
@@ -410,13 +410,13 @@ export default function LoginPage() {
             {/* Scrollable terms body */}
             <div style={{ flex: 1, overflowY: "auto", background: "rgba(255,255,255,.03)", border: `1px solid rgba(255,255,255,.08)`, borderRadius: 16, padding: "18px 16px", marginBottom: 18, fontSize: 12, color: "rgba(255,255,255,.7)", lineHeight: 1.75 }}>
               {[
-                { title: "1. Acceptance of Terms", body: 'By accessing or using We Move New York ("WMNY"), you agree to be bound by these Terms of Use. If you do not agree, do not use the App.' },
-                { title: "2. Who Can Use This App", body: "WMNY is intended exclusively for active NYC bus operators. By registering you confirm you are a current bus operator, the information you provide is accurate, you will not share your credentials, and you are at least 18 years of age." },
-                { title: "3. Shift Swap Coordination", body: "WMNY is a coordination tool only. It does not replace any MTA, TWU, or union collective bargaining agreements. All shift swaps must comply with your depot's official procedures and receive supervisor approval. WMNY makes no guarantee a swap will be approved by management." },
-                { title: "4. User Conduct", body: "You agree not to post false or fraudulent swap listings, harass or threaten other users, share others' personal information without consent, use the App for commercial gain, attempt unauthorized access, or post discriminatory content. Violations may result in immediate account suspension." },
+                { title: "1. Acceptance of Terms", body: 'By accessing or using TWU Local 106 Connect ("the App"), you agree to be bound by these Terms of Use. If you do not agree, do not use the App.' },
+                { title: "2. Who Can Use This App", body: "TWU Local 106 Connect is intended exclusively for active members of TWU Local 106 (the Transit Supervisors Organization). By registering you confirm you are a current Local 106 member, the information you provide is accurate, you will not share your credentials, and you are at least 18 years of age." },
+                { title: "3. Shift Swap Coordination", body: "TWU Local 106 Connect is a coordination tool only. It does not replace any MTA, TWU, or union collective bargaining agreements. All shift swaps must comply with your depot's official procedures and receive supervisor approval. The App makes no guarantee a swap will be approved by management." },
+                { title: "4. User Conduct", body: "You agree not to post false or fraudulent swap listings, harass or threaten other members, share others' personal information without consent, use the App for commercial gain, attempt unauthorized access, or post discriminatory content. Violations may result in immediate account suspension." },
                 { title: "5. Reputation System", body: "Reviews must be honest and based on actual swap experiences. Manipulating ratings — including self-reviewing or fake reviews — is prohibited and may result in account termination." },
-                { title: "6. Invite Codes", body: "You are responsible for who you invite. Do not share invite codes publicly or with non-MTA personnel. Misuse may result in suspension of your account and the invited account." },
-                { title: "7. Disclaimer of Liability", body: "WMNY is provided as-is without warranties. We are not responsible for disputes, missed shifts, denied swaps, or disciplinary actions arising from use of this platform." },
+                { title: "6. Invite Codes", body: "You are responsible for who you invite. Do not share invite codes publicly or with non-members. Misuse may result in suspension of your account and the invited account." },
+                { title: "7. Disclaimer of Liability", body: "TWU Local 106 Connect is provided as-is without warranties. We are not responsible for disputes, missed shifts, denied swaps, or disciplinary actions arising from use of this platform." },
                 { title: "8. Changes to Terms", body: "We reserve the right to update these Terms at any time. Continued use after changes are posted constitutes acceptance of the revised terms." },
               ].map(({ title, body }) => (
                 <div key={title} style={{ marginBottom: 14 }}>

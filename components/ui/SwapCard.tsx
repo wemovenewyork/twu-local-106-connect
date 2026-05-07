@@ -70,7 +70,7 @@ export default function SwapCard({ swap: s, user, onDelete, onStatusChange, onEd
 
   const categoryGlow: Record<string, string> = {
     work: "#0249B5",
-    daysoff: "#D1AD38",
+    daysoff: "#AD1B27",
     vacation: "#00C9A7",
   };
   const glowColor = categoryGlow[s.category] ?? "#0249B5";

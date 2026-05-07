@@ -10,7 +10,7 @@ export default function NotFound() {
         alignItems: "center",
         justifyContent: "center",
         padding: "40px 20px",
-        background: "#010028",
+        background: "#1A1F4D",
         fontFamily: "var(--font-poppins, sans-serif)",
       }}
     >
@@ -33,7 +33,7 @@ export default function NotFound() {
             lineHeight: 1,
           }}
         >
-          🚌
+          👷
         </div>
         <h1
           style={{
@@ -62,10 +62,10 @@ export default function NotFound() {
             display: "block",
             padding: "14px 20px",
             borderRadius: 14,
-            background: "linear-gradient(135deg,#D1AD38,#D1AD38dd)",
+            background: "linear-gradient(135deg,#AD1B27,#AD1B27dd)",
             fontSize: 15,
             fontWeight: 700,
-            color: "#010028",
+            color: "#FFFFFF",
             textDecoration: "none",
           }}
         >

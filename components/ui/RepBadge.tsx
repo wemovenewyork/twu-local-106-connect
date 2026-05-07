@@ -39,7 +39,7 @@ export default function RepBadge({ rep, size = "small" }: Props) {
           <div style={{ fontSize: 18, fontWeight: 800, color: "#2ED573" }}>{s.total - (s.total - (s.total > 0 ? Math.round(s.reliability * s.total / 100) : 0))}</div>
           <div style={{ fontSize: 9, color: C.m, textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>Completed</div>
         </div>
-        <div style={{ textAlign: "center", padding: 10, borderRadius: 10, background: "rgba(209,173,56,.08)" }}>
+        <div style={{ textAlign: "center", padding: 10, borderRadius: 10, background: "rgba(173,27,39,.08)" }}>
           <div style={{ fontSize: 18, fontWeight: 800, color: C.gold }}>—</div>
           <div style={{ fontSize: 9, color: C.m, textTransform: "uppercase", letterSpacing: 1, marginTop: 2 }}>Cancelled</div>
         </div>

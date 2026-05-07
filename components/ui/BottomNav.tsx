@@ -46,7 +46,7 @@ export default function BottomNav({ active, depotCode, lang }: Props) {
         left: 0,
         right: 0,
         zIndex: 200,
-        background: "rgba(1,0,40,.9)",
+        background: "rgba(26,31,77,.9)",
         backdropFilter: "blur(28px)",
         borderTop: "1px solid rgba(255,255,255,.06)",
         padding: "6px 0 max(12px, env(safe-area-inset-bottom))",

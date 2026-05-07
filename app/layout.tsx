@@ -8,6 +8,7 @@ import OfflineBanner from "@/components/ui/OfflineBanner";
 import AnalyticsProvider from "@/components/ui/AnalyticsProvider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { brand } from "@/config/brand";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -17,13 +18,13 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "WMNY Shift Swap",
-  description: "Peer-to-peer shift swap platform for NYC MTA bus operators",
+  title: brand.name,
+  description: `${brand.unionName} — official member portal for ${brand.organizationName}. Find shift swaps, read news, contact officers.`,
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "WMNY Shift Swap",
+    title: brand.appShortName,
   },
 };
 
@@ -31,10 +32,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={poppins.variable}>
       <head>
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" type="image/png" href="/icons/icon-192.png" sizes="192x192" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-        <meta name="theme-color" content="#010028" />
+        <link rel="icon" href="/icons/icon-192.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="theme-color" content={brand.colors.navy} />
       </head>
       <body className={poppins.className}>
         <Script

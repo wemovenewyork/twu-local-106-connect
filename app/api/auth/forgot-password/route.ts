@@ -7,6 +7,7 @@ import { ok, err } from "@/lib/apiResponse";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { parseBody, BODY_1KB } from "@/lib/parseBody";
 import { escapeHtml } from "@/lib/escapeHtml";
+import { brand } from "@/config/brand";
 
 // POST /api/auth/forgot-password
 // Accepts { email } — sends reset link if account exists. Always returns 200 to prevent enumeration.
@@ -39,14 +40,14 @@ export async function POST(req: NextRequest) {
       try {
         await sendEmail(
           user.email,
-          "Reset your WMNY Shift Swap password",
-          `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:#010028;color:#fff;border-radius:16px">
+          `Reset your ${brand.name} password`,
+          `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:${brand.colors.navy};color:#fff;border-radius:16px">
             <h1 style="font-size:22px;font-weight:800;margin-bottom:8px">Reset your password</h1>
             <p style="color:rgba(255,255,255,.6);font-size:14px;line-height:1.6;margin-bottom:24px">
-              Hi ${escapeHtml(user.firstName)}, we received a request to reset your WMNY Shift Swap password.
+              Hi ${escapeHtml(user.firstName)}, we received a request to reset your ${brand.name} password.
               This link expires in 1 hour.
             </p>
-            <a href="${resetLink}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:#D1AD38;color:#010028;font-weight:700;font-size:15px;text-decoration:none">
+            <a href="${resetLink}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:${brand.colors.red};color:#fff;font-weight:700;font-size:15px;text-decoration:none">
               Reset Password
             </a>
             <p style="color:rgba(255,255,255,.4);font-size:12px;margin-top:24px">

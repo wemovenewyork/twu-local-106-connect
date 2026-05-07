@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { randomBytes } from "crypto";
 import { parseBody, BODY_1KB } from "@/lib/parseBody";
+import { brand } from "@/config/brand";
 
 function genCode(): string {
-  return "WMNY-" + randomBytes(3).toString("hex").toUpperCase();
+  return `${brand.inviteCodePrefix}-` + randomBytes(3).toString("hex").toUpperCase();
 }
 
 // GET /api/admin/invites — list all invite codes

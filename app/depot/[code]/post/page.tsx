@@ -285,7 +285,7 @@ export default function PostSwapPage() {
       <style>{`
         @keyframes rippleOut { from { transform: scale(0); opacity: 0.6; } to { transform: scale(2.5); opacity: 0; } }
       `}</style>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(1,0,40,.75)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
         <DepotBadge depot={depot} size={38} />
         <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>{depot.name}</div>
@@ -357,7 +357,7 @@ export default function PostSwapPage() {
           {/* Days off fields */}
           {f.category === "daysoff" && (
             <>
-              <div style={{ background: "rgba(209,173,56,.04)", borderRadius: 16, border: "1px solid rgba(209,173,56,.12)", padding: 16 }}>
+              <div style={{ background: "rgba(173,27,39,.04)", borderRadius: 16, border: "1px solid rgba(173,27,39,.12)", padding: 16 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>
                   Your Shift (the day you&apos;re giving away)
                 </div>
