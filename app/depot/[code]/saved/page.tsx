@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot, Swap } from "@/types";
+import { Division, Swap } from "@/types";
 import { C } from "@/constants/colors";
 import SwapCard from "@/components/ui/SwapCard";
-import DepotBadge from "@/components/ui/DepotBadge";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import Icon from "@/components/ui/Icon";
 import Footer from "@/components/ui/Footer";
 import BottomNav from "@/components/ui/BottomNav";
@@ -21,7 +21,7 @@ export default function SavedSwapsPage() {
   const params = useParams<{ code: string }>();
   const code = params.code;
 
-  const [depot, setDepot] = useState<Depot | null>(null);
+  const [division, setDepot] = useState<Division | null>(null);
   const [swaps, setSwaps] = useState<Swap[]>([]);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -29,13 +29,13 @@ export default function SavedSwapsPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
     if (!code || !user) return;
-    api.get<Depot>(`/depots/${code}`).then(setDepot).catch(() => router.replace("/depots"));
+    api.get<Division>(`/divisions/${code}`).then(setDepot).catch(() => router.replace("/divisions"));
     api.get<Swap[]>("/swaps/saved").then(setSwaps).catch(console.error);
   }, [code, user, router]);
 
@@ -46,15 +46,15 @@ export default function SavedSwapsPage() {
     } catch { showToast("Failed to unsave"); }
   };
 
-  if (!depot) return null;
+  if (!division) return null;
 
   return (
     <div style={{ minHeight: "100vh" }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
-        <DepotBadge depot={depot} size={38} />
+        <DivisionBadge division={division} size={38} />
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: C.white }}>Saved Swaps</div>
           <div style={{ fontSize: 10, color: C.m }}>Your bookmarked swaps</div>
@@ -71,7 +71,7 @@ export default function SavedSwapsPage() {
             </div>
             <div style={{ fontSize: 16, fontWeight: 700, color: C.white, marginBottom: 8 }}>No saved swaps</div>
             <div style={{ fontSize: 13, color: C.m }}>Bookmark swaps you&apos;re interested in — they&apos;ll appear here.</div>
-            <button onClick={() => router.push(`/depot/${code}/swaps`)} style={{ marginTop: 20, padding: "10px 24px", borderRadius: 12, border: "none", cursor: "pointer", background: C.gold, color: C.bg, fontSize: 13, fontWeight: 700 }}>
+            <button onClick={() => router.push(`/division/${code}/swaps`)} style={{ marginTop: 20, padding: "10px 24px", borderRadius: 12, border: "none", cursor: "pointer", background: C.gold, color: C.bg, fontSize: 13, fontWeight: 700 }}>
               Browse Swaps
             </button>
           </div>
@@ -83,7 +83,7 @@ export default function SavedSwapsPage() {
                 swap={s}
                 user={user}
                 onToggleSave={handleToggleSave}
-                onClick={() => router.push(`/depot/${code}/swaps/${s.id}`)}
+                onClick={() => router.push(`/division/${code}/swaps/${s.id}`)}
               />
             ))}
           </div>
@@ -91,7 +91,7 @@ export default function SavedSwapsPage() {
         <Footer />
       </main>
 
-      <BottomNav active="browse" depotCode={code} />
+      <BottomNav active="browse" divisionCode={code} />
       {toast && <Toast message={toast} />}
     </div>
   );

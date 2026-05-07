@@ -41,8 +41,8 @@ export default function PrivacyPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>2. Information We Collect</h2>
-          <p style={s.p}><strong style={{ color: C.white }}>Account Information:</strong> When you register, we collect your name, email address, depot assignment, and a hashed (encrypted) password. We never store your password in plain text.</p>
-          <p style={s.p}><strong style={{ color: C.white }}>Swap Listings:</strong> Content you post — including shift details, run numbers, routes, and dates — is visible to other verified users at your depot.</p>
+          <p style={s.p}><strong style={{ color: C.white }}>Account Information:</strong> When you register, we collect your name, email address, division assignment, and a hashed (encrypted) password. We never store your password in plain text.</p>
+          <p style={s.p}><strong style={{ color: C.white }}>Swap Listings:</strong> Content you post — including shift details, run numbers, routes, and dates — is visible to other verified users at your division.</p>
           <p style={s.p}><strong style={{ color: C.white }}>Messages:</strong> Messages sent through the platform are stored to facilitate swap coordination. Messages are only visible to the sender and recipient.</p>
           <p style={s.p}><strong style={{ color: C.white }}>Reputation & Reviews:</strong> Ratings and completion history are stored and displayed to other users to build trust in the platform.</p>
           <p style={s.p}><strong style={{ color: C.white }}>Usage Data:</strong> We use Google Analytics and Google Tag Manager to collect basic usage data such as pages visited and features used to improve the App. This data is processed by Google in accordance with their privacy policy. We do not sell this data, and we do not use it to identify individual users or share it with your employer.</p>
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>4. Who Can See Your Information</h2>
-          <p style={s.p}><strong style={{ color: C.white }}>Other verified users</strong> can see your name, depot, swap listings, and reputation score.</p>
+          <p style={s.p}><strong style={{ color: C.white }}>Other verified users</strong> can see your name, division, swap listings, and reputation score.</p>
           <p style={s.p}><strong style={{ color: C.white }}>Your contact information</strong> (phone number) is only visible if you choose to include it on a swap post.</p>
           <p style={s.p}><strong style={{ color: C.white }}>Messages</strong> are private between sender and recipient only.</p>
           <p style={s.p}><strong style={{ color: C.white }}>Your email address</strong> is never displayed publicly on the platform.</p>

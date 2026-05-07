@@ -7,34 +7,34 @@ const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
 
 const DEPOTS = [
-  { name: "Baisley Park Depot", code: "BP", borough: "Queens", operator: "MTA Bus" },
-  { name: "Casey Stengel Depot", code: "CS", borough: "Queens", operator: "NYCT" },
-  { name: "Castleton Depot", code: "CA", borough: "Staten Island", operator: "NYCT" },
-  { name: "Charleston Depot", code: "CH", borough: "Staten Island", operator: "NYCT" },
-  { name: "College Point Depot", code: "CP", borough: "Queens", operator: "MTA Bus" },
-  { name: "East New York Depot", code: "EN", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Eastchester Depot", code: "EC", borough: "Bronx", operator: "MTA Bus" },
-  { name: "Far Rockaway Depot", code: "FR", borough: "Queens", operator: "MTA Bus" },
-  { name: "Flatbush Depot", code: "FB", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Fresh Pond Depot", code: "FP", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Grand Avenue Depot", code: "GA", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Gun Hill Depot", code: "GH", borough: "Bronx", operator: "MaBSTOA" },
-  { name: "Jackie Gleason Depot", code: "JG", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Jamaica Depot", code: "JA", borough: "Queens", operator: "NYCT" },
-  { name: "JFK Depot", code: "JF", borough: "Queens", operator: "MTA Bus" },
-  { name: "Kingsbridge Depot", code: "KB", borough: "Bronx", operator: "MaBSTOA" },
-  { name: "LaGuardia Depot", code: "LG", borough: "Queens", operator: "MTA Bus" },
-  { name: "Manhattanville Depot", code: "MV", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Meredith Depot", code: "ME", borough: "Staten Island", operator: "NYCT" },
-  { name: "Michael J. Quill Depot", code: "MQ", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Mother Clara Hale Depot", code: "MC", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Queens Village Depot", code: "QV", borough: "Queens", operator: "NYCT" },
-  { name: "Spring Creek Depot", code: "SC", borough: "Brooklyn", operator: "MTA Bus" },
-  { name: "Tuskegee Airmen Depot", code: "TA", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Ulmer Park Depot", code: "UP", borough: "Brooklyn", operator: "NYCT" },
-  { name: "West Farms Depot", code: "WF", borough: "Bronx", operator: "MaBSTOA" },
-  { name: "Yonkers Depot", code: "YK", borough: "Bronx", operator: "MTA Bus" },
-  { name: "Yukon Depot", code: "YU", borough: "Staten Island", operator: "NYCT" },
+  { name: "Baisley Park Division", code: "BP", borough: "Queens", operator: "MTA Bus" },
+  { name: "Casey Stengel Division", code: "CS", borough: "Queens", operator: "NYCT" },
+  { name: "Castleton Division", code: "CA", borough: "Staten Island", operator: "NYCT" },
+  { name: "Charleston Division", code: "CH", borough: "Staten Island", operator: "NYCT" },
+  { name: "College Point Division", code: "CP", borough: "Queens", operator: "MTA Bus" },
+  { name: "East New York Division", code: "EN", borough: "Brooklyn", operator: "NYCT" },
+  { name: "Eastchester Division", code: "EC", borough: "Bronx", operator: "MTA Bus" },
+  { name: "Far Rockaway Division", code: "FR", borough: "Queens", operator: "MTA Bus" },
+  { name: "Flatbush Division", code: "FB", borough: "Brooklyn", operator: "NYCT" },
+  { name: "Fresh Pond Division", code: "FP", borough: "Brooklyn", operator: "NYCT" },
+  { name: "Grand Avenue Division", code: "GA", borough: "Brooklyn", operator: "NYCT" },
+  { name: "Gun Hill Division", code: "GH", borough: "Bronx", operator: "MaBSTOA" },
+  { name: "Jackie Gleason Division", code: "JG", borough: "Brooklyn", operator: "NYCT" },
+  { name: "Jamaica Division", code: "JA", borough: "Queens", operator: "NYCT" },
+  { name: "JFK Division", code: "JF", borough: "Queens", operator: "MTA Bus" },
+  { name: "Kingsbridge Division", code: "KB", borough: "Bronx", operator: "MaBSTOA" },
+  { name: "LaGuardia Division", code: "LG", borough: "Queens", operator: "MTA Bus" },
+  { name: "Manhattanville Division", code: "MV", borough: "Manhattan", operator: "MaBSTOA" },
+  { name: "Meredith Division", code: "ME", borough: "Staten Island", operator: "NYCT" },
+  { name: "Michael J. Quill Division", code: "MQ", borough: "Manhattan", operator: "MaBSTOA" },
+  { name: "Mother Clara Hale Division", code: "MC", borough: "Manhattan", operator: "MaBSTOA" },
+  { name: "Queens Village Division", code: "QV", borough: "Queens", operator: "NYCT" },
+  { name: "Spring Creek Division", code: "SC", borough: "Brooklyn", operator: "MTA Bus" },
+  { name: "Tuskegee Airmen Division", code: "TA", borough: "Manhattan", operator: "MaBSTOA" },
+  { name: "Ulmer Park Division", code: "UP", borough: "Brooklyn", operator: "NYCT" },
+  { name: "West Farms Division", code: "WF", borough: "Bronx", operator: "MaBSTOA" },
+  { name: "Yonkers Division", code: "YK", borough: "Bronx", operator: "MTA Bus" },
+  { name: "Yukon Division", code: "YU", borough: "Staten Island", operator: "NYCT" },
 ];
 
 function genCode(): string {
@@ -47,9 +47,9 @@ function genCode(): string {
 }
 
 async function main() {
-  console.log("Seeding depots...");
+  console.log("Seeding divisions...");
   for (const d of DEPOTS) {
-    await prisma.depot.upsert({
+    await prisma.division.upsert({
       where: { code: d.code },
       update: {},
       create: d,

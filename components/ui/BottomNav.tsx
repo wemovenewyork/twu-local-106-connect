@@ -10,11 +10,11 @@ import { playClick } from "@/lib/sound";
 
 interface Props {
   active: "browse" | "post" | "my" | "messages" | "saved";
-  depotCode: string;
+  divisionCode: string;
   lang?: string;
 }
 
-export default function BottomNav({ active, depotCode, lang }: Props) {
+export default function BottomNav({ active, divisionCode, lang }: Props) {
   const router = useRouter();
   const [unread, setUnread] = useState(0);
   const [activeTab, setActiveTab] = useState<"browse" | "post" | "my" | "messages" | "saved">(active);
@@ -31,9 +31,9 @@ export default function BottomNav({ active, depotCode, lang }: Props) {
   }, []);
 
   const items = [
-    { k: "browse", ic: "list", l: tr("nav.swaps"), href: `/depot/${depotCode}/swaps` },
-    { k: "my", ic: "usr", l: tr("nav.my"), href: `/depot/${depotCode}/my` },
-    { k: "messages", ic: "msg", l: tr("nav.messages"), href: `/depot/${depotCode}/messages`, badge: unread },
+    { k: "browse", ic: "list", l: tr("nav.swaps"), href: `/division/${divisionCode}/swaps` },
+    { k: "my", ic: "usr", l: tr("nav.my"), href: `/division/${divisionCode}/my` },
+    { k: "messages", ic: "msg", l: tr("nav.messages"), href: `/division/${divisionCode}/messages`, badge: unread },
   ];
 
   return (

@@ -4,18 +4,18 @@ import { prisma } from "@/lib/prisma";
 import { calcScore } from "@/lib/reputation";
 import { ok, err } from "@/lib/apiResponse";
 
-// GET /api/depots/:code/flexible → list operators in this depot with flexibleMode on
+// GET /api/divisions/:code/flexible → list operators in this division with flexibleMode on
 export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   let user;
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const { code } = await params;
-  const depot = await prisma.depot.findUnique({ where: { code } });
-  if (!depot) return err("Depot not found", 404);
+  const division = await prisma.division.findUnique({ where: { code } });
+  if (!division) return err("Division not found", 404);
 
   const flexibleUsers = await prisma.user.findMany({
     where: {
-      depotId: depot.id,
+      divisionId: division.id,
       flexibleMode: true,
       id: { not: user.userId },          // don't show yourself
     },
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
       id: true,
       firstName: true,
       lastName: true,
-      depotId: true,
+      divisionId: true,
       flexibleSince: true,
       reputation: true,
     },
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
         id: u.id,
         firstName: u.firstName,
         lastName: u.lastName,
-        depotId: u.depotId,
+        divisionId: u.divisionId,
         flexibleSince: u.flexibleSince,
         reputation: calcScore({
           completed: rep?.completed ?? 0,

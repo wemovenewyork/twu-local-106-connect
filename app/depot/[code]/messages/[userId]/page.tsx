@@ -66,7 +66,7 @@ export default function ThreadPage() {
       // Notification rows themselves stick around as history (mark read,
       // not delete) so users can scroll back through alerts later.
       api.post(`/notifications/mark-read-by-url`, {
-        url: `/depot/${code}/messages/${counterpartId}`,
+        url: `/division/${code}/messages/${counterpartId}`,
       }).then(() => {
         window.dispatchEvent(new Event("local106:notifications-changed"));
       }).catch(() => {});
@@ -82,14 +82,14 @@ export default function ThreadPage() {
         setCounterpart(cp);
       }
     } catch {
-      router.replace(`/depot/${code}/messages`);
+      router.replace(`/division/${code}/messages`);
     }
   }, [user, counterpartId, code, router]);
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
@@ -146,7 +146,7 @@ export default function ThreadPage() {
       await api.post(`/users/${counterpartId}/block`, {});
       showToast("User blocked", "success");
       setBlockConfirm(false);
-      router.push(`/depot/${code}/messages`);
+      router.push(`/division/${code}/messages`);
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : "Block failed", "error");
     } finally { setBlocking(false); }
@@ -206,7 +206,7 @@ export default function ThreadPage() {
       </div>
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.9)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}/messages`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={() => router.push(`/division/${code}/messages`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
         <div style={{ width: 38, height: 38, borderRadius: "50%", background: `linear-gradient(135deg,${C.navy},${C.blue})`, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${C.bd}`, flexShrink: 0 }}>

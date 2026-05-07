@@ -40,9 +40,9 @@ export async function GET(
   const swap = await getSwapWithRep(id);
   if (!swap) return err("Swap not found", 404);
 
-  // Depot scoping
+  // Division scoping
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (swap.depotId !== dbUser?.depotId) return err("Not authorized", 403);
+  if (swap.divisionId !== dbUser?.divisionId) return err("Not authorized", 403);
 
   // If either party has blocked the other, treat the swap as not found.
   // Owners can always see their own swap.
@@ -202,15 +202,15 @@ export async function DELETE(
     });
     // Best-effort notification to the operator who proposed the agreement
     try {
-      const depot = await prisma.depot.findUnique({
-        where: { id: swap.depotId },
+      const division = await prisma.division.findUnique({
+        where: { id: swap.divisionId },
         select: { code: true },
       });
-      const depotCode = depot?.code ?? swap.depotId;
+      const divisionCode = division?.code ?? swap.divisionId;
       await notifyUser(activeAgreement.userAId, {
         title: "Swap deleted",
         body: "The poster cancelled this swap. Check the board for other options.",
-        url: `/depot/${depotCode}/swaps`,
+        url: `/division/${divisionCode}/swaps`,
       });
     } catch { /* notification is best-effort */ }
   }

@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot } from "@/types";
+import { Division } from "@/types";
 import { C } from "@/constants/colors";
-import DepotBadge from "@/components/ui/DepotBadge";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import Icon from "@/components/ui/Icon";
 import InboxIcon from "@/components/ui/InboxIcon";
 import NotifIcon from "@/components/ui/NotifIcon";
@@ -23,7 +23,7 @@ export default function ActionPage() {
   const router = useRouter();
   const params = useParams<{ code: string }>();
   const code = params.code;
-  const [depot, setDepot] = useState<Depot | null>(null);
+  const [division, setDepot] = useState<Division | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
   const [unread, setUnread] = useState(0);
   const [stats, setStats] = useState<{ completed: number; active: number } | null>(null);
@@ -33,29 +33,29 @@ export default function ActionPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
     if (!code) return;
-    api.get<Depot>(`/depots/${code}`).then(setDepot).catch(() => router.replace("/depots"));
+    api.get<Division>(`/divisions/${code}`).then(setDepot).catch(() => router.replace("/divisions"));
     api.get<{ unreadCount: number }>("/messages").then(d => setUnread(d.unreadCount)).catch(() => {});
-    api.get<{ completed: number; active: number }>(`/depots/${code}/stats`).then(setStats).catch(() => {});
+    api.get<{ completed: number; active: number }>(`/divisions/${code}/stats`).then(setStats).catch(() => {});
   }, [code, router]);
 
-  if (!depot) return null;
+  if (!division) return null;
 
   const lang = user?.language ?? "en";
   const options = [
-    { k: "browse", ic: "list", label: t("browse", lang) || "Browse Swaps", cl: C.blue, href: `/depot/${code}/swaps`, count: depot.openSwaps ?? 0 },
-    { k: "post", ic: "edit", label: t("post", lang) || "Post a Swap", cl: C.gold, href: `/depot/${code}/post` },
-    { k: "my", ic: "usr", label: t("my", lang) || "My Posted Swaps", cl: "#00C9A7", href: `/depot/${code}/my` },
-    { k: "messages", ic: "msg", label: t("messages", lang) || "My Messages", cl: "#C084FC", href: `/depot/${code}/messages`, badge: unread },
-    { k: "saved", ic: "saved", label: t("saved", lang) || "My Saved Swaps", cl: C.gold, href: `/depot/${code}/saved` },
-    { k: "history", ic: "clk", label: t("history", lang) || "My Swaps", cl: "#60A5FA", href: `/depot/${code}/history` },
+    { k: "browse", ic: "list", label: t("browse", lang) || "Browse Swaps", cl: C.blue, href: `/division/${code}/swaps`, count: division.openSwaps ?? 0 },
+    { k: "post", ic: "edit", label: t("post", lang) || "Post a Swap", cl: C.gold, href: `/division/${code}/post` },
+    { k: "my", ic: "usr", label: t("my", lang) || "My Posted Swaps", cl: "#00C9A7", href: `/division/${code}/my` },
+    { k: "messages", ic: "msg", label: t("messages", lang) || "My Messages", cl: "#C084FC", href: `/division/${code}/messages`, badge: unread },
+    { k: "saved", ic: "saved", label: t("saved", lang) || "My Saved Swaps", cl: C.gold, href: `/division/${code}/saved` },
+    { k: "history", ic: "clk", label: t("history", lang) || "My Swaps", cl: "#60A5FA", href: `/division/${code}/history` },
     ...(user?.role === "depotRep" || user?.role === "admin"
-      ? [{ k: "rep", ic: "shield", label: "Rep Dashboard", cl: "#C084FC", href: `/depot/${code}/rep` }]
+      ? [{ k: "rep", ic: "shield", label: "Rep Dashboard", cl: "#C084FC", href: `/division/${code}/rep` }]
       : []),
   ];
 
@@ -67,7 +67,7 @@ export default function ActionPage() {
         @keyframes rotateFast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
       <div style={{ background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push("/depots")} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={() => router.push("/divisions")} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
         <div
@@ -77,11 +77,10 @@ export default function ActionPage() {
           }}
           style={{ cursor: "pointer", animation: logoSpin ? "rotateFast 0.4s linear infinite" : "rotateLogo 8s linear infinite" }}
         >
-          <DepotBadge depot={depot} size={38} />
+          <DivisionBadge division={division} size={38} />
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.white }}>{depot.name}</div>
-          <div style={{ fontSize: 10, color: C.m }}>{depot.operator}</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: C.white }}>{division.name}</div>
         </div>
         <NotifIcon />
         <InboxIcon />
@@ -121,7 +120,7 @@ export default function ActionPage() {
           <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", gap: 12, marginBottom: 16 }}>
             <button
               type="button"
-              onClick={() => { playClick(); router.push(`/depot/${code}/swaps?status=filled`); }}
+              onClick={() => { playClick(); router.push(`/division/${code}/swaps?status=filled`); }}
               style={{
                 background: "rgba(255,255,255,.04)",
                 border: `1px solid ${C.bd}`,
@@ -139,7 +138,7 @@ export default function ActionPage() {
             </button>
             <button
               type="button"
-              onClick={() => { playClick(); router.push(`/depot/${code}/swaps`); }}
+              onClick={() => { playClick(); router.push(`/division/${code}/swaps`); }}
               style={{
                 background: "rgba(255,255,255,.04)",
                 border: `1px solid ${C.bd}`,
@@ -183,7 +182,7 @@ export default function ActionPage() {
           ))}
         </div>
       </main>
-      {user && <OnboardingChecklist userId={user.id} depotCode={code} />}
+      {user && <OnboardingChecklist userId={user.id} divisionCode={code} />}
       <FeedbackButton />
     </div>
   );

@@ -9,7 +9,7 @@ import Icon from "@/components/ui/Icon";
 const faqs = [
   {
     q: "How do I post a swap?",
-    a: "Tap \"Post a Swap\", choose your swap type, fill in your shift details, and submit. Your swap will be visible to all members at your depot.",
+    a: "Tap \"Post a Swap\", choose your swap type, fill in your shift details, and submit. Your swap will be visible to all members at your division.",
   },
   {
     q: "What happens after both members confirm?",
@@ -17,15 +17,15 @@ const faqs = [
   },
   {
     q: "Can my supervisor override this?",
-    a: "Yes. TWU Local 106 Connect is a coordination tool only. All swaps must comply with your depot's official procedures and receive supervisor approval.",
+    a: "Yes. TWU Local 106 Connect is a coordination tool only. All swaps must comply with your division's official procedures and receive supervisor approval.",
   },
   {
     q: "How do Mutual Matches work?",
     a: "Post your swap and we automatically compare it against other open swaps. If your schedules complement each other, it shows up as a match.",
   },
   {
-    q: "Why can't I change my home depot?",
-    a: "To prevent abuse, you can only change your home depot once every 7 days. Contact an admin if you have an urgent situation.",
+    q: "Why can't I change my home division?",
+    a: "To prevent abuse, you can only change your home division once every 7 days. Contact an admin if you have an urgent situation.",
   },
   {
     q: "How do I report a problem?",
@@ -54,7 +54,7 @@ function AccordionItem({ q, a }: { q: string; a: string }) {
 export default function HelpPage() {
   const { user } = useAuth();
   const router = useRouter();
-  const depotCode = user?.depot?.code;
+  const divisionCode = user?.division?.code;
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
@@ -93,12 +93,12 @@ export default function HelpPage() {
         <div style={{ marginTop: 32, padding: "18px 20px", borderRadius: 16, background: "rgba(255,255,255,.03)", border: `1px solid ${C.bd}`, textAlign: "center" }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.white, marginBottom: 6 }}>Still need help?</div>
           <div style={{ fontSize: 12, color: C.m, lineHeight: 1.6, marginBottom: 16 }}>Use the feedback button in the app or report a swap for urgent issues.</div>
-          {depotCode && (
+          {divisionCode && (
             <button
-              onClick={() => router.push(`/depot/${depotCode}`)}
+              onClick={() => router.push(`/division/${divisionCode}`)}
               style={{ padding: "10px 24px", borderRadius: 12, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 13, fontWeight: 700, color: C.bg }}
             >
-              Back to Depot
+              Back to Division
             </button>
           )}
         </div>

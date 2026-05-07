@@ -45,7 +45,7 @@ export default function FirstSwapCelebration({ onDismiss }: Props) {
           First swap posted!
         </div>
         <div style={{ fontSize: 14, color: C.m, lineHeight: 1.6 }}>
-          Your swap is now live. Other operators in your depot can see it and reach out.
+          Your swap is now live. Other operators in your division can see it and reach out.
         </div>
         <div style={{ marginTop: 20, fontSize: 12, color: "rgba(255,255,255,.3)" }}>
           Tap anywhere to continue

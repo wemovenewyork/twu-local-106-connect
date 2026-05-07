@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const [profile, swaps, messages, agreements, savedSwaps, notifications, reputation, reviews] = await Promise.all([
     prisma.user.findUnique({
       where: { id: user.userId },
-      select: { id: true, firstName: true, lastName: true, email: true, role: true, language: true, createdAt: true, depotId: true },
+      select: { id: true, firstName: true, lastName: true, email: true, role: true, language: true, createdAt: true, divisionId: true },
     }),
     prisma.swap.findMany({
       where: { userId: user.userId },

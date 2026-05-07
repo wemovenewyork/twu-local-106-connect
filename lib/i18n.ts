@@ -8,7 +8,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "nav.messages": "My Messages",
     "nav.profile": "Profile",
     "nav.my": "My Posted Swaps",
-    // Depot action menu (English)
+    // Division action menu (English)
     "browse": "Browse Swaps",
     "post": "Post a Swap",
     "my": "My Posted Swaps",
@@ -73,7 +73,7 @@ const translations: Record<Lang, Record<string, string>> = {
     // Profile
     "profile.title": "My Profile",
     "profile.language": "Language",
-    "profile.depot": "Depot",
+    "profile.division": "Division",
     "profile.reputation": "Reputation",
     // Auth
     "auth.signIn": "Sign In",
@@ -145,7 +145,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "messages.placeholder": "Escribe un mensaje...",
     "profile.title": "Mi Perfil",
     "profile.language": "Idioma",
-    "profile.depot": "Depósito",
+    "profile.division": "Depósito",
     "profile.reputation": "Reputación",
     "auth.signIn": "Iniciar Sesión",
     "auth.register": "Crear Cuenta",
@@ -160,7 +160,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "notif.disable": "Desactivar Notificaciones",
     "notif.enabled": "Notificaciones activadas",
     "notif.blocked": "Notificaciones bloqueadas por el navegador",
-    // Depot action menu keys
+    // Division action menu keys
     "browse": "Ver Turnos Disponibles",
     "post": "Publicar un Turno",
     "my": "Mis Publicaciones",
@@ -226,7 +226,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "messages.placeholder": "Ekri yon mesaj...",
     "profile.title": "Pwofil Mwen",
     "profile.language": "Lang",
-    "profile.depot": "Depo",
+    "profile.division": "Depo",
     "profile.reputation": "Reputasyon",
     "auth.signIn": "Konekte",
     "auth.register": "Kreye Kont",
@@ -296,7 +296,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "messages.placeholder": "写消息...",
     "profile.title": "我的资料",
     "profile.language": "语言",
-    "profile.depot": "站点",
+    "profile.division": "站点",
     "profile.reputation": "声誉",
     "auth.signIn": "登录",
     "auth.register": "创建账户",
@@ -311,7 +311,7 @@ const translations: Record<Lang, Record<string, string>> = {
     "notif.disable": "禁用通知",
     "notif.enabled": "通知已启用",
     "notif.blocked": "通知被浏览器阻止",
-    // Depot action menu keys
+    // Division action menu keys
     "browse": "查看可用班次",
     "post": "发布班次",
     "my": "我的发布",
@@ -327,7 +327,7 @@ const translations: Record<Lang, Record<string, string>> = {
 export function t(langOrKey: Lang | string, keyOrLang?: string): string {
   // Support two call signatures:
   //   t(lang, key)  — original signature
-  //   t(key, lang)  — new signature for depot page (t("browse", user?.language))
+  //   t(key, lang)  — new signature for division page (t("browse", user?.language))
   if (keyOrLang === undefined) {
     // t(key) — no lang, default to en
     const key = langOrKey;

@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot, Swap } from "@/types";
+import { Division, Swap } from "@/types";
 import { C } from "@/constants/colors";
 import SwapCard from "@/components/ui/SwapCard";
-import DepotBadge from "@/components/ui/DepotBadge";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import Icon from "@/components/ui/Icon";
 import BottomNav from "@/components/ui/BottomNav";
 import ConfirmModal from "@/components/ui/ConfirmModal";
@@ -22,7 +22,7 @@ export default function MyPostsPage() {
   const params = useParams<{ code: string }>();
   const code = params.code;
 
-  const [depot, setDepot] = useState<Depot | null>(null);
+  const [division, setDepot] = useState<Division | null>(null);
   const [swaps, setSwaps] = useState<Swap[]>([]);
   const [toast, setToast] = useState<{ message: string; type?: "success" | "error" | "info" } | null>(null);
   const [confirm, setConfirm] = useState<{ title: string; text: string; action: () => void } | null>(null);
@@ -31,13 +31,13 @@ export default function MyPostsPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
     if (!code || !user) return;
-    api.get<Depot>(`/depots/${code}`).then(setDepot).catch(() => router.replace("/depots"));
+    api.get<Division>(`/divisions/${code}`).then(setDepot).catch(() => router.replace("/divisions"));
     api.get<Swap[]>("/users/me/swaps").then(setSwaps).catch(console.error);
   }, [code, user, router]);
 
@@ -68,17 +68,17 @@ export default function MyPostsPage() {
     showToast("Template saved!");
   };
 
-  if (!depot) return null;
+  if (!division) return null;
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
-        <DepotBadge depot={depot} size={38} />
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
+        <DivisionBadge division={division} size={38} />
         <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>My Posts</div>
         <NotifIcon />
         <InboxIcon />
-        <button onClick={() => router.push(`/depot/${code}/history`)} style={{ padding: "6px 14px", borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, cursor: "pointer", fontSize: 12, fontWeight: 600, flexShrink: 0 }}>History</button>
+        <button onClick={() => router.push(`/division/${code}/history`)} style={{ padding: "6px 14px", borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, cursor: "pointer", fontSize: 12, fontWeight: 600, flexShrink: 0 }}>History</button>
       </div>
 
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 720, margin: "0 auto", padding: "16px 20px 50px" }}>
@@ -97,20 +97,20 @@ export default function MyPostsPage() {
           {swaps.length === 0 ? (
             <div style={{ textAlign: "center", padding: 40, color: C.m }}>
               <div style={{ fontSize: 15, fontWeight: 600 }}>No posts yet</div>
-              <button onClick={() => router.push(`/depot/${code}/post`)} style={{ marginTop: 14, padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 13, fontWeight: 700, color: C.bg }}>
+              <button onClick={() => router.push(`/division/${code}/post`)} style={{ marginTop: 14, padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 13, fontWeight: 700, color: C.bg }}>
                 Post a Swap
               </button>
             </div>
           ) : swaps.map((s, idx) => (
             <div key={s.id} style={{ animation: `fadeUp .5s cubic-bezier(.4,0,.2,1) ${idx * 0.06}s both` }}>
-              <SwapCard swap={s} user={user} onDelete={handleDelete} onStatusChange={handleStatus} onEdit={sw => router.push(`/depot/${code}/post?edit=${sw.id}`)} onSaveTemplate={handleSaveTemplate} />
+              <SwapCard swap={s} user={user} onDelete={handleDelete} onStatusChange={handleStatus} onEdit={sw => router.push(`/division/${code}/post?edit=${sw.id}`)} onSaveTemplate={handleSaveTemplate} />
             </div>
           ))}
           <Footer />
         </div>
       </main>
 
-      <BottomNav active="my" depotCode={code} />
+      <BottomNav active="my" divisionCode={code} />
       {confirm && <ConfirmModal title={confirm.title} text={confirm.text} onConfirm={confirm.action} onCancel={() => setConfirm(null)} />}
       {toast && <Toast message={toast.message} type={toast.type} />}
     </div>

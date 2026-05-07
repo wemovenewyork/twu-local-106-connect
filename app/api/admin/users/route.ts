@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       // subAdmin does not see email addresses
       ...(isSubAdmin ? {} : { email: true }),
       role: true, createdAt: true, lastActiveAt: true, suspendedUntil: true,
-      depot: { select: { name: true, code: true } },
+      division: { select: { name: true, code: true } },
     },
   });
 
@@ -48,8 +48,8 @@ export async function PATCH(req: NextRequest) {
 
   const patchBody = await parseBody(req, BODY_2KB);
   if (patchBody instanceof NextResponse) return patchBody;
-  const { userId, role, depotId, suspendedUntil, verifiedOperator } = patchBody as {
-    userId: string; role?: string; depotId?: string | null; suspendedUntil?: string; verifiedOperator?: boolean;
+  const { userId, role, divisionId, suspendedUntil, verifiedOperator } = patchBody as {
+    userId: string; role?: string; divisionId?: string | null; suspendedUntil?: string; verifiedOperator?: boolean;
   };
   if (!userId) return err("userId required", 400);
   if (userId === user.userId) return err("Cannot change your own role", 400);
@@ -61,21 +61,21 @@ export async function PATCH(req: NextRequest) {
   if (role !== undefined && !["operator", "depotRep", "subAdmin", "admin"].includes(role)) {
     return err("Invalid role", 400);
   }
-  if (role === "depotRep" && !depotId) return err("Depot is required for depot rep role", 400);
+  if (role === "depotRep" && !divisionId) return err("Division is required for division rep role", 400);
 
   const updated = await prisma.user.update({
     where: { id: userId },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: {
       ...(role !== undefined && { role }),
-      ...(depotId !== undefined && {
-        depotId: depotId ?? null,
-        depotSetAt: new Date(), // Admin resets the lock timer
+      ...(divisionId !== undefined && {
+        divisionId: divisionId ?? null,
+        divisionSetAt: new Date(), // Admin resets the lock timer
       }),
       ...(suspendedUntil !== undefined && { suspendedUntil: new Date(suspendedUntil) }),
       ...(verifiedOperator !== undefined && { verifiedOperator }),
     } as Parameters<typeof prisma.user.update>[0]["data"],
-    select: { id: true, firstName: true, lastName: true, role: true, depotId: true, suspendedUntil: true, depot: { select: { name: true, code: true } } },
+    select: { id: true, firstName: true, lastName: true, role: true, divisionId: true, suspendedUntil: true, division: { select: { name: true, code: true } } },
   });
 
   // If admin suspended the user (or set suspendedUntil to a future date),
@@ -107,7 +107,7 @@ export async function PATCH(req: NextRequest) {
     targetType: "user",
     detail: [
       role !== undefined ? `role → ${role}` : null,
-      depotId !== undefined ? `depot → ${depotId ?? "none"}` : null,
+      divisionId !== undefined ? `division → ${divisionId ?? "none"}` : null,
     ].filter(Boolean).join(", ") + ` for ${target.email}`,
     ip,
   });
@@ -140,7 +140,7 @@ export async function DELETE(req: NextRequest) {
       firstName: "Deleted",
       lastName: "User",
       avatarUrl: null,
-      depotId: null,
+      divisionId: null,
       pushSubscriptions: { deleteMany: {} },
     },
   });

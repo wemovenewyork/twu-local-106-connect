@@ -97,7 +97,7 @@ export default function ErrorPage({
             Try again
           </button>
           <button
-            onClick={() => (window.location.href = "/depots")}
+            onClick={() => (window.location.href = "/divisions")}
             style={{
               padding: "14px 20px",
               borderRadius: 14,

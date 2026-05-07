@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser?.depotId) return err("Set your depot first", 400);
+  if (!dbUser?.divisionId) return err("Set your division first", 400);
   touchLastActive(user.userId);
 
   const { searchParams } = new URL(req.url);
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(Math.max(limitParam, 1), 50);
 
   // Build where clause
-  const andClauses: Record<string, unknown>[] = [{ depotId: dbUser.depotId }];
+  const andClauses: Record<string, unknown>[] = [{ divisionId: dbUser.divisionId }];
 
   // Hide swaps from operators the current user has blocked, and from operators
   // who have blocked the current user. Symmetric, same as the messaging filter.
@@ -131,9 +131,9 @@ export async function POST(req: NextRequest) {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.userId },
-    include: { depot: { select: { code: true } } },
+    include: { division: { select: { code: true } } },
   });
-  if (!dbUser?.depotId) return err("Set your depot first", 400);
+  if (!dbUser?.divisionId) return err("Set your division first", 400);
   const activeErr = checkActive(dbUser);
   if (activeErr) return err(activeErr, 403);
 
@@ -257,7 +257,7 @@ export async function POST(req: NextRequest) {
   const swap = await prisma.swap.create({
     data: {
       userId: user.userId,
-      depotId: dbUser.depotId,
+      divisionId: dbUser.divisionId,
       category: category as SwapCategory,
       details,
       contact: contact ?? null,
@@ -278,19 +278,19 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Notify all other users at this depot who have push subscriptions
-  const depotUsers = await prisma.user.findMany({
-    where: { depotId: dbUser.depotId, id: { not: user.userId }, pushSubscriptions: { some: {} } },
+  // Notify all other users at this division who have push subscriptions
+  const divisionUsers = await prisma.user.findMany({
+    where: { divisionId: dbUser.divisionId, id: { not: user.userId }, pushSubscriptions: { some: {} } },
     select: { id: true },
   });
   const categoryLabel =
     swap.category === "work" ? "Work"
     : swap.category === "daysoff" ? "Days Off"
     : "Vacation";
-  await notifyMany(depotUsers.map(u => u.id), {
+  await notifyMany(divisionUsers.map(u => u.id), {
     title: `New ${categoryLabel} swap posted`,
     body: `${posterName} posted a new swap — check the board`,
-    url: `/depot/${dbUser.depot!.code}/swaps/${swap.id}`,
+    url: `/division/${dbUser.division!.code}/swaps/${swap.id}`,
   });
 
   return ok(swap, 201);

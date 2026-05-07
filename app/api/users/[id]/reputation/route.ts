@@ -17,13 +17,13 @@ export async function GET(
 
   const { id } = await params;
 
-  // Scope reputation lookups to same depot — prevents enumeration of users across depots
+  // Scope reputation lookups to same division — prevents enumeration of users across divisions
   const [caller, target] = await Promise.all([
-    prisma.user.findUnique({ where: { id: user.userId }, select: { depotId: true } }),
-    prisma.user.findUnique({ where: { id }, select: { depotId: true } }),
+    prisma.user.findUnique({ where: { id: user.userId }, select: { divisionId: true } }),
+    prisma.user.findUnique({ where: { id }, select: { divisionId: true } }),
   ]);
   if (!caller || !target) return err("User not found", 404);
-  if (caller.depotId !== target.depotId) return err("Not found", 404);
+  if (caller.divisionId !== target.divisionId) return err("Not found", 404);
 
   const [rep, reviews] = await Promise.all([
     prisma.reputation.findUnique({ where: { userId: id } }),

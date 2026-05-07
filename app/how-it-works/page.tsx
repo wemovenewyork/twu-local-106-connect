@@ -13,16 +13,16 @@ const STEPS = [
     color: C.gold,
     title: "Get Your Invite",
     desc: "TWU Local 106 Connect is supervisor-to-supervisor. Every new member joins with an invite code from a fellow Local 106 member. No management, no gatekeeping.",
-    detail: "When you join, you automatically receive 3 invite codes to share with colleagues at your depot.",
+    detail: "When you join, you automatically receive 3 invite codes to share with colleagues at your division.",
     visual: <InviteVisual />,
   },
   {
     n: "02",
     color: C.blue,
-    title: "Set Your Depot",
-    desc: "Pick your home depot. Your swap board is shared only with members at your location — keeping everything relevant and local.",
-    detail: "You can update your depot once every 7 days if you transfer.",
-    visual: <DepotVisual />,
+    title: "Set Your Division",
+    desc: "Pick your home division. Your swap board is shared only with members at your location — keeping everything relevant and local.",
+    detail: "You can update your division once every 7 days if you transfer.",
+    visual: <DivisionVisual />,
   },
   {
     n: "03",
@@ -36,7 +36,7 @@ const STEPS = [
     n: "04",
     color: "#C084FC",
     title: "Get Matched",
-    desc: "Browse open swaps from your depot. Our auto-matcher also scans the board and flags members whose schedules complement yours.",
+    desc: "Browse open swaps from your division. Our auto-matcher also scans the board and flags members whose schedules complement yours.",
     detail: "A Mutual Match means both your schedules work for each other — the hardest part is already done.",
     visual: <MatchVisual />,
   },
@@ -53,7 +53,7 @@ const STEPS = [
     color: "#2ED573",
     title: "Print & Present",
     desc: "Once both members confirm, a timestamped agreement is generated. Show the agreement on your phone to your supervisor or manager — they handle approval the same way they always have.",
-    detail: "The agreement still requires supervisor approval per your depot's procedures — TWU Local 106 Connect coordinates the swap, it doesn't replace management sign-off.",
+    detail: "The agreement still requires supervisor approval per your division's procedures — TWU Local 106 Connect coordinates the swap, it doesn't replace management sign-off.",
     visual: <PrintVisual />,
   },
 ];
@@ -75,11 +75,11 @@ function InviteVisual() {
   );
 }
 
-function DepotVisual() {
-  const depots = ["Queens Village", "East New York", "Flatbush", "Gun Hill", "Spring Creek"];
+function DivisionVisual() {
+  const divisions = ["Queens Village", "East New York", "Flatbush", "Gun Hill", "Spring Creek"];
   return (
     <div style={{ width: "100%", maxWidth: 260 }}>
-      {depots.slice(0,3).map((d, i) => (
+      {divisions.slice(0,3).map((d, i) => (
         <div key={d} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, background: i === 1 ? `${C.blue}18` : "rgba(255,255,255,.03)", border: `1px solid ${i === 1 ? C.blue + "44" : "rgba(255,255,255,.06)"}`, marginBottom: 6 }}>
           <div style={{ width: 8, height: 8, borderRadius: "50%", background: i === 1 ? C.blue : "rgba(255,255,255,.15)", boxShadow: i === 1 ? `0 0 8px ${C.blue}` : "none" }} />
           <div style={{ fontSize: 13, fontWeight: i === 1 ? 700 : 400, color: i === 1 ? C.white : C.m, flex: 1 }}>{d}</div>

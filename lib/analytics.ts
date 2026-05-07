@@ -22,7 +22,7 @@ export function initAnalytics() {
 
 export function identifyUser(userId: string, props: {
   role?: string;
-  depot?: string;
+  division?: string;
   language?: string;
   jobTitle?: string;
 }) {
@@ -51,14 +51,14 @@ export const analytics = {
   logoutCompleted: () => track("logout_completed"),
 
   // Onboarding
-  profileSetupCompleted: (depotCode: string) => track("profile_setup_completed", { depot: depotCode }),
+  profileSetupCompleted: (divisionCode: string) => track("profile_setup_completed", { division: divisionCode }),
   onboardingCompleted: () => track("onboarding_completed"),
   checklistItemCompleted: (item: string) => track("checklist_item_completed", { item }),
   checklistDismissed: (completedCount: number) => track("checklist_dismissed", { completed_count: completedCount }),
 
   // Swaps
-  swapPosted: (props: { type: string; depot: string; swapType?: string }) => track("swap_posted", props),
-  swapViewed: (swapId: string, depot: string) => track("swap_viewed", { swap_id: swapId, depot }),
+  swapPosted: (props: { type: string; division: string; swapType?: string }) => track("swap_posted", props),
+  swapViewed: (swapId: string, division: string) => track("swap_viewed", { swap_id: swapId, division }),
   swapSaved: (swapId: string) => track("swap_saved", { swap_id: swapId }),
   swapShared: (swapId: string, method: string) => track("swap_shared", { swap_id: swapId, method }),
   swapFiltered: (filters: Record<string, unknown>) => track("swap_filtered", filters),

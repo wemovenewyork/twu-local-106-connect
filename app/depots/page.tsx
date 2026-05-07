@@ -4,42 +4,34 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot } from "@/types";
-import { C, OC } from "@/constants/colors";
-import DepotBadge from "@/components/ui/DepotBadge";
+import { Division } from "@/types";
+import { C } from "@/constants/colors";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import Icon from "@/components/ui/Icon";
 import Footer from "@/components/ui/Footer";
 import TiltCard from "@/components/ui/TiltCard";
 import NotifIcon from "@/components/ui/NotifIcon";
 import InboxIcon from "@/components/ui/InboxIcon";
 
-const BOROUGHS = ["All", "Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island"];
-
-export default function DepotsPage() {
+export default function DivisionsPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [depots, setDepots] = useState<Depot[]>([]);
+  const [divisions, setDivisions] = useState<Division[]>([]);
   const [q, setQ] = useState("");
-  const [bo, setBo] = useState("All");
   const [hovered, setHovered] = useState<string | null>(null);
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
   }, [user, loading, router]);
 
   useEffect(() => {
-    api.get<Depot[]>("/depots").then(setDepots).catch(console.error);
+    api.get<Division[]>("/divisions").then(setDivisions).catch(console.error);
   }, []);
 
-  const grouped = useMemo(() => {
-    const filtered = depots.filter(d =>
-      (bo === "All" || d.borough === bo) &&
-      (!q || d.name.toLowerCase().includes(q.toLowerCase()))
-    );
-    const g: Record<string, Depot[]> = {};
-    filtered.forEach(d => (g[d.borough] = g[d.borough] || []).push(d));
-    return g;
-  }, [depots, q, bo]);
+  const filtered = useMemo(
+    () => divisions.filter(d => !q || d.name.toLowerCase().includes(q.toLowerCase())),
+    [divisions, q]
+  );
 
   return (
     <div className="page-enter" style={{ minHeight: "100vh", background: C.bg }}>
@@ -61,22 +53,15 @@ export default function DepotsPage() {
           <div style={{ fontSize: 14, color: C.gold, marginBottom: 10 }}>Welcome, {user?.firstName}</div>
           <h2 style={{ fontSize: "clamp(28px,7vw,46px)", fontWeight: 800, color: C.white, lineHeight: 1.1 }}>
             Choose Your{" "}
-            <span style={{ background: `linear-gradient(135deg,${C.gold},${C.gold}bb)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Depot</span>
+            <span style={{ background: `linear-gradient(135deg,${C.gold},${C.gold}bb)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Division</span>
           </h2>
         </div>
 
         <div style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(12px)", borderRadius: 20, border: "1px solid rgba(255,255,255,.06)", padding: 18, marginBottom: 24 }}>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search depots..." style={{ height: 48, marginBottom: 10 }} />
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {BOROUGHS.map(x => (
-              <button key={x} onClick={() => setBo(x)} style={{ padding: "7px 16px", borderRadius: 100, border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, background: bo === x ? C.gold : "rgba(255,255,255,.05)", color: bo === x ? C.bg : C.m }}>
-                {x}
-              </button>
-            ))}
-          </div>
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search divisions..." style={{ height: 48 }} />
         </div>
 
-        {depots.length === 0 && (
+        {divisions.length === 0 && (
           <div style={{ display: "grid", gap: 6 }}>
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="skeleton" style={{ height: 66, borderRadius: 14 }} />
@@ -84,36 +69,28 @@ export default function DepotsPage() {
           </div>
         )}
 
-        {Object.keys(grouped).sort().map(bn => (
-          <div key={bn} style={{ marginBottom: 28 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.gold, letterSpacing: 4, textTransform: "uppercase", marginBottom: 10 }}>{bn}</div>
-            <div style={{ display: "grid", gap: 6 }}>
-              {grouped[bn].map(d => (
-                <TiltCard key={d.code} className="card-enter" intensity={6}>
-                  <button
-                    onClick={() => router.push(`/depot/${d.code}/swaps`)}
-                    onMouseEnter={() => setHovered(d.code)}
-                    onMouseLeave={() => setHovered(null)}
-                    style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", padding: "12px 16px", borderRadius: 14, border: "none", cursor: "pointer", textAlign: "left", transition: "background .25s, box-shadow .25s", background: hovered === d.code ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.025)", backdropFilter: "blur(8px)", borderLeft: hovered === d.code ? `3px solid ${C.gold}` : "3px solid transparent", boxShadow: hovered === d.code ? `0 8px 32px rgba(0,0,0,.2), inset 0 0 0 1px rgba(173,27,39,.15)` : `inset 0 0 0 1px rgba(255,255,255,.05)` }}
-                  >
-                    <DepotBadge depot={d} size={42} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 14, fontWeight: 600, color: C.white }}>{d.name}</div>
-                      <div style={{ display: "flex", gap: 8, marginTop: 3 }}>
-                        <span style={{ padding: "2px 8px", borderRadius: 6, background: (OC[d.operator] || C.blue) + "18", fontSize: 10, fontWeight: 600, color: OC[d.operator] || C.blue }}>{d.operator}</span>
-                        <span style={{ fontSize: 11, color: C.m }}>{d.borough}</span>
-                      </div>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ background: C.gold + "18", color: C.gold, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 8 }}>{d.openSwaps ?? 0} swaps</span>
-                      <Icon n="chev" s={16} c={C.gold} />
-                    </div>
-                  </button>
-                </TiltCard>
-              ))}
-            </div>
-          </div>
-        ))}
+        <div style={{ display: "grid", gap: 6, marginBottom: 28 }}>
+          {filtered.map(d => (
+            <TiltCard key={d.code} className="card-enter" intensity={6}>
+              <button
+                onClick={() => router.push(`/division/${d.code}/swaps`)}
+                onMouseEnter={() => setHovered(d.code)}
+                onMouseLeave={() => setHovered(null)}
+                style={{ display: "flex", alignItems: "center", gap: 14, width: "100%", padding: "12px 16px", borderRadius: 14, border: "none", cursor: "pointer", textAlign: "left", transition: "background .25s, box-shadow .25s", background: hovered === d.code ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.025)", backdropFilter: "blur(8px)", borderLeft: hovered === d.code ? `3px solid ${C.gold}` : "3px solid transparent", boxShadow: hovered === d.code ? `0 8px 32px rgba(0,0,0,.2), inset 0 0 0 1px rgba(173,27,39,.15)` : `inset 0 0 0 1px rgba(255,255,255,.05)` }}
+              >
+                <DivisionBadge division={d} size={42} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: C.white }}>{d.name}</div>
+                  <div style={{ fontSize: 11, color: C.m, marginTop: 3 }}>{d.code}</div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ background: C.gold + "18", color: C.gold, fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 8 }}>{d.openSwaps ?? 0} swaps</span>
+                  <Icon n="chev" s={16} c={C.gold} />
+                </div>
+              </button>
+            </TiltCard>
+          ))}
+        </div>
         <Footer />
       </main>
     </div>

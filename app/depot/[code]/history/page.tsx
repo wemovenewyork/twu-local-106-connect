@@ -60,8 +60,8 @@ export default function HistoryPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function HistoryPage() {
     <div style={{ minHeight: "100vh", paddingBottom: 80 }}>
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
         <div style={{ flex: 1 }}>
@@ -197,7 +197,7 @@ export default function HistoryPage() {
                     return (
                       <div
                         key={s.id}
-                        onClick={() => router.push(`/depot/${code}/swaps/${s.id}`)}
+                        onClick={() => router.push(`/division/${code}/swaps/${s.id}`)}
                         style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 14, background: "rgba(255,255,255,.04)", border: `1px solid rgba(255,255,255,.06)`, cursor: "pointer" }}
                       >
                         <div style={{ width: 36, height: 36, borderRadius: 10, background: cat.c + "18", border: `1px solid ${cat.c}33`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -283,7 +283,7 @@ export default function HistoryPage() {
         )}
       </main>
 
-      <BottomNav depotCode={code} active="my" />
+      <BottomNav divisionCode={code} active="my" />
     </div>
   );
 }

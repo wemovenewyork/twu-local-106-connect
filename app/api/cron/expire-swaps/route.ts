@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       status: { in: ["open", "pending"] },
       date: { lt: nyToday, not: null },
     },
-    select: { id: true, userId: true, depotId: true, details: true },
+    select: { id: true, userId: true, divisionId: true, details: true },
   });
 
   // Mark work swaps as expired: open/pending swaps whose date is in the past
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     await notifyUser(swap.userId, {
       title: "Your swap expired",
       body: `"${swap.details.substring(0, 60)}" — repost it to keep looking`,
-      url: `/depot/${swap.depotId}/my`,
+      url: `/division/${swap.divisionId}/my`,
     });
   }
 

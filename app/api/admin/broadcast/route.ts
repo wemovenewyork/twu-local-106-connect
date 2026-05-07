@@ -6,7 +6,7 @@ import { notifyUser, notifyMany } from "@/lib/notifyUser";
 import { parseBody, BODY_4KB } from "@/lib/parseBody";
 
 // POST /api/admin/broadcast
-// body: { target: "all" | "user" | "depot", userId?: string, depotCode?: string, text: string }
+// body: { target: "all" | "user" | "division", userId?: string, divisionCode?: string, text: string }
 export async function POST(req: NextRequest) {
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
@@ -18,11 +18,11 @@ export async function POST(req: NextRequest) {
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
-  const { target, userId, depotCode, text } = body as { target: string; userId?: string; depotCode?: string; text: string };
+  const { target, userId, divisionCode, text } = body as { target: string; userId?: string; divisionCode?: string; text: string };
 
   if (!text?.trim()) return err("Message text required", 400);
   if (text.trim().length > 1000) return err("Max 1000 characters", 400);
-  if (!["all", "user", "depot"].includes(target)) return err("Invalid target", 400);
+  if (!["all", "user", "division"].includes(target)) return err("Invalid target", 400);
   if (isSubAdmin && target === "all") return err("SubAdmins cannot broadcast to all users", 403);
 
   const trimmed = text.trim();
@@ -44,13 +44,13 @@ export async function POST(req: NextRequest) {
     return ok({ sent: 1 });
   }
 
-  if (target === "depot") {
-    if (!depotCode) return err("depotCode required for depot target", 400);
-    const depot = await prisma.depot.findUnique({ where: { code: depotCode } });
-    if (!depot) return err("Depot not found", 404);
+  if (target === "division") {
+    if (!divisionCode) return err("divisionCode required for division target", 400);
+    const division = await prisma.division.findUnique({ where: { code: divisionCode } });
+    if (!division) return err("Division not found", 404);
 
     const recipients = await prisma.user.findMany({
-      where: { depotId: depot.id, id: { not: token.userId } },
+      where: { divisionId: division.id, id: { not: token.userId } },
       select: { id: true },
     });
     if (!recipients.length) return ok({ sent: 0 });

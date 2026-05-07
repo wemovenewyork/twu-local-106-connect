@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   const swaps = await prisma.swap.findMany({
     where: { status: "open", date: { gte: tomorrow, lt: dayAfter } },
-    select: { id: true, userId: true, depotId: true, details: true },
+    select: { id: true, userId: true, divisionId: true, details: true },
   });
 
   if (swaps.length === 0) return ok({ notified: 0 });
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     notifyUser(swap.userId, {
       title: "Your swap expires tomorrow",
       body: `"${snippet}" — fill it or repost before it expires`,
-      url: `/depot/${swap.depotId}/my`,
+      url: `/division/${swap.divisionId}/my`,
     });
 
     // Notify interested users (those who messaged about it)
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       notifyMany(ids, {
         title: "Swap expiring tomorrow",
         body: `"${snippet}" — reach out now before it's gone`,
-        url: `/depot/${swap.depotId}/swaps/${swap.id}`,
+        url: `/division/${swap.divisionId}/swaps/${swap.id}`,
       });
     }
     notified++;

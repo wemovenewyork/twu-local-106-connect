@@ -73,10 +73,10 @@ export default function LoginPage() {
     if (!loading && user && !showConsentFlow && !showTerms) {
       if (user.termsVersion !== CURRENT_TERMS_VERSION) {
         setShowTerms(true);
-      } else if (!user.depotId) {
+      } else if (!user.divisionId) {
         router.replace("/setup-profile");
       } else {
-        router.replace(user.depot?.code ? `/depot/${user.depot.code}` : "/depots");
+        router.replace(user.division?.code ? `/division/${user.division.code}` : "/divisions");
       }
     }
   }, [user, loading, router, showConsentFlow, showTerms]);
@@ -103,7 +103,7 @@ export default function LoginPage() {
     if (Object.keys(errs).length) { setFieldErrs(errs); setShaking(true); setTimeout(() => setShaking(false), 500); return; }
     setSubmitting(true); setErr(""); setFieldErrs({}); setNeedsVerification(false); setResendStatus("");
     try {
-      const data = await api.post<{ user: { id: string; firstName: string; lastName: string; email: string; depotId?: string | null; language: string } }>("/auth/login", { email: em, password: pw });
+      const data = await api.post<{ user: { id: string; firstName: string; lastName: string; email: string; divisionId?: string | null; language: string } }>("/auth/login", { email: em, password: pw });
       // Clear any stale "pending verification" state on successful login
       sessionStorage.removeItem("local106-pending-verify-email");
       login(data.user as Parameters<typeof login>[0]);
@@ -371,7 +371,7 @@ export default function LoginPage() {
                 Local 106 is the union, but this platform is <strong style={{ color: C.white }}>not affiliated with the MTA, MaBSTOA, or MTA Bus Company</strong>.
               </p>
               <p style={{ margin: "0 0 12px" }}>
-                All swap agreements are <strong style={{ color: C.white }}>between members only</strong>. It is your responsibility to ensure any swap complies with your collective bargaining agreement, depot rules, and all applicable MTA / MaBSTOA / MTA Bus policies before submitting it for official approval.
+                All swap agreements are <strong style={{ color: C.white }}>between members only</strong>. It is your responsibility to ensure any swap complies with your collective bargaining agreement, division rules, and all applicable MTA / MaBSTOA / MTA Bus policies before submitting it for official approval.
               </p>
               <p style={{ margin: 0 }}>
                 By continuing, you confirm you are an active TWU Local 106 member and agree to use this app in accordance with your employment obligations.
@@ -412,7 +412,7 @@ export default function LoginPage() {
               {[
                 { title: "1. Acceptance of Terms", body: 'By accessing or using TWU Local 106 Connect ("the App"), you agree to be bound by these Terms of Use. If you do not agree, do not use the App.' },
                 { title: "2. Who Can Use This App", body: "TWU Local 106 Connect is intended exclusively for active members of TWU Local 106 (the Transit Supervisors Organization). By registering you confirm you are a current Local 106 member, the information you provide is accurate, you will not share your credentials, and you are at least 18 years of age." },
-                { title: "3. Shift Swap Coordination", body: "TWU Local 106 Connect is a coordination tool only. It does not replace any MTA, TWU, or union collective bargaining agreements. All shift swaps must comply with your depot's official procedures and receive supervisor approval. The App makes no guarantee a swap will be approved by management." },
+                { title: "3. Shift Swap Coordination", body: "TWU Local 106 Connect is a coordination tool only. It does not replace any MTA, TWU, or union collective bargaining agreements. All shift swaps must comply with your division's official procedures and receive supervisor approval. The App makes no guarantee a swap will be approved by management." },
                 { title: "4. User Conduct", body: "You agree not to post false or fraudulent swap listings, harass or threaten other members, share others' personal information without consent, use the App for commercial gain, attempt unauthorized access, or post discriminatory content. Violations may result in immediate account suspension." },
                 { title: "5. Reputation System", body: "Reviews must be honest and based on actual swap experiences. Manipulating ratings — including self-reviewing or fake reviews — is prohibited and may result in account termination." },
                 { title: "6. Invite Codes", body: "You are responsible for who you invite. Do not share invite codes publicly or with non-members. Misuse may result in suspension of your account and the invited account." },
@@ -446,7 +446,7 @@ export default function LoginPage() {
                 try {
                   await api.post("/auth/accept-terms", { version: CURRENT_TERMS_VERSION });
                 } catch { /* non-fatal — proceed anyway */ }
-                const dest = user?.depot?.code ? `/depot/${user.depot.code}` : user?.depotId ? "/depots" : "/setup-profile";
+                const dest = user?.division?.code ? `/division/${user.division.code}` : user?.divisionId ? "/divisions" : "/setup-profile";
                 window.location.href = dest;
               }}
               disabled={!termsChecked || acceptingTerms}

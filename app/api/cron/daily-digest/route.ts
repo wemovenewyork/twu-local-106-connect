@@ -4,7 +4,7 @@ import { sendPush } from "@/lib/pushNotify";
 import { ok, err } from "@/lib/apiResponse";
 
 // Runs every morning at 7 AM — sends each subscribed operator a summary of
-// new open swaps posted in their depot in the last 24 hours.
+// new open swaps posted in their division in the last 24 hours.
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
   const auth = req.headers.get("authorization");
@@ -13,40 +13,40 @@ export async function GET(req: NextRequest) {
   try {
   const since = new Date(Date.now() - 86_400_000);
 
-  // Group new swaps by depotId
+  // Group new swaps by divisionId
   const newSwaps = await prisma.swap.findMany({
     where: { status: "open", createdAt: { gte: since } },
-    select: { depotId: true, category: true },
+    select: { divisionId: true, category: true },
   });
 
-  const countsByDepot = new Map<string, number>();
+  const countsByDivision = new Map<string, number>();
   for (const s of newSwaps) {
-    countsByDepot.set(s.depotId, (countsByDepot.get(s.depotId) ?? 0) + 1);
+    countsByDivision.set(s.divisionId, (countsByDivision.get(s.divisionId) ?? 0) + 1);
   }
 
-  if (countsByDepot.size === 0) return ok({ sent: 0, message: "No new swaps" });
+  if (countsByDivision.size === 0) return ok({ sent: 0, message: "No new swaps" });
 
-  // Get all push subscriptions for users in affected depots
+  // Get all push subscriptions for users in affected divisions
   const subscriptions = await prisma.pushSubscription.findMany({
-    where: { user: { depotId: { in: Array.from(countsByDepot.keys()) } } },
-    include: { user: { select: { depotId: true, firstName: true } } },
+    where: { user: { divisionId: { in: Array.from(countsByDivision.keys()) } } },
+    include: { user: { select: { divisionId: true, firstName: true } } },
   });
 
   let sent = 0;
   const failed: string[] = [];
 
   for (const sub of subscriptions) {
-    const depotId = sub.user.depotId;
-    if (!depotId) continue;
-    const count = countsByDepot.get(depotId) ?? 0;
+    const divisionId = sub.user.divisionId;
+    if (!divisionId) continue;
+    const count = countsByDivision.get(divisionId) ?? 0;
     if (count === 0) continue;
 
     const success = await sendPush(
       { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
       {
         title: "TWU Local 106 Connect — Daily Digest",
-        body: `${count} new swap${count === 1 ? "" : "s"} posted at your depot today.`,
-        url: "/depots",
+        body: `${count} new swap${count === 1 ? "" : "s"} posted at your division today.`,
+        url: "/divisions",
       }
     );
 

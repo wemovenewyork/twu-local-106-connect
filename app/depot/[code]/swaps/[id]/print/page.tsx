@@ -29,7 +29,7 @@ export default function PrintAgreementPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
   }, [user, loading, router]);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function PrintAgreementPage() {
       <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
       <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 10 }}>Agreement not confirmed</div>
       <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6, marginBottom: 28 }}>{gateError}</div>
-      <button onClick={() => router.push(`/depot/${code}/swaps/${id}`)} style={{ padding: "10px 24px", borderRadius: 8, border: "1px solid #ddd", background: "#fff", cursor: "pointer", fontSize: 14 }}>Back to Swap</button>
+      <button onClick={() => router.push(`/division/${code}/swaps/${id}`)} style={{ padding: "10px 24px", borderRadius: 8, border: "1px solid #ddd", background: "#fff", cursor: "pointer", fontSize: 14 }}>Back to Swap</button>
     </div>
   );
 
@@ -95,7 +95,7 @@ export default function PrintAgreementPage() {
 
       <div className="no-print" style={{ position: "sticky", top: 0, zIndex: 100, background: "#fff", borderBottom: "1px solid #e5e5e5", padding: "10px 16px", display: "flex", alignItems: "center", gap: 12 }}>
         <button
-          onClick={() => router.push(`/depot/${code}/swaps/${id}`)}
+          onClick={() => router.push(`/division/${code}/swaps/${id}`)}
           aria-label="Back to swap"
           style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 14px", borderRadius: 8, border: "1px solid #ddd", background: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 600, color: "#333" }}
         >

@@ -3,7 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 
-// GET /api/depots/:code/rep-dashboard/analytics
+// GET /api/divisions/:code/rep-dashboard/analytics
 // Returns 30-day daily counts of swaps posted and agreements completed
 export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   let user;
@@ -14,9 +14,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
   if (dbUser.role !== "depotRep" && dbUser.role !== "admin") return err("Forbidden", 403);
 
   const { code } = await params;
-  const depot = await prisma.depot.findUnique({ where: { code } });
-  if (!depot) return err("Depot not found", 404);
-  if (dbUser.role === "depotRep" && dbUser.depotId !== depot.id) return err("You can only view your own depot", 403);
+  const division = await prisma.division.findUnique({ where: { code } });
+  if (!division) return err("Division not found", 404);
+  if (dbUser.role === "depotRep" && dbUser.divisionId !== division.id) return err("You can only view your own division", 403);
 
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
@@ -24,11 +24,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
 
   const [recentSwaps, recentAgreements] = await Promise.all([
     prisma.swap.findMany({
-      where: { depotId: depot.id, createdAt: { gte: thirtyDaysAgo } },
+      where: { divisionId: division.id, createdAt: { gte: thirtyDaysAgo } },
       select: { createdAt: true },
     }),
     prisma.swapAgreement.findMany({
-      where: { swap: { depotId: depot.id }, status: "completed", completedAt: { gte: thirtyDaysAgo } },
+      where: { swap: { divisionId: division.id }, status: "completed", completedAt: { gte: thirtyDaysAgo } },
       select: { completedAt: true },
     }),
   ]);

@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      depotId: user.depotId,
+      divisionId: user.divisionId,
       role: user.role,
       language: user.language,
     },

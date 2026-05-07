@@ -54,7 +54,7 @@ function ActivityChart({ data }: { data: DayData[] }) {
 }
 
 interface DashData {
-  depot: { name: string; code: string; operator: string };
+  division: { name: string; code: string };
   swapCounts: { status: string; category: string; _count: number }[];
   recentAgreements: {
     id: string;
@@ -88,19 +88,19 @@ export default function RepDashboardPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
   }, [user, loading, router]);
 
   useEffect(() => {
     if (!user) return;
     if (user.role !== "depotRep" && user.role !== "admin") {
-      setError("Access restricted to depot reps and admins.");
+      setError("Access restricted to division reps and admins.");
       return;
     }
-    api.get<DashData>(`/depots/${code}/rep-dashboard`)
+    api.get<DashData>(`/divisions/${code}/rep-dashboard`)
       .then(setData)
       .catch((e: unknown) => setError(e instanceof Error ? e.message : "Failed to load"));
-    api.get<DayData[]>(`/depots/${code}/rep-dashboard/analytics`)
+    api.get<DayData[]>(`/divisions/${code}/rep-dashboard/analytics`)
       .then(setAnalytics)
       .catch(() => {});
     api.get<{ inviteCodes: { code: string; isValid: boolean }[] }>("/users/me")
@@ -139,12 +139,12 @@ export default function RepDashboardPage() {
     <div style={{ minHeight: "100vh", paddingBottom: 40 }}>
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: C.white }}>Rep Dashboard</div>
-          <div style={{ fontSize: 10, color: C.gold, letterSpacing: 2, textTransform: "uppercase" }}>{data.depot.name} — Read Only</div>
+          <div style={{ fontSize: 10, color: C.gold, letterSpacing: 2, textTransform: "uppercase" }}>{data.division.name} — Read Only</div>
         </div>
         <div style={{ width: 36, height: 36, borderRadius: 10, background: "#C084FC18", border: "1px solid #C084FC33", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="shield" s={18} c="#C084FC" />

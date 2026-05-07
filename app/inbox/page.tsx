@@ -33,7 +33,7 @@ export default function InboxPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
   }, [user, loading, router]);
 
   const load = useCallback(() => {
@@ -52,12 +52,12 @@ export default function InboxPage() {
     return () => { clearInterval(interval); document.removeEventListener("visibilitychange", onVisible); };
   }, [user, load]);
 
-  const depotCode = user?.depot?.code;
+  const divisionCode = user?.division?.code;
   const totalUnread = convos.reduce((s, c) => s + c.unreadCount, 0);
 
   const openThread = (counterpartId: string) => {
-    if (depotCode) {
-      router.push(`/depot/${depotCode}/messages/${counterpartId}`);
+    if (divisionCode) {
+      router.push(`/division/${divisionCode}/messages/${counterpartId}`);
     }
   };
 
@@ -129,9 +129,9 @@ export default function InboxPage() {
                 <button
                   key={conv.counterpartId}
                   onClick={() => openThread(conv.counterpartId)}
-                  disabled={!depotCode}
+                  disabled={!divisionCode}
                   style={{
-                    width: "100%", textAlign: "left", border: "none", cursor: depotCode ? "pointer" : "default",
+                    width: "100%", textAlign: "left", border: "none", cursor: divisionCode ? "pointer" : "default",
                     animation: `fadeUp .35s cubic-bezier(.4,0,.2,1) ${idx * 0.05}s both`,
                     background: hasUnread ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.025)",
                     backdropFilter: "blur(8px)", borderRadius: 14, padding: "14px 16px",

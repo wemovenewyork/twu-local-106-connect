@@ -10,14 +10,14 @@ export async function GET(req: NextRequest) {
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
   if (!dbUser || !["admin", "subAdmin"].includes(dbUser.role)) return err("Forbidden", 403);
 
-  const [totalUsers, totalSwaps, openSwaps, pendingReports, totalDepots, completedAgreements] = await Promise.all([
+  const [totalUsers, totalSwaps, openSwaps, pendingReports, totalDivisions, completedAgreements] = await Promise.all([
     prisma.user.count(),
     prisma.swap.count(),
     prisma.swap.count({ where: { status: "open" } }),
     prisma.report.count({ where: { status: "pending" } }),
-    prisma.depot.count(),
+    prisma.division.count(),
     prisma.swapAgreement.count({ where: { status: "completed" } }),
   ]);
 
-  return ok({ totalUsers, totalSwaps, openSwaps, pendingReports, totalDepots, completedAgreements });
+  return ok({ totalUsers, totalSwaps, openSwaps, pendingReports, totalDivisions, completedAgreements });
 }

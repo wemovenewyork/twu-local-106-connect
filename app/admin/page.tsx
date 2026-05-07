@@ -11,12 +11,12 @@ const PURPLE = "#C084FC";
 
 interface Stats {
   totalUsers: number; totalSwaps: number; openSwaps: number;
-  pendingReports: number; totalDepots: number; completedAgreements: number;
+  pendingReports: number; totalDivisions: number; completedAgreements: number;
 }
 
 interface Report {
   id: string; reason: string | null; createdAt: string;
-  swap: { id: string; details: string; category: string; posterName: string; depot: { name: string; code: string } };
+  swap: { id: string; details: string; category: string; posterName: string; division: { name: string; code: string } };
   reporter: { id: string; firstName: string; lastName: string };
 }
 
@@ -24,7 +24,7 @@ interface AdminUser {
   id: string; firstName: string; lastName: string; email: string;
   role: "operator" | "depotRep" | "subAdmin" | "admin"; createdAt: string;
   lastActiveAt: string | null; suspendedUntil: string | null;
-  depot: { name: string; code: string } | null;
+  division: { name: string; code: string } | null;
 }
 
 interface InviteCode {
@@ -46,8 +46,8 @@ export default function AdminPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [userQ, setUserQ] = useState("");
-  const [depots, setDepots] = useState<{ id: string; name: string; code: string }[]>([]);
-  const [pendingDepot, setPendingDepot] = useState<Record<string, string>>({});
+  const [divisions, setDivisions] = useState<{ id: string; name: string; code: string }[]>([]);
+  const [pendingDivision, setPendingDivision] = useState<Record<string, string>>({});
   const [invites, setInvites] = useState<InviteCode[]>([]);
   const [inviteCount, setInviteCount] = useState(5);
   const [busy, setBusy] = useState<string | null>(null);
@@ -60,19 +60,19 @@ export default function AdminPage() {
   const [profileUserId, setProfileUserId] = useState<string | null>(null);
   const [profileData, setProfileData] = useState<{
     id: string; firstName: string; lastName: string; email: string; role: string;
-    createdAt: string; depot: { name: string; code: string; borough: string } | null;
+    createdAt: string; division: { name: string; code: string } | null;
     flexibleMode: boolean; reputation: { score: number; label: string; completed: number; cancelled: number; noShow: number };
     swapCount: number; messageCount: number;
   } | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
 
-  const [bcTarget, setBcTarget] = useState<"all" | "user" | "depot">("all");
+  const [bcTarget, setBcTarget] = useState<"all" | "user" | "division">("all");
   const [bcUserId, setBcUserId] = useState("");
   const [bcUserName, setBcUserName] = useState("");
   const [bcUserQ, setBcUserQ] = useState("");
-  const [bcDepotCode, setBcDepotCode] = useState("");
-  const [bcDepotName, setBcDepotName] = useState("");
-  const [bcDepotQ, setBcDepotQ] = useState("");
+  const [bcDivisionCode, setBcDivisionCode] = useState("");
+  const [bcDivisionName, setBcDivisionName] = useState("");
+  const [bcDivisionQ, setBcDivisionQ] = useState("");
   const [bcText, setBcText] = useState("");
   const [bcSending, setBcSending] = useState(false);
 
@@ -82,14 +82,14 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !["admin", "subAdmin"].includes(user.role)) router.replace("/depots");
+    if (!loading && user && !["admin", "subAdmin"].includes(user.role)) router.replace("/divisions");
   }, [user, loading, router]);
 
   useEffect(() => {
     if (!user || !["admin", "subAdmin"].includes(user.role)) return;
     api.get<Stats>("/admin/stats").then(setStats).catch(() => {});
     api.get<Report[]>("/admin/reports").then(setReports).catch(() => {});
-    api.get<{ id: string; name: string; code: string }[]>("/depots").then(setDepots).catch(() => {});
+    api.get<{ id: string; name: string; code: string }[]>("/divisions").then(setDivisions).catch(() => {});
   }, [user]);
 
   useEffect(() => {
@@ -143,13 +143,13 @@ export default function AdminPage() {
 
   const handleRoleChange = async (userId: string, role: string) => {
     if (role === "depotRep") {
-      // Stage the role change — wait for depot selection before calling API
-      setPendingDepot(prev => ({ ...prev, [userId]: "" }));
+      // Stage the role change — wait for division selection before calling API
+      setPendingDivision(prev => ({ ...prev, [userId]: "" }));
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: role as AdminUser["role"] } : u));
       return;
     }
-    // Clear any pending depot selection if switching away from depotRep
-    setPendingDepot(prev => { const next = { ...prev }; delete next[userId]; return next; });
+    // Clear any pending division selection if switching away from depotRep
+    setPendingDivision(prev => { const next = { ...prev }; delete next[userId]; return next; });
     setBusy(userId);
     try {
       await api.patch("/admin/users", { userId, role });
@@ -160,15 +160,15 @@ export default function AdminPage() {
     } finally { setBusy(null); }
   };
 
-  const handleDepotRepConfirm = async (userId: string) => {
-    const depotId = pendingDepot[userId];
-    if (!depotId) { showToast("Select a depot first"); return; }
+  const handleDivisionRepConfirm = async (userId: string) => {
+    const divisionId = pendingDivision[userId];
+    if (!divisionId) { showToast("Select a division first"); return; }
     setBusy(userId);
     try {
-      const updated = await api.patch<AdminUser>("/admin/users", { userId, role: "depotRep", depotId });
+      const updated = await api.patch<AdminUser>("/admin/users", { userId, role: "depotRep", divisionId });
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updated } : u));
-      setPendingDepot(prev => { const next = { ...prev }; delete next[userId]; return next; });
-      showToast("Depot rep assigned");
+      setPendingDivision(prev => { const next = { ...prev }; delete next[userId]; return next; });
+      showToast("Division rep assigned");
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : "Failed");
     } finally { setBusy(null); }
@@ -188,12 +188,12 @@ export default function AdminPage() {
   const handleBroadcast = async () => {
     if (!bcText.trim() || bcSending) return;
     if (bcTarget === "user" && !bcUserId) { showToast("Select a user"); return; }
-    if (bcTarget === "depot" && !bcDepotCode) { showToast("Select a depot"); return; }
+    if (bcTarget === "division" && !bcDivisionCode) { showToast("Select a division"); return; }
     setBcSending(true);
     try {
       const body: Record<string, string> = { target: bcTarget, text: bcText.trim() };
       if (bcTarget === "user") body.userId = bcUserId;
-      if (bcTarget === "depot") body.depotCode = bcDepotCode;
+      if (bcTarget === "division") body.divisionCode = bcDivisionCode;
       const res = await api.post<{ sent: number }>("/admin/broadcast", body);
       showToast(`Sent to ${res.sent} user${res.sent !== 1 ? "s" : ""}`);
       setBcText("");
@@ -204,7 +204,7 @@ export default function AdminPage() {
 
   const handleBulkRoleChange = async () => {
     if (!bulkRole || selectedUsers.size === 0 || bulkBusy) return;
-    if (bulkRole === "depotRep") { showToast("Depot rep requires individual depot assignment"); return; }
+    if (bulkRole === "depotRep") { showToast("Division rep requires individual division assignment"); return; }
     setBulkBusy(true);
     try {
       await Promise.all([...selectedUsers].map(userId =>
@@ -237,7 +237,7 @@ export default function AdminPage() {
 
   const handleBulkExport = () => {
     const selected = users.filter(u => selectedUsers.has(u.id));
-    const data = selected.map(u => ({ id: u.id, firstName: u.firstName, lastName: u.lastName, email: u.email ?? "", role: u.role, depot: u.depot?.name ?? "", lastActiveAt: u.lastActiveAt, suspendedUntil: u.suspendedUntil }));
+    const data = selected.map(u => ({ id: u.id, firstName: u.firstName, lastName: u.lastName, email: u.email ?? "", role: u.role, division: u.division?.name ?? "", lastActiveAt: u.lastActiveAt, suspendedUntil: u.suspendedUntil }));
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -280,7 +280,7 @@ export default function AdminPage() {
 
   const statCards = stats ? [
     { l: "Users", v: stats.totalUsers, c: C.blue },
-    { l: "Depots", v: stats.totalDepots, c: C.gold },
+    { l: "Divisions", v: stats.totalDivisions, c: C.gold },
     { l: "Total Swaps", v: stats.totalSwaps, c: "#00C9A7" },
     { l: "Open Swaps", v: stats.openSwaps, c: "#2ED573" },
     { l: "Agreements", v: stats.completedAgreements, c: PURPLE },
@@ -291,7 +291,7 @@ export default function AdminPage() {
     <div style={{ minHeight: "100vh", paddingBottom: 40 }}>
       {/* Header */}
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.9)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push("/depots")} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={() => router.push("/divisions")} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
         <div style={{ flex: 1 }}>
@@ -337,7 +337,7 @@ export default function AdminPage() {
               <div style={{ textAlign: "center", padding: "48px 20px", color: C.m }}>
                 <Icon n="chk" s={36} c="#2ED573" />
                 <div style={{ fontSize: 15, fontWeight: 700, color: C.white, marginTop: 12 }}>No pending reports</div>
-                <div style={{ fontSize: 12, color: C.m, marginTop: 6 }}>All clear across all depots.</div>
+                <div style={{ fontSize: 12, color: C.m, marginTop: 6 }}>All clear across all divisions.</div>
               </div>
             ) : reports.map(r => {
               const colors = CM[r.swap.category as keyof typeof CM] ?? CM.work;
@@ -349,7 +349,7 @@ export default function AdminPage() {
                       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                         <span style={{ fontSize: 10, fontWeight: 700, color: colors.c, textTransform: "uppercase", letterSpacing: 1 }}>{r.swap.category}</span>
                         <span style={{ fontSize: 10, color: C.m }}>·</span>
-                        <span style={{ fontSize: 10, color: C.m }}>{r.swap.depot.name}</span>
+                        <span style={{ fontSize: 10, color: C.m }}>{r.swap.division.name}</span>
                       </div>
                       <div style={{ fontSize: 13, fontWeight: 600, color: C.white, marginBottom: 4 }}>
                         {r.swap.posterName} — {r.swap.details.substring(0, 80)}{r.swap.details.length > 80 ? "…" : ""}
@@ -463,7 +463,7 @@ export default function AdminPage() {
                             )}
                           </div>
                           {!isSubAdmin && u.email && <div style={{ fontSize: 11, color: C.m, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.email}</div>}
-                          {u.depot && <div style={{ fontSize: 10, color: C.gold, marginTop: 2 }}>{u.depot.name}</div>}
+                          {u.division && <div style={{ fontSize: 10, color: C.gold, marginTop: 2 }}>{u.division.name}</div>}
                           {u.lastActiveAt && (
                             <div style={{ fontSize: 10, color: C.m, marginTop: 2 }}>
                               Active {Math.floor((Date.now() - new Date(u.lastActiveAt).getTime()) / 86400000)} days ago
@@ -480,7 +480,7 @@ export default function AdminPage() {
                             style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${rc}44`, background: rc + "12", color: rc, fontSize: 12, fontWeight: 700, cursor: "pointer", appearance: "auto", opacity: isBusy || isConfirming ? 0.5 : 1 }}
                           >
                             <option value="operator">Operator</option>
-                            <option value="depotRep">Depot Rep</option>
+                            <option value="depotRep">Division Rep</option>
                             <option value="subAdmin">Sub Admin</option>
                             <option value="admin">Admin</option>
                           </select>
@@ -488,29 +488,29 @@ export default function AdminPage() {
                         {isSubAdmin && (
                           <span style={{ padding: "4px 10px", borderRadius: 8, background: rc + "18", border: `1px solid ${rc}33`, fontSize: 11, fontWeight: 700, color: rc }}>{u.role}</span>
                         )}
-                        {u.role === "depotRep" && u.depot && pendingDepot[u.id] === undefined && (
-                          <div style={{ fontSize: 10, fontWeight: 600, color: C.gold, textAlign: "right" }}>{u.depot.name} ({u.depot.code})</div>
+                        {u.role === "depotRep" && u.division && pendingDivision[u.id] === undefined && (
+                          <div style={{ fontSize: 10, fontWeight: 600, color: C.gold, textAlign: "right" }}>{u.division.name} ({u.division.code})</div>
                         )}
-                        {pendingDepot[u.id] !== undefined && (
+                        {pendingDivision[u.id] !== undefined && (
                           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                             <select
-                              value={pendingDepot[u.id]}
-                              onChange={e => setPendingDepot(prev => ({ ...prev, [u.id]: e.target.value }))}
+                              value={pendingDivision[u.id]}
+                              onChange={e => setPendingDivision(prev => ({ ...prev, [u.id]: e.target.value }))}
                               style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${C.gold}44`, background: C.gold + "10", color: C.gold, fontSize: 12, cursor: "pointer", appearance: "auto" }}
                             >
-                              <option value="">— Select depot —</option>
-                              {depots.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
+                              <option value="">— Select division —</option>
+                              {divisions.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
                             </select>
                             <button
-                              onClick={() => handleDepotRepConfirm(u.id)}
-                              disabled={!pendingDepot[u.id] || isBusy}
-                              style={{ padding: "6px 12px", borderRadius: 8, border: "none", cursor: "pointer", background: C.gold, color: C.bg, fontSize: 12, fontWeight: 700, opacity: !pendingDepot[u.id] || isBusy ? 0.5 : 1 }}
+                              onClick={() => handleDivisionRepConfirm(u.id)}
+                              disabled={!pendingDivision[u.id] || isBusy}
+                              style={{ padding: "6px 12px", borderRadius: 8, border: "none", cursor: "pointer", background: C.gold, color: C.bg, fontSize: 12, fontWeight: 700, opacity: !pendingDivision[u.id] || isBusy ? 0.5 : 1 }}
                             >
                               {isBusy ? "…" : "Confirm"}
                             </button>
                           </div>
                         )}
-                        {!isSubAdmin && !isSelf && pendingDepot[u.id] === undefined && (
+                        {!isSubAdmin && !isSelf && pendingDivision[u.id] === undefined && (
                           <button
                             onClick={() => handleSuspend(u.id)}
                             disabled={busy === u.id + "_suspend" || isConfirming || !!(u.suspendedUntil && new Date(u.suspendedUntil) > new Date())}
@@ -519,7 +519,7 @@ export default function AdminPage() {
                             {u.suspendedUntil && new Date(u.suspendedUntil) > new Date() ? "Suspended" : "Suspend"}
                           </button>
                         )}
-                        {!isSubAdmin && !isSelf && !pendingDepot[u.id] !== undefined && (
+                        {!isSubAdmin && !isSelf && !pendingDivision[u.id] !== undefined && (
                           <button
                             onClick={() => setDeleteConfirm(isConfirming ? null : u.id)}
                             disabled={isBusy}
@@ -621,48 +621,48 @@ export default function AdminPage() {
             <div>
               <label style={lb}>Send To</label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                {(["all", "depot", "user"] as const).filter(t => !(isSubAdmin && t === "all")).map(t => (
+                {(["all", "division", "user"] as const).filter(t => !(isSubAdmin && t === "all")).map(t => (
                   <button
                     key={t}
                     onClick={() => setBcTarget(t)}
                     style={{ padding: "10px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 12, fontWeight: 700, background: bcTarget === t ? PURPLE + "22" : "rgba(255,255,255,.04)", color: bcTarget === t ? PURPLE : C.m, boxShadow: bcTarget === t ? `inset 0 0 0 1px ${PURPLE}44` : `inset 0 0 0 1px rgba(255,255,255,.06)` }}
                   >
-                    {t === "all" ? "All Users" : t === "depot" ? "A Depot" : "One User"}
+                    {t === "all" ? "All Users" : t === "division" ? "A Division" : "One User"}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Depot search */}
-            {bcTarget === "depot" && (
+            {/* Division search */}
+            {bcTarget === "division" && (
               <div>
-                <label style={lb}>Search Depot</label>
-                {bcDepotCode ? (
+                <label style={lb}>Search Division</label>
+                {bcDivisionCode ? (
                   <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px", borderRadius: 12, background: PURPLE + "0c", border: `1px solid ${PURPLE}33` }}>
-                    <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.white }}>{bcDepotName}</div>
-                    <button onClick={() => { setBcDepotCode(""); setBcDepotName(""); setBcDepotQ(""); }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, color: C.m, padding: 0 }}>Change</button>
+                    <div style={{ flex: 1, fontSize: 13, fontWeight: 700, color: C.white }}>{bcDivisionName}</div>
+                    <button onClick={() => { setBcDivisionCode(""); setBcDivisionName(""); setBcDivisionQ(""); }} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 11, color: C.m, padding: 0 }}>Change</button>
                   </div>
                 ) : (
                   <>
                     <input
-                      value={bcDepotQ}
-                      onChange={e => setBcDepotQ(e.target.value)}
-                      placeholder="Type depot name…"
+                      value={bcDivisionQ}
+                      onChange={e => setBcDivisionQ(e.target.value)}
+                      placeholder="Type division name…"
                       style={{ height: 44, marginBottom: 6 }}
                     />
-                    {bcDepotQ.trim() && (
+                    {bcDivisionQ.trim() && (
                       <div style={{ borderRadius: 12, border: `1px solid ${C.bd}`, overflow: "hidden" }}>
-                        {depots.filter(d => d.name.toLowerCase().includes(bcDepotQ.toLowerCase())).slice(0, 6).map(d => (
+                        {divisions.filter(d => d.name.toLowerCase().includes(bcDivisionQ.toLowerCase())).slice(0, 6).map(d => (
                           <button
                             key={d.code}
-                            onClick={() => { setBcDepotCode(d.code); setBcDepotName(d.name); setBcDepotQ(""); }}
+                            onClick={() => { setBcDivisionCode(d.code); setBcDivisionName(d.name); setBcDivisionQ(""); }}
                             style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: "rgba(255,255,255,.03)", border: "none", borderBottom: `1px solid ${C.bd}`, cursor: "pointer", fontSize: 13, color: C.white }}
                           >
                             {d.name} <span style={{ fontSize: 11, color: C.m }}>({d.code})</span>
                           </button>
                         ))}
-                        {depots.filter(d => d.name.toLowerCase().includes(bcDepotQ.toLowerCase())).length === 0 && (
-                          <div style={{ padding: "10px 14px", fontSize: 12, color: C.m }}>No depots found</div>
+                        {divisions.filter(d => d.name.toLowerCase().includes(bcDivisionQ.toLowerCase())).length === 0 && (
+                          <div style={{ padding: "10px 14px", fontSize: 12, color: C.m }}>No divisions found</div>
                         )}
                       </div>
                     )}
@@ -701,7 +701,7 @@ export default function AdminPage() {
                           >
                             {u.firstName} {u.lastName}
                             {u.email && <span style={{ fontSize: 11, color: C.m }}> · {u.email}</span>}
-                            {u.depot && <span style={{ fontSize: 11, color: C.gold }}> · {u.depot.name}</span>}
+                            {u.division && <span style={{ fontSize: 11, color: C.gold }}> · {u.division.name}</span>}
                           </button>
                         ))}
                         {users.filter(u =>
@@ -735,10 +735,10 @@ export default function AdminPage() {
 
             <button
               onClick={handleBroadcast}
-              disabled={!bcText.trim() || bcSending || (bcTarget === "user" && !bcUserId) || (bcTarget === "depot" && !bcDepotCode)}
-              style={{ padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${PURPLE},${PURPLE}cc)`, color: "#fff", fontSize: 14, fontWeight: 700, opacity: (!bcText.trim() || bcSending || (bcTarget === "user" && !bcUserId) || (bcTarget === "depot" && !bcDepotCode)) ? 0.5 : 1 }}
+              disabled={!bcText.trim() || bcSending || (bcTarget === "user" && !bcUserId) || (bcTarget === "division" && !bcDivisionCode)}
+              style={{ padding: "14px", borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${PURPLE},${PURPLE}cc)`, color: "#fff", fontSize: 14, fontWeight: 700, opacity: (!bcText.trim() || bcSending || (bcTarget === "user" && !bcUserId) || (bcTarget === "division" && !bcDivisionCode)) ? 0.5 : 1 }}
             >
-              {bcSending ? "Sending…" : bcTarget === "all" ? "Send to All Users" : bcTarget === "depot" ? "Send to Depot" : "Send to User"}
+              {bcSending ? "Sending…" : bcTarget === "all" ? "Send to All Users" : bcTarget === "division" ? "Send to Division" : "Send to User"}
             </button>
           </div>
         )}
@@ -819,10 +819,10 @@ export default function AdminPage() {
 
                   {/* Details */}
                   <div style={{ display: "grid", gap: 8 }}>
-                    {profileData.depot && (
+                    {profileData.division && (
                       <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${C.bd}`, display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 12, color: C.m }}>Depot</span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: C.white }}>{profileData.depot.name} · {profileData.depot.borough}</span>
+                        <span style={{ fontSize: 12, color: C.m }}>Division</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: C.white }}>{profileData.division.name}</span>
                       </div>
                     )}
                     <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.03)", border: `1px solid ${C.bd}`, display: "flex", justifyContent: "space-between" }}>

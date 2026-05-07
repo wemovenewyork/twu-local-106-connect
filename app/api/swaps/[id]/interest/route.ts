@@ -47,23 +47,23 @@ export async function POST(
   });
   if (block) return err("Unable to send message", 403);
 
-  const [message, sender, depot] = await Promise.all([
+  const [message, sender, division] = await Promise.all([
     prisma.message.create({
       data: { swapId: id, fromUserId: user.userId, toUserId: swap.userId, text: text.trim() },
     }),
     prisma.user.findUnique({ where: { id: user.userId }, select: { firstName: true, lastName: true } }),
-    prisma.depot.findUnique({ where: { id: swap.depotId }, select: { code: true } }),
+    prisma.division.findUnique({ where: { id: swap.divisionId }, select: { code: true } }),
   ]);
 
   const senderName = sender ? `${sender.firstName} ${sender.lastName}` : "Someone";
-  const depotCode = depot?.code ?? swap.depotId;
+  const divisionCode = division?.code ?? swap.divisionId;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
   if (!appUrl) return err("Server configuration error — contact support", 500);
 
   const emailHtml = `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:${brand.colors.navy};color:#fff;border-radius:16px">
   <h2 style="font-size:18px;font-weight:800;margin-bottom:8px">New interest in your swap</h2>
   <p style="color:rgba(255,255,255,.6);font-size:14px;line-height:1.6;margin-bottom:24px">${escapeHtml(senderName)} is interested in your swap — log in to respond.</p>
-  <a href="${appUrl}/depot/${depotCode}/swaps/${id}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:${brand.colors.red};color:#fff;font-weight:700;font-size:15px;text-decoration:none">View Swap</a>
+  <a href="${appUrl}/division/${divisionCode}/swaps/${id}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:${brand.colors.red};color:#fff;font-weight:700;font-size:15px;text-decoration:none">View Swap</a>
 </div>`;
 
   // Notify swap owner — awaited so the fetch completes before the serverless function exits
@@ -72,7 +72,7 @@ export async function POST(
     {
       title: "New interest in your swap",
       body: `${senderName} is interested — "${text.trim().replace(/[\n\r\t]/g, " ").substring(0, 60)}"`,
-      url: `/depot/${depotCode}/swaps/${id}`,
+      url: `/division/${divisionCode}/swaps/${id}`,
     },
     "New interest in your swap",
     emailHtml

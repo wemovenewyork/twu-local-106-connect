@@ -54,7 +54,7 @@ export default function TermsPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>3. Shift Swap Coordination</h2>
-          <p style={s.p}>TWU Local 106 Connect is a coordination tool only. It does not replace, supersede, or conflict with any MTA, TWU, or union collective bargaining agreements. All shift swaps must be conducted in accordance with your depot&apos;s official procedures and with supervisor approval.</p>
+          <p style={s.p}>TWU Local 106 Connect is a coordination tool only. It does not replace, supersede, or conflict with any MTA, TWU, or union collective bargaining agreements. All shift swaps must be conducted in accordance with your division&apos;s official procedures and with supervisor approval.</p>
           <p style={s.p}>TWU Local 106 Connect makes no guarantee that a swap listed on the platform will be approved by management. Users are solely responsible for ensuring their swap complies with all applicable rules and agreements.</p>
         </div>
 

@@ -86,11 +86,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   // Notify the swap poster that someone wants to agree
-  const depotCode = await prisma.depot.findUnique({ where: { id: swap.depotId }, select: { code: true } });
+  const divisionCode = await prisma.division.findUnique({ where: { id: swap.divisionId }, select: { code: true } });
   await notifyUser(swap.userId, {
     title: "Someone wants to swap with you!",
     body: `${proposer?.firstName ?? "A member"} proposed an agreement on your swap`,
-    url: `/depot/${depotCode?.code ?? swap.depotId}/swaps/${id}`,
+    url: `/division/${divisionCode?.code ?? swap.divisionId}/swaps/${id}`,
   });
 
   return ok(agreement, 201);
@@ -141,11 +141,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const isUserB = agreement.userBId === user.userId;
   const isUserA = agreement.userAId === user.userId;
 
-  const swap = await prisma.swap.findUnique({ where: { id }, select: { depotId: true } });
-  const depot = swap?.depotId
-    ? await prisma.depot.findUnique({ where: { id: swap.depotId }, select: { code: true } })
+  const swap = await prisma.swap.findUnique({ where: { id }, select: { divisionId: true } });
+  const division = swap?.divisionId
+    ? await prisma.division.findUnique({ where: { id: swap.divisionId }, select: { code: true } })
     : null;
-  const depotId = depot?.code ?? swap?.depotId ?? "";
+  const divisionId = division?.code ?? swap?.divisionId ?? "";
 
   if (action === "cancel") {
     const updated = await prisma.$transaction(async (tx) => {
@@ -169,7 +169,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     await notifyUser(otherUserId, {
       title: "Agreement cancelled",
       body: "The swap agreement was cancelled",
-      url: `/depot/${depotId}/swaps/${id}`,
+      url: `/division/${divisionId}/swaps/${id}`,
     });
 
     return ok(updated);
@@ -210,7 +210,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         await notifyMany(ids, {
           title: "Swap has been filled",
           body: "A swap you were interested in has been filled — check the board for new ones",
-          url: `/depot/${depotId}/swaps`,
+          url: `/division/${divisionId}/swaps`,
         });
       }
     };
@@ -251,7 +251,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       await notifyUser(agreement.userAId, {
         title: "Swap confirmed! 🎉",
         body: "Your swap is locked in. Show the agreement to your supervisor or manager for approval.",
-        url: `/depot/${depotId}/swaps/${id}`,
+        url: `/division/${divisionId}/swaps/${id}`,
       });
       // Also tell other interested operators the swap is gone
       await notifyInterestedOperators([agreement.userAId]);
@@ -264,7 +264,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       await notifyUser(agreement.userBId, {
         title: "Swap agreement completed!",
         body: "Both members confirmed. Your swap is locked in.",
-        url: `/depot/${depotId}/swaps/${id}`,
+        url: `/division/${divisionId}/swaps/${id}`,
       });
       await notifyInterestedOperators([agreement.userBId]);
       return ok(updated);

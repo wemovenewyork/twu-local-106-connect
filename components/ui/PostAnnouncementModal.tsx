@@ -7,12 +7,12 @@ import { C } from "@/constants/colors";
 import FocusTrap from "./FocusTrap";
 
 interface Props {
-  depotCode: string;
+  divisionCode: string;
   onPosted: (a: Announcement) => void;
   onClose: () => void;
 }
 
-export default function PostAnnouncementModal({ depotCode, onPosted, onClose }: Props) {
+export default function PostAnnouncementModal({ divisionCode, onPosted, onClose }: Props) {
   const [text, setText] = useState("");
   const [pinned, setPinned] = useState(false);
   const [expiresIn, setExpiresIn] = useState<"" | "1" | "3" | "7" | "14" | "30">("");
@@ -35,7 +35,7 @@ export default function PostAnnouncementModal({ depotCode, onPosted, onClose }: 
         d.setDate(d.getDate() + Number(expiresIn));
         expiresAt = d.toISOString();
       }
-      const ann = await api.post<Announcement>(`/depots/${depotCode}/announcements`, {
+      const ann = await api.post<Announcement>(`/divisions/${divisionCode}/announcements`, {
         text: text.trim(),
         pinned,
         expiresAt: expiresAt ?? null,
@@ -63,7 +63,7 @@ export default function PostAnnouncementModal({ depotCode, onPosted, onClose }: 
         style={{ width: "100%", background: "rgb(6,5,52)", borderRadius: "20px 20px 0 0", padding: "24px 20px 44px", maxWidth: 520, margin: "0 auto" }}
       >
         <h2 id={titleId} style={{ fontSize: 16, fontWeight: 800, color: C.white, marginBottom: 4 }}>Post Announcement</h2>
-        <div style={{ fontSize: 12, color: C.m, marginBottom: 18 }}>Visible to all operators at your depot</div>
+        <div style={{ fontSize: 12, color: C.m, marginBottom: 18 }}>Visible to all operators at your division</div>
 
         {error && (
           <div role="alert" aria-live="assertive" style={{ padding: "10px 14px", borderRadius: 10, background: `${C.red}15`, border: `1px solid ${C.red}33`, fontSize: 12, color: C.red, marginBottom: 14 }}>

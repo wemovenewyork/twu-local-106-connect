@@ -4,10 +4,10 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot, Swap, Announcement, FlexibleOperator } from "@/types";
+import { Division, Swap, Announcement, FlexibleOperator } from "@/types";
 import { C, CM, SWAP_TYPES } from "@/constants/colors";
 import SwapCard from "@/components/ui/SwapCard";
-import DepotBadge from "@/components/ui/DepotBadge";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import BottomNav from "@/components/ui/BottomNav";
 import Toast from "@/components/ui/Toast";
@@ -33,14 +33,14 @@ export default function BrowsePage() {
   const searchParams = useSearchParams();
 
   // Allow callers to deep-link to a specific status filter via ?status=...
-  // Used by the depot home stat pills (active swaps → ?status=open default,
+  // Used by the division home stat pills (active swaps → ?status=open default,
   // completed this month → ?status=filled). Only honour known status values.
   const initialStatus = (() => {
     const s = searchParams.get("status");
     return s && ["open", "pending", "filled", "expired", "all"].includes(s) ? s : "open";
   })();
 
-  const [depot, setDepot] = useState<Depot | null>(null);
+  const [division, setDepot] = useState<Division | null>(null);
   const [swaps, setSwaps] = useState<Swap[]>([]);
   const [catCounts, setCatCounts] = useState<Record<string, number>>({});
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -90,16 +90,16 @@ export default function BrowsePage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
     if (!loading && user) markChecklistItem(user.id, "browsed");
   }, [user, loading, router, code]);
 
   useEffect(() => {
     if (!code || !user) return;
-    api.get<Depot>(`/depots/${code}`).then(setDepot).catch(() => router.replace("/depots"));
-    api.get<Announcement[]>(`/depots/${code}/announcements`).then(setAnnouncements).catch(() => {});
-    api.get<FlexibleOperator[]>(`/depots/${code}/flexible`).then(setFlexibleOps).catch(() => {});
+    api.get<Division>(`/divisions/${code}`).then(setDepot).catch(() => router.replace("/divisions"));
+    api.get<Announcement[]>(`/divisions/${code}/announcements`).then(setAnnouncements).catch(() => {});
+    api.get<FlexibleOperator[]>(`/divisions/${code}/flexible`).then(setFlexibleOps).catch(() => {});
     fetchSwaps();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code, user]);
@@ -221,7 +221,7 @@ export default function BrowsePage() {
       const { flexibleMode } = await api.post<{ flexibleMode: boolean }>("/users/me/flexible", {});
       if (flexibleMode) {
         // add self to list optimistically — re-fetch to get real data
-        api.get<FlexibleOperator[]>(`/depots/${code}/flexible`).then(setFlexibleOps).catch(() => {});
+        api.get<FlexibleOperator[]>(`/divisions/${code}/flexible`).then(setFlexibleOps).catch(() => {});
         showToast("You're now in \"I'll Take Anything\" mode!");
       } else {
         setFlexibleOps(prev => prev.filter(op => op.id !== user?.id));
@@ -244,7 +244,7 @@ export default function BrowsePage() {
 
   const handleDeleteAnn = async (id: string) => {
     try {
-      await api.del(`/depots/${code}/announcements/${id}`);
+      await api.del(`/divisions/${code}/announcements/${id}`);
       setAnnouncements(prev => prev.filter(a => a.id !== id));
       showToast("Announcement removed");
     } catch (e: unknown) { showToast(e instanceof Error ? e.message : "Failed", "error"); }
@@ -273,7 +273,7 @@ export default function BrowsePage() {
     }
   };
 
-  if (!depot) return null;
+  if (!division) return null;
 
   return (
     <div className="page-enter" style={{ minHeight: "100vh", background: C.bg }}
@@ -288,12 +288,12 @@ export default function BrowsePage() {
         ) : "↓ Pull to refresh"}
       </div>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "12px 12px", display: "flex", alignItems: "center", gap: 6 }}>
-        <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon n="back" s={15} /></button>
-        <DepotBadge depot={depot} size={32} />
-        <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: C.white, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{depot.name}</div>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon n="back" s={15} /></button>
+        <DivisionBadge division={division} size={32} />
+        <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: C.white, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{division.name}</div>
         <NotifIcon />
         <InboxIcon />
-        <button onClick={() => router.push(`/depot/${code}/saved`)} aria-label="Saved swaps" title="Saved Swaps" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.m, flexShrink: 0 }}>
+        <button onClick={() => router.push(`/division/${code}/saved`)} aria-label="Saved swaps" title="Saved Swaps" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.m, flexShrink: 0 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
         </button>
         {isRep && (
@@ -301,18 +301,18 @@ export default function BrowsePage() {
             <button onClick={() => setPostAnnModal(true)} title="Post Announcement" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.gold}44`, background: C.gs, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.gold, flexShrink: 0 }}>
               <Icon n="bell" s={14} c={C.gold} />
             </button>
-            <button onClick={() => router.push(`/depot/${code}/rep`)} title="Rep Dashboard" style={{ width: 32, height: 32, borderRadius: 10, border: "1px solid #C084FC33", background: "#C084FC12", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <button onClick={() => router.push(`/division/${code}/rep`)} title="Rep Dashboard" style={{ width: 32, height: 32, borderRadius: 10, border: "1px solid #C084FC33", background: "#C084FC12", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <Icon n="shield" s={14} c="#C084FC" />
             </button>
           </>
         )}
-        <button onClick={() => { playClick(); router.push(`/depot/${code}/post`); }} style={{ padding: "7px 12px", borderRadius: 10, border: "none", cursor: "pointer", background: "#AD1B27", fontSize: 12, fontWeight: 700, color: "#1A1F4D", flexShrink: 0 }}>+ Post</button>
+        <button onClick={() => { playClick(); router.push(`/division/${code}/post`); }} style={{ padding: "7px 12px", borderRadius: 10, border: "none", cursor: "pointer", background: "#AD1B27", fontSize: 12, fontWeight: 700, color: "#1A1F4D", flexShrink: 0 }}>+ Post</button>
       </div>
 
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 720, margin: "0 auto", padding: "0 20px" }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, background: `linear-gradient(135deg,${C.white},${C.gold}88)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", padding: "18px 0 8px" }}>Available Swaps</h2>
 
-        <FirstSwapBanner depotCode={code} />
+        <FirstSwapBanner divisionCode={code} />
 
         {/* Announcements */}
         <AnnouncementBanner
@@ -411,7 +411,7 @@ export default function BrowsePage() {
           {swapsLoaded && swaps.length === 0 && (
             <div style={{ textAlign: "center", padding: "40px 20px", color: C.m }}>
               <div style={{ fontSize: 15, fontWeight: 600, color: C.white, marginBottom: 8 }}>No swaps posted yet — be the first!</div>
-              <button onClick={() => router.push(`/depot/${code}/post`)} style={{ marginTop: 8, padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 13, fontWeight: 700, color: C.bg }}>
+              <button onClick={() => router.push(`/division/${code}/post`)} style={{ marginTop: 8, padding: "10px 22px", borderRadius: 12, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 13, fontWeight: 700, color: C.bg }}>
                 + Post a Swap
               </button>
             </div>
@@ -434,11 +434,11 @@ export default function BrowsePage() {
                 user={user}
                 onDelete={handleDelete}
                 onStatusChange={handleStatus}
-                onEdit={s.userId === user?.id ? (sw) => router.push(`/depot/${code}/post?edit=${sw.id}`) : undefined}
+                onEdit={s.userId === user?.id ? (sw) => router.push(`/division/${code}/post?edit=${sw.id}`) : undefined}
                 onReport={handleReport}
                 onToggleSave={s.userId !== user?.id ? handleToggleSave : undefined}
                 lastVisit={lastVisit}
-                onClick={() => { sessionStorage.setItem(scrollKey, String(window.scrollY)); router.push(`/depot/${code}/swaps/${s.id}`); }}
+                onClick={() => { sessionStorage.setItem(scrollKey, String(window.scrollY)); router.push(`/division/${code}/swaps/${s.id}`); }}
               />
             </div>
           ))}
@@ -454,14 +454,14 @@ export default function BrowsePage() {
         <Footer />
       </main>
 
-      <BottomNav active="browse" depotCode={code} lang={user?.language} />
+      <BottomNav active="browse" divisionCode={code} lang={user?.language} />
       {confirm && <ConfirmModal title={confirm.title} text={confirm.text} onConfirm={confirm.action} onCancel={() => setConfirm(null)} />}
       {toast && <Toast message={toast.message} type={toast.type} />}
 
       {/* Post Announcement modal (reps only) */}
       {postAnnModal && (
         <PostAnnouncementModal
-          depotCode={code}
+          divisionCode={code}
           onPosted={ann => { setAnnouncements(prev => [ann, ...prev]); setPostAnnModal(false); showToast("Announcement posted!"); }}
           onClose={() => setPostAnnModal(false)}
         />

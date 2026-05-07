@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { C } from "@/constants/colors";
 import Icon from "@/components/ui/Icon";
 
-export default function FirstSwapBanner({ depotCode }: { depotCode: string }) {
+export default function FirstSwapBanner({ divisionCode }: { divisionCode: string }) {
   const router = useRouter();
   const [show, setShow] = useState(false);
 
@@ -45,7 +45,7 @@ export default function FirstSwapBanner({ depotCode }: { depotCode: string }) {
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
             <button
-              onClick={() => { dismiss(); router.push(`/depot/${depotCode}/post`); }}
+              onClick={() => { dismiss(); router.push(`/division/${divisionCode}/post`); }}
               style={{ padding: "8px 18px", borderRadius: 10, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}cc)`, color: C.bg, fontSize: 13, fontWeight: 700 }}
             >
               Post a Swap
@@ -65,7 +65,7 @@ export default function FirstSwapBanner({ depotCode }: { depotCode: string }) {
         {[
           { n: "1", t: "Pick a type", s: "Work, days off, or vacation" },
           { n: "2", t: "Add details", s: "Date, run, shift info" },
-          { n: "3", t: "Post it", s: "Operators at your depot will see it" },
+          { n: "3", t: "Post it", s: "Operators at your division will see it" },
         ].map(step => (
           <div key={step.n} style={{ textAlign: "center" }}>
             <div style={{ width: 20, height: 20, borderRadius: "50%", background: C.gold, color: C.bg, fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px" }}>{step.n}</div>

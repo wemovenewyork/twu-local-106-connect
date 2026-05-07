@@ -29,7 +29,7 @@ export default function DisclaimerPage() {
         <section style={{ marginBottom: 24 }}>
           <h2 style={{ fontSize: 14, fontWeight: 700, color: C.gold, marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 }}>Official Approval Required</h2>
           <p style={{ fontSize: 14, color: "rgba(255,255,255,.7)", lineHeight: 1.7 }}>
-            All shift swaps must be formally approved in accordance with depot rules, MTA / MaBSTOA / MTA Bus regulations, and the direction of supervisors or management. Using this platform does not constitute official approval of any swap. Failure to follow proper approval procedures is not permitted.
+            All shift swaps must be formally approved in accordance with division rules, MTA / MaBSTOA / MTA Bus regulations, and the direction of supervisors or management. Using this platform does not constitute official approval of any swap. Failure to follow proper approval procedures is not permitted.
           </p>
         </section>
 

@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot } from "@/types";
+import { Division } from "@/types";
 import { C } from "@/constants/colors";
 import Icon from "@/components/ui/Icon";
 import RepBadge from "@/components/ui/RepBadge";
-import DepotBadge from "@/components/ui/DepotBadge";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import Toast from "@/components/ui/Toast";
 import NotifToggle from "@/components/ui/NotifToggle";
 import InboxIcon from "@/components/ui/InboxIcon";
@@ -38,12 +38,12 @@ export default function ProfilePage() {
   const { user, logout, updateUser, loading, refreshUser } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<"profile" | "security">("profile");
-  const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [email, setEmail] = useState(""); const [lang, setLang] = useState("en"); const [depotId, setDepotId] = useState("");
+  const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [email, setEmail] = useState(""); const [lang, setLang] = useState("en"); const [divisionId, setDivisionId] = useState("");
   const [curPw, setCurPw] = useState(""); const [newPw, setNewPw] = useState(""); const [newPw2, setNewPw2] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePw, setDeletePw] = useState(""); const [deleteErr, setDeleteErr] = useState(""); const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState<string | null>(null); const [pwErr, setPwErr] = useState("");
-  const [depots, setDepots] = useState<Depot[]>([]); const [saving, setSaving] = useState(false);
+  const [divisions, setDivisions] = useState<Division[]>([]); const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [notifPrefs, setNotifPrefs] = useState<NotifPrefs>(DEFAULT_NOTIF);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -55,8 +55,8 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (user) { setFn(user.firstName); setLn(user.lastName); setEmail(user.email); setLang(user.language || "en"); setDepotId(user.depotId ?? ""); }
-    api.get<Depot[]>("/depots").then(setDepots).catch(() => {});
+    if (user) { setFn(user.firstName); setLn(user.lastName); setEmail(user.email); setLang(user.language || "en"); setDivisionId(user.divisionId ?? ""); }
+    api.get<Division[]>("/divisions").then(setDivisions).catch(() => {});
   }, [user]);
 
   useEffect(() => { setNotifPrefs(loadNotifPrefs()); }, []);
@@ -118,7 +118,7 @@ export default function ProfilePage() {
   const saveProfile = async () => {
     setSaving(true);
     try {
-      const data = await api.put("/users/me", { firstName: fn, lastName: ln, email, language: lang, depotId });
+      const data = await api.put("/users/me", { firstName: fn, lastName: ln, email, language: lang, divisionId });
       updateUser(data as Parameters<typeof updateUser>[0]);
       showToast("Saved!");
     } catch (e: unknown) { showToast(e instanceof Error ? e.message : "Save failed"); }
@@ -140,22 +140,22 @@ export default function ProfilePage() {
   const handleLogout = () => { logout(); router.replace("/login"); };
 
   if (!user) return null;
-  const depot = user.depot ?? depots.find(d => d.id === user.depotId) ?? null;
+  const division = user.division ?? divisions.find(d => d.id === user.divisionId) ?? null;
 
-  const depotLocked = (() => {
-    if (!user.depotId) return false;
+  const divisionLocked = (() => {
+    if (!user.divisionId) return false;
     if (user.role === "admin" || user.role === "subAdmin") return false;
-    if (!user.depotSetAt) return false;
-    return (Date.now() - new Date(user.depotSetAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+    if (!user.divisionSetAt) return false;
+    return (Date.now() - new Date(user.divisionSetAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
   })();
-  const depotUnlocksAt = user.depotSetAt
-    ? new Date(new Date(user.depotSetAt).getTime() + 7 * 24 * 60 * 60 * 1000)
+  const divisionUnlocksAt = user.divisionSetAt
+    ? new Date(new Date(user.divisionSetAt).getTime() + 7 * 24 * 60 * 60 * 1000)
     : null;
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(user?.depot?.code ? `/depot/${user.depot.code}` : "/depots")} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
+        <button onClick={() => router.push(user?.division?.code ? `/division/${user.division.code}` : "/divisions")} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
         <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>My Profile</div>
         <NotifIcon />
         <InboxIcon />
@@ -187,10 +187,10 @@ export default function ProfilePage() {
             {(user.reputation?.total ?? 0) > 0 && <ProgressRing score={user.reputation?.score ?? 0} size={48} strokeWidth={4} />}
             <RepBadge rep={user.reputation} size="small" />
           </div>
-          {depot && (
+          {division && (
             <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 8, padding: "4px 12px", borderRadius: 8, background: C.s, border: `1px solid ${C.bd}` }}>
-              <DepotBadge depot={depot} size={20} />
-              <span style={{ fontSize: 11, color: C.gold, fontWeight: 600 }}>{depot.name}</span>
+              <DivisionBadge division={division} size={20} />
+              <span style={{ fontSize: 11, color: C.gold, fontWeight: 600 }}>{division.name}</span>
             </div>
           )}
         </div>
@@ -238,29 +238,23 @@ export default function ProfilePage() {
               </div>
             </div>
             <div>
-              <label htmlFor="prof-depot" style={lb}>Home Depot</label>
+              <label htmlFor="prof-division" style={lb}>Home Division</label>
               <select
-                id="prof-depot"
-                value={depotId}
-                onChange={e => setDepotId(e.target.value)}
-                disabled={depotLocked}
-                style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `1px solid ${C.bd}`, background: C.s, color: depotId ? C.white : C.m, fontSize: 14, cursor: depotLocked ? "not-allowed" : "pointer", appearance: "auto", opacity: depotLocked ? 0.6 : 1 }}
+                id="prof-division"
+                value={divisionId}
+                onChange={e => setDivisionId(e.target.value)}
+                disabled={divisionLocked}
+                style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `1px solid ${C.bd}`, background: C.s, color: divisionId ? C.white : C.m, fontSize: 14, cursor: divisionLocked ? "not-allowed" : "pointer", appearance: "auto", opacity: divisionLocked ? 0.6 : 1 }}
               >
-                <option value="">— Select your home depot —</option>
-                {["Manhattan","Brooklyn","Bronx","Queens","Staten Island"].map(borough => {
-                  const bd = depots.filter(d => d.borough === borough);
-                  if (!bd.length) return null;
-                  return (
-                    <optgroup key={borough} label={borough}>
-                      {bd.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
-                    </optgroup>
-                  );
-                })}
+                <option value="">— Select your home division —</option>
+                {divisions.map(d => (
+                  <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
+                ))}
               </select>
-              {depotLocked && (
+              {divisionLocked && (
                 <div style={{ fontSize: 11, color: C.gold, marginTop: 6, lineHeight: 1.5 }}>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{display:"inline",verticalAlign:"middle",marginRight:4}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                  {depotUnlocksAt ? `Locked until ${depotUnlocksAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}` : "Locked"}
+                  {divisionUnlocksAt ? `Locked until ${divisionUnlocksAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}` : "Locked"}
                 </div>
               )}
             </div>
@@ -311,7 +305,7 @@ export default function ProfilePage() {
                 {([
                   { key: "messages" as const, label: "Messages" },
                   { key: "swapInterest" as const, label: "Swap interest (someone messages about your swap)" },
-                  { key: "announcements" as const, label: "Announcements from your depot" },
+                  { key: "announcements" as const, label: "Announcements from your division" },
                 ] as const).map(({ key, label }) => (
                   <div key={key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                     <span style={{ fontSize: 13, color: C.white, lineHeight: 1.4 }}>{label}</span>

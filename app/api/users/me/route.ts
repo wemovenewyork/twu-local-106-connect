@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.userId },
-    include: { depot: true },
+    include: { division: true },
   });
   if (!dbUser) return err("User not found", 404);
 
@@ -43,8 +43,8 @@ export async function GET(req: NextRequest) {
     firstName: dbUser.firstName,
     lastName: dbUser.lastName,
     email: dbUser.email,
-    depotId: dbUser.depotId,
-    depot: dbUser.depot,
+    divisionId: dbUser.divisionId,
+    division: dbUser.division,
     role: dbUser.role,
     language: dbUser.language,
     avatarUrl: dbUser.avatarUrl,
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     reputation,
     inviteCodes,
     jobTitle: dbUser.jobTitle,
-    depotSetAt: dbUser.depotSetAt?.toISOString() ?? null,
+    divisionSetAt: dbUser.divisionSetAt?.toISOString() ?? null,
     verifiedOperator: dbUser.verifiedOperator,
   });
 }
@@ -64,9 +64,9 @@ export async function PUT(req: NextRequest) {
 
   const body = await parseBody(req, BODY_200KB);
   if (body instanceof NextResponse) return body;
-  const { firstName, lastName, email, language, depotId, jobTitle, avatarUrl } = body as {
+  const { firstName, lastName, email, language, divisionId, jobTitle, avatarUrl } = body as {
     firstName?: string; lastName?: string; email?: string; language?: string;
-    depotId?: string; jobTitle?: string; avatarUrl?: string;
+    divisionId?: string; jobTitle?: string; avatarUrl?: string;
   };
 
   const callerUser = await prisma.user.findUnique({ where: { id: user.userId }, select: { email: true, suspendedUntil: true } });
@@ -123,18 +123,18 @@ export async function PUT(req: NextRequest) {
     if (existing) return err("Email already in use", 409);
   }
 
-  // Depot change enforcement
-  if (depotId !== undefined) {
+  // Division change enforcement
+  if (divisionId !== undefined) {
     const dbUser = await prisma.user.findUnique({
       where: { id: user.userId },
-      select: { depotId: true, depotSetAt: true, role: true },
+      select: { divisionId: true, divisionSetAt: true, role: true },
     });
     const isAdmin = dbUser?.role === "admin" || dbUser?.role === "subAdmin";
-    if (!isAdmin && dbUser?.depotId && dbUser.depotId !== depotId && depotId !== null) {
+    if (!isAdmin && dbUser?.divisionId && dbUser.divisionId !== divisionId && divisionId !== null) {
       const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-      if (dbUser.depotSetAt && (Date.now() - dbUser.depotSetAt.getTime()) < sevenDaysMs) {
-        const unlocksAt = new Date(dbUser.depotSetAt.getTime() + sevenDaysMs);
-        return err(`Home depot can only be changed once every 7 days. Unlocks ${unlocksAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}.`, 403);
+      if (dbUser.divisionSetAt && (Date.now() - dbUser.divisionSetAt.getTime()) < sevenDaysMs) {
+        const unlocksAt = new Date(dbUser.divisionSetAt.getTime() + sevenDaysMs);
+        return err(`Home division can only be changed once every 7 days. Unlocks ${unlocksAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}.`, 403);
       }
     }
   }
@@ -148,12 +148,12 @@ export async function PUT(req: NextRequest) {
       ...(language && { language }),
       ...(jobTitle !== undefined && { jobTitle }),
       ...(avatarUrl !== undefined && { avatarUrl }),
-      ...(depotId !== undefined && {
-        depotId,
-        ...(depotId ? { depotSetAt: new Date() } : {}),
+      ...(divisionId !== undefined && {
+        divisionId,
+        ...(divisionId ? { divisionSetAt: new Date() } : {}),
       }),
     },
-    include: { depot: true },
+    include: { division: true },
   });
 
   return ok({
@@ -161,11 +161,11 @@ export async function PUT(req: NextRequest) {
     firstName: updated.firstName,
     lastName: updated.lastName,
     email: updated.email,
-    depotId: updated.depotId,
-    depot: updated.depot,
+    divisionId: updated.divisionId,
+    division: updated.division,
     role: updated.role,
     language: updated.language,
     jobTitle: updated.jobTitle,
-    depotSetAt: updated.depotSetAt?.toISOString() ?? null,
+    divisionSetAt: updated.divisionSetAt?.toISOString() ?? null,
   });
 }

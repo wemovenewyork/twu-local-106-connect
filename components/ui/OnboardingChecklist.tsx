@@ -45,10 +45,10 @@ export function markChecklistItem(userId: string, key: keyof ChecklistState) {
 
 interface Props {
   userId: string;
-  depotCode: string;
+  divisionCode: string;
 }
 
-export default function OnboardingChecklist({ userId, depotCode }: Props) {
+export default function OnboardingChecklist({ userId, divisionCode }: Props) {
   const router = useRouter();
   const [state, setState] = useState<ChecklistState>({ ...DEFAULT_STATE });
   const [minimized, setMinimized] = useState(false);
@@ -73,7 +73,7 @@ export default function OnboardingChecklist({ userId, depotCode }: Props) {
       if (item.href.startsWith("/")) {
         router.push(item.href);
       } else {
-        router.push(`/depot/${depotCode}/${item.href}`);
+        router.push(`/division/${divisionCode}/${item.href}`);
       }
     } else if (item.key === "pushEnabled") {
       Notification.requestPermission().then(p => {

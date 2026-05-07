@@ -64,13 +64,13 @@ export default function SwapDetailPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
     if (!id || !user) return;
-    api.get<Swap>(`/swaps/${id}`).then(setSwap).catch(() => router.replace(`/depot/${code}/swaps`));
+    api.get<Swap>(`/swaps/${id}`).then(setSwap).catch(() => router.replace(`/division/${code}/swaps`));
     api.get<SwapAgreement>(`/swaps/${id}/agreement`)
       .then(setAgreement)
       .catch(() => {})
@@ -80,7 +80,7 @@ export default function SwapDetailPage() {
     // the user has actually opened the destination. Notifications themselves
     // are kept (mark read, not delete) for history.
     api.post(`/notifications/mark-read-by-url`, {
-      url: `/depot/${code}/swaps/${id}`,
+      url: `/division/${code}/swaps/${id}`,
     }).then(() => {
       window.dispatchEvent(new Event("local106:notifications-changed"));
     }).catch(() => {});
@@ -125,7 +125,7 @@ export default function SwapDetailPage() {
     try {
       await api.post(`/users/${s.userId}/message`, { text });
       setMsgModal(false);
-      router.push(`/depot/${code}/messages/${s.userId}`);
+      router.push(`/division/${code}/messages/${s.userId}`);
     } catch (e: unknown) { showToast(e instanceof Error ? e.message : "Send failed"); }
   };
 
@@ -145,7 +145,7 @@ export default function SwapDetailPage() {
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}/swaps`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid " + C.bd, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
+        <button onClick={() => router.push(`/division/${code}/swaps`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid " + C.bd, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
         <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>Swap Details</div>
         <button onClick={handleShare} aria-label="Share this swap" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -292,7 +292,7 @@ export default function SwapDetailPage() {
               currentUserId={user?.id ?? ""}
               onUpdate={(a) => { setAgreement(a); if (a.status === "completed") setSwap(prev => prev ? { ...prev, status: "filled" } : null); }}
               onPropose={() => setProposeModal(true)}
-              onPrint={() => window.open(`/depot/${code}/swaps/${id}/print`, "_blank")}
+              onPrint={() => window.open(`/division/${code}/swaps/${id}/print`, "_blank")}
             />
           )}
 
@@ -304,7 +304,7 @@ export default function SwapDetailPage() {
               currentUserId={user?.id ?? ""}
               onUpdate={(a) => { setAgreement(a); if (a.status === "completed") setSwap(prev => prev ? { ...prev, status: "filled" } : null); }}
               onPropose={() => {}}
-              onPrint={() => window.open(`/depot/${code}/swaps/${id}/print`, "_blank")}
+              onPrint={() => window.open(`/division/${code}/swaps/${id}/print`, "_blank")}
             />
           )}
         </div>

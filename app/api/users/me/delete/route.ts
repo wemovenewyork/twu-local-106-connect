@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       firstName: "Deleted",
       lastName: "User",
       avatarUrl: null,
-      depotId: null,
+      divisionId: null,
       pushSubscriptions: { deleteMany: {} },
       inviteCodes: { updateMany: { where: {}, data: { isValid: false } } },
     },

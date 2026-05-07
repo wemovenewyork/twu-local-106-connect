@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
     identifyUser(userData.id, {
       role: userData.role,
-      depot: userData.depot?.code,
+      division: userData.division?.code,
       language: userData.language ?? "en",
     });
   };

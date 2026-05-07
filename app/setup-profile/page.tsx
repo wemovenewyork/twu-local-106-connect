@@ -4,21 +4,20 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot } from "@/types";
+import { Division } from "@/types";
 import { C } from "@/constants/colors";
 import { analytics } from "@/lib/analytics";
 
 // Soft launch: only Bus Operators. Once we expand to other crafts, restore the
 // full list: ["Bus Operator", "Maintainer", "Cleaner", "Station Agent", "Train Operator", "Conductor", "Other"]
 const SOFT_LAUNCH_JOB_TITLE = "Bus Operator";
-const BOROUGH_ORDER = ["Manhattan", "Brooklyn", "Bronx", "Queens", "Staten Island"];
 const lb: React.CSSProperties = { display: "block", marginBottom: 8, fontSize: 12, fontWeight: 600, color: C.m, letterSpacing: 2, textTransform: "uppercase" };
 
 export default function SetupProfilePage() {
   const { user, loading, refreshUser } = useAuth();
   const router = useRouter();
-  const [depots, setDepots] = useState<Depot[]>([]);
-  const [depotId, setDepotId] = useState("");
+  const [divisions, setDivisions] = useState<Division[]>([]);
+  const [divisionId, setDivisionId] = useState("");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
@@ -30,24 +29,19 @@ export default function SetupProfilePage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    api.get<Depot[]>("/depots").then(setDepots).catch(() => {});
+    api.get<Division[]>("/divisions").then(setDivisions).catch(() => {});
   }, []);
 
-  const groupedDepots = BOROUGH_ORDER.map(borough => ({
-    borough,
-    depots: depots.filter(d => d.borough === borough),
-  })).filter(g => g.depots.length > 0);
-
   const handleSave = async () => {
-    if (!depotId) { setErr("Please select your home depot"); return; }
+    if (!divisionId) { setErr("Please select your home division"); return; }
     setSaving(true);
     setErr("");
     try {
-      await api.put("/users/me", { jobTitle, depotId });
+      await api.put("/users/me", { jobTitle, divisionId });
       await refreshUser();
-      const selected = depots.find(d => d.id === depotId);
+      const selected = divisions.find(d => d.id === divisionId);
       analytics.profileSetupCompleted(selected?.code ?? "");
-      router.replace(selected ? `/depot/${selected.code}` : "/depots");
+      router.replace(selected ? `/division/${selected.code}` : "/divisions");
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Save failed");
     } finally {
@@ -66,33 +60,31 @@ export default function SetupProfilePage() {
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: C.white, marginBottom: 6 }}>Set Up Your Profile</h1>
           <p style={{ fontSize: 13, color: C.m, lineHeight: 1.5 }}>
-            Hi {user.firstName}! Choose your home depot to get started. Your home depot determines which swaps you see and post.
+            Hi {user.firstName}! Choose your home division to get started. Your home division determines which swaps you see and post.
           </p>
         </div>
 
         <div style={{ display: "grid", gap: 16 }}>
           <div>
-            <label htmlFor="setup-depot" style={lb}>Home Depot</label>
+            <label htmlFor="setup-division" style={lb}>Home Division</label>
             <select
-              id="setup-depot"
-              value={depotId}
-              onChange={e => { setDepotId(e.target.value); setErr(""); }}
-              style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `1px solid ${C.bd}`, background: C.s, color: depotId ? C.white : C.m, fontSize: 16, cursor: "pointer" }}
+              id="setup-division"
+              value={divisionId}
+              onChange={e => { setDivisionId(e.target.value); setErr(""); }}
+              style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `1px solid ${C.bd}`, background: C.s, color: divisionId ? C.white : C.m, fontSize: 16, cursor: "pointer" }}
             >
-              <option value="">— Select your home depot —</option>
-              {groupedDepots.map(({ borough, depots: bd }) => (
-                <optgroup key={borough} label={borough}>
-                  {bd.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
-                </optgroup>
+              <option value="">— Select your home division —</option>
+              {divisions.map(d => (
+                <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
               ))}
             </select>
-            {depots.length === 1 && (
+            {divisions.length === 1 && (
               <div style={{ fontSize: 11, color: C.gold, marginTop: 6, lineHeight: 1.5 }}>
-                TWU Local 106 Connect is currently in soft launch at {depots[0].name} only. More depots coming soon.
+                TWU Local 106 Connect is currently in soft launch at {divisions[0].name} only. More divisions coming soon.
               </div>
             )}
             <div style={{ fontSize: 11, color: C.m, marginTop: 6, lineHeight: 1.5 }}>
-              You can only see and post swaps in your home depot. Once set, this can only be changed once every 7 days.
+              You can only see and post swaps in your home division. Once set, this can only be changed once every 7 days.
             </div>
           </div>
 

@@ -7,7 +7,7 @@ import { err } from "@/lib/apiResponse";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { parseBody, BODY_1KB } from "@/lib/parseBody";
 import { writeAuditLog } from "@/lib/audit";
-import { isDepotInSoftLaunch } from "@/lib/softLaunch";
+import { isDivisionInSoftLaunch } from "@/lib/softLaunch";
 
 const MAX_ATTEMPTS = 10;
 const LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (!email || !password) return err("Email and password required", 400);
     if (password.length > 128) return err("Password too long", 400);
 
-    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() }, include: { depot: true } });
+    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() }, include: { division: true } });
     if (!user) return err("Invalid email or password", 401);
 
     // Check email verification
@@ -80,16 +80,16 @@ export async function POST(req: NextRequest) {
       data: { loginAttempts: 0, lockedUntil: null },
     });
 
-    // Soft launch gate — only allow depots in the SOFT_LAUNCH_DEPOT allowlist
+    // Soft launch gate — only allow divisions in the SOFT_LAUNCH_DEPOT allowlist
     // (admins bypass). The allowlist accepts a single code ("QV") or a
     // comma-separated list ("QV,WF,MV"). When the env var is unset, no
     // restriction applies.
     if (
       !["admin", "subAdmin"].includes(user.role) &&
-      user.depotId &&
-      !isDepotInSoftLaunch(user.depot?.code)
+      user.divisionId &&
+      !isDivisionInSoftLaunch(user.division?.code)
     ) {
-      return err(`TWU Local 106 Connect is currently in limited soft launch. We'll be at your depot soon!`, 403);
+      return err(`TWU Local 106 Connect is currently in limited soft launch. We'll be at your division soon!`, 403);
     }
 
     const payload = { userId: user.id, email: user.email };
@@ -102,8 +102,8 @@ export async function POST(req: NextRequest) {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        depotId: user.depotId,
-        depot: user.depot,
+        divisionId: user.divisionId,
+        division: user.division,
         role: user.role,
         language: user.language,
         termsVersion: user.termsVersion,

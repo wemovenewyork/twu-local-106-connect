@@ -90,8 +90,8 @@ function futureDate(daysAhead: number): Date { const d = new Date(); d.setDate(d
 async function main() {
   console.log("Fetching users...");
   const users = await prisma.user.findMany({
-    where: { email: { endsWith: "@mta.com" }, NOT: { email: "system@wemoveny.internal" }, depotId: { not: null } },
-    select: { id: true, depotId: true, firstName: true, lastName: true },
+    where: { email: { endsWith: "@mta.com" }, NOT: { email: "system@wemoveny.internal" }, divisionId: { not: null } },
+    select: { id: true, divisionId: true, firstName: true, lastName: true },
   });
   console.log(`Found ${users.length} operators`);
 
@@ -125,7 +125,7 @@ async function main() {
     await prisma.swap.create({
       data: {
         userId: u.id,
-        depotId: u.depotId!,
+        divisionId: u.divisionId!,
         category: "work",
         status,
         posterName: `${u.firstName} ${u.lastName}`,
@@ -155,7 +155,7 @@ async function main() {
     await prisma.swap.create({
       data: {
         userId: u.id,
-        depotId: u.depotId!,
+        divisionId: u.divisionId!,
         category: "daysoff",
         status,
         posterName: `${u.firstName} ${u.lastName}`,
@@ -179,7 +179,7 @@ async function main() {
     await prisma.swap.create({
       data: {
         userId: u.id,
-        depotId: u.depotId!,
+        divisionId: u.divisionId!,
         category: "vacation",
         status: rand(["open","open","open","open","pending"] as const),
         posterName: `${u.firstName} ${u.lastName}`,

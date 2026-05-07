@@ -1,21 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { err } from "@/lib/apiResponse";
-import { getSoftLaunchDepots } from "@/lib/softLaunch";
+import { getSoftLaunchDivisions } from "@/lib/softLaunch";
 
 export async function GET() {
   try {
-    const allowlist = getSoftLaunchDepots();
-    const depots = await prisma.depot.findMany({
+    const allowlist = getSoftLaunchDivisions();
+    const divisions = await prisma.division.findMany({
       where: allowlist ? { code: { in: allowlist } } : undefined,
       orderBy: { name: "asc" },
     });
     const counts = await prisma.swap.groupBy({
-      by: ["depotId"],
+      by: ["divisionId"],
       _count: { id: true },
       where: { status: "open" },
     });
-    const countMap = Object.fromEntries(counts.map((c) => [c.depotId, c._count.id]));
-    const data = depots.map((d) => ({ ...d, openSwaps: countMap[d.id] ?? 0 }));
+    const countMap = Object.fromEntries(counts.map((c) => [c.divisionId, c._count.id]));
+    const data = divisions.map((d) => ({ ...d, openSwaps: countMap[d.id] ?? 0 }));
 
     return Response.json(data, {
       status: 200,
@@ -26,6 +26,6 @@ export async function GET() {
       },
     });
   } catch {
-    return err("Unable to load depots — please try again", 503);
+    return err("Unable to load divisions — please try again", 503);
   }
 }

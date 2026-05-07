@@ -53,18 +53,18 @@ export async function POST(req: NextRequest) {
   });
   if (block) return err("Unable to send message", 403);
 
-  const [message, sender, depot] = await Promise.all([
+  const [message, sender, division] = await Promise.all([
     prisma.message.create({
       data: { swapId, fromUserId: user.userId, toUserId: swap.userId, text: text.trim() },
     }),
     prisma.user.findUnique({ where: { id: user.userId }, select: { firstName: true, lastName: true } }),
-    prisma.depot.findUnique({ where: { id: swap.depotId }, select: { code: true } }),
+    prisma.division.findUnique({ where: { id: swap.divisionId }, select: { code: true } }),
   ]);
 
   const senderName = sender ? `${sender.firstName} ${sender.lastName}` : "Someone";
   const safeSenderName = escapeHtml(senderName);
   const safeText = escapeHtml(text.trim().slice(0, 300));
-  const threadUrl = depot ? `/depot/${depot.code}/messages/${user.userId}` : "/";
+  const threadUrl = division ? `/division/${division.code}/messages/${user.userId}` : "/";
   await notifyUserWithEmailFallback(
     swap.userId,
     {
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
         type: "swap_interest",
         title: "Someone is interested in your swap",
         body: `A new message about your swap: "${swap.details.slice(0, 60)}${swap.details.length > 60 ? "…" : ""}"`,
-        url: depot ? `/depot/${depot.code}/swaps/${swapId}` : "/",
+        url: division ? `/division/${division.code}/swaps/${swapId}` : "/",
       },
     });
   } catch { /* non-fatal */ }

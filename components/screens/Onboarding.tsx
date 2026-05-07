@@ -149,7 +149,7 @@ const STEPS = [
   {
     color: C.blue,
     title: "Post Your Swap",
-    body: "Choose your swap type, add your shift details, and post it to your depot board. Takes under a minute.",
+    body: "Choose your swap type, add your shift details, and post it to your division board. Takes under a minute.",
     Illustration: IllustrationPost,
   },
   {

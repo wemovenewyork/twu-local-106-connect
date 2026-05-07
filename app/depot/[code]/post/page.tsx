@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot, Swap } from "@/types";
+import { Division, Swap } from "@/types";
 import { C, CM, SWAP_TYPES } from "@/constants/colors";
-import DepotBadge from "@/components/ui/DepotBadge";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import Icon from "@/components/ui/Icon";
 import Toast from "@/components/ui/Toast";
 import NotifIcon from "@/components/ui/NotifIcon";
@@ -116,7 +116,7 @@ export default function PostSwapPage() {
   const editId = searchParams.get("edit");
   const code = params.code;
 
-  const [depot, setDepot] = useState<Depot | null>(null);
+  const [division, setDepot] = useState<Division | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -143,13 +143,13 @@ export default function PostSwapPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
     if (!code) return;
-    api.get<Depot>(`/depots/${code}`).then(setDepot).catch(() => router.replace("/depots"));
+    api.get<Division>(`/divisions/${code}`).then(setDepot).catch(() => router.replace("/divisions"));
     if (editId) {
       api.get<Swap>(`/swaps/${editId}`).then(sw => {
         sF({
@@ -248,11 +248,11 @@ export default function PostSwapPage() {
       if (editId) {
         await api.put(`/swaps/${editId}`, payload);
         showToast("Swap updated!");
-        analytics.swapPosted({ type: f.category, depot: code, swapType: "edit" });
+        analytics.swapPosted({ type: f.category, division: code, swapType: "edit" });
       } else {
         await api.post("/swaps", payload);
         showToast("Swap posted!");
-        analytics.swapPosted({ type: f.category, depot: code });
+        analytics.swapPosted({ type: f.category, division: code });
         if (user && !localStorage.getItem("first-swap-done")) {
           localStorage.setItem("first-swap-done", "1");
           if (user) markChecklistItem(user.id, "posted");
@@ -263,13 +263,13 @@ export default function PostSwapPage() {
       }
       playSuccess();
       setSubmitted(true);
-      setTimeout(() => router.push(`/depot/${code}/swaps`), showCelebration ? 4500 : 600);
+      setTimeout(() => router.push(`/division/${code}/swaps`), showCelebration ? 4500 : 600);
     } catch (e: unknown) {
       showToast(e instanceof Error ? e.message : "Failed to post swap");
     } finally { setSubmitting(false); }
   };
 
-  if (!depot) return null;
+  if (!division) return null;
 
   const dateInputStyle: React.CSSProperties = {
     width: "100%",
@@ -286,9 +286,9 @@ export default function PostSwapPage() {
         @keyframes rippleOut { from { transform: scale(0); opacity: 0.6; } to { transform: scale(2.5); opacity: 0; } }
       `}</style>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
-        <DepotBadge depot={depot} size={38} />
-        <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>{depot.name}</div>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
+        <DivisionBadge division={division} size={38} />
+        <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>{division.name}</div>
         <NotifIcon />
         <InboxIcon />
       </div>

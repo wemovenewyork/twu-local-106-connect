@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id: toUserId } = await params;
   const dbSender = await prisma.user.findUnique({
     where: { id: user.userId },
-    select: { email: true, suspendedUntil: true, depotId: true, role: true },
+    select: { email: true, suspendedUntil: true, divisionId: true, role: true },
   });
   if (!dbSender) return err("User not found", 404);
   const activeErr = checkActive(dbSender);
@@ -28,11 +28,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const toUser = await prisma.user.findUnique({ where: { id: toUserId } });
   if (!toUser) return err("User not found", 404);
 
-  // Same-depot restriction. Admins can DM anyone (for support/moderation),
-  // but regular operators are limited to their own depot to prevent
-  // cross-depot harassment after we expand beyond Queens Village.
+  // Same-division restriction. Admins can DM anyone (for support/moderation),
+  // but regular operators are limited to their own division to prevent
+  // cross-division harassment after we expand beyond Queens Village.
   const isAdmin = dbSender.role === "admin" || dbSender.role === "subAdmin";
-  if (!isAdmin && (!dbSender.depotId || dbSender.depotId !== toUser.depotId)) {
+  if (!isAdmin && (!dbSender.divisionId || dbSender.divisionId !== toUser.divisionId)) {
     return err("User not found", 404);
   }
 
@@ -53,17 +53,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!text?.trim()) return err("Message text is required", 400);
   if (text.length > 500) return err("Message must be 500 characters or fewer", 400);
 
-  const [message, sender, depot] = await Promise.all([
+  const [message, sender, division] = await Promise.all([
     prisma.message.create({
       data: { fromUserId: user.userId, toUserId, text: text.trim(), swapId: null },
       include: { fromUser: { select: { id: true, firstName: true, lastName: true } } },
     }),
     prisma.user.findUnique({ where: { id: user.userId }, select: { firstName: true, lastName: true } }),
-    toUser.depotId ? prisma.depot.findUnique({ where: { id: toUser.depotId }, select: { code: true } }) : null,
+    toUser.divisionId ? prisma.division.findUnique({ where: { id: toUser.divisionId }, select: { code: true } }) : null,
   ]);
 
-  const threadUrl = depot?.code
-    ? `/depot/${depot.code}/messages/${user.userId}`
+  const threadUrl = division?.code
+    ? `/division/${division.code}/messages/${user.userId}`
     : `/inbox`;
 
   await notifyUser(toUserId, {

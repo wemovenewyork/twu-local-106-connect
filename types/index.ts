@@ -1,10 +1,8 @@
-export interface Depot {
+export interface Division {
   id: string;
   name: string;
   code: string;
-  borough: string;
-  operator: string;
-  logoUrl?: string | null;
+  description?: string | null;
   openSwaps?: number;
 }
 
@@ -14,7 +12,7 @@ export type SwapStatus = "open" | "pending" | "filled" | "expired";
 export interface Swap {
   id: string;
   userId: string;
-  depotId: string;
+  divisionId: string;
   category: SwapCategory;
   status: SwapStatus;
   posterName: string;
@@ -58,8 +56,8 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  depotId?: string | null;
-  depot?: Depot | null;
+  divisionId?: string | null;
+  division?: Division | null;
   role: UserRole;
   language: string;
   avatarUrl?: string | null;
@@ -68,13 +66,13 @@ export interface User {
   reputation?: RepScore;
   inviteCodes?: { code: string; isValid: boolean }[];
   jobTitle?: string | null;
-  depotSetAt?: string | null;
+  divisionSetAt?: string | null;
   verifiedOperator?: boolean;
 }
 
 export interface Announcement {
   id: string;
-  depotId: string;
+  divisionId: string;
   authorId: string;
   body: string;
   pinned: boolean;
@@ -88,7 +86,7 @@ export interface FlexibleOperator {
   id: string;
   firstName: string;
   lastName: string;
-  depotId: string;
+  divisionId: string;
   flexibleSince: string;
   reputation?: RepScore;
 }

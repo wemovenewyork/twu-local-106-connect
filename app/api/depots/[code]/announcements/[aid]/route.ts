@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { parseBody, BODY_4KB } from "@/lib/parseBody";
 
-// PATCH /api/depots/:code/announcements/:aid → edit pinned/body/expiresAt
-// DELETE /api/depots/:code/announcements/:aid → delete
+// PATCH /api/divisions/:code/announcements/:aid → edit pinned/body/expiresAt
+// DELETE /api/divisions/:code/announcements/:aid → delete
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ code: string; aid: string }> }) {
   let user;
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }

@@ -21,8 +21,8 @@ export default function NotifIcon() {
     // When other parts of the app mark notifications read (e.g. opening a
     // message thread or a swap detail page), they dispatch this event so the
     // bell badge updates instantly instead of waiting up to 30s for the next
-    // poll. See app/depot/[code]/messages/[userId]/page.tsx and
-    // app/depot/[code]/swaps/[id]/page.tsx.
+    // poll. See app/division/[code]/messages/[userId]/page.tsx and
+    // app/division/[code]/swaps/[id]/page.tsx.
     window.addEventListener("local106:notifications-changed", poll);
     return () => {
       clearInterval(interval);

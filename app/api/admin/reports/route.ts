@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       swap: {
         select: {
           id: true, details: true, category: true, posterName: true,
-          depot: { select: { name: true, code: true } },
+          division: { select: { name: true, code: true } },
         },
       },
       reporter: { select: { id: true, firstName: true, lastName: true } },

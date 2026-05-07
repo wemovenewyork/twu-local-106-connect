@@ -4,10 +4,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
-import { Depot } from "@/types";
+import { Division } from "@/types";
 import { C } from "@/constants/colors";
 import Icon from "@/components/ui/Icon";
-import DepotBadge from "@/components/ui/DepotBadge";
+import DivisionBadge from "@/components/ui/DivisionBadge";
 import BottomNav from "@/components/ui/BottomNav";
 import Footer from "@/components/ui/Footer";
 import NotifIcon from "@/components/ui/NotifIcon";
@@ -31,7 +31,7 @@ export default function MessagesPage() {
   const params = useParams<{ code: string }>();
   const code = params.code;
 
-  const [depot, setDepot] = useState<Depot | null>(null);
+  const [division, setDepot] = useState<Division | null>(null);
   const [convos, setConvos] = useState<Conversation[]>([]);
   const [searchQ, setSearchQ] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -51,13 +51,13 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !user.depotId) router.replace("/setup-profile");
-    if (!loading && user?.depot && user.depot.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/depot/${user.depot.code}/swaps`);
+    if (!loading && user && !user.divisionId) router.replace("/setup-profile");
+    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
     if (!code || !user) return;
-    api.get<Depot>(`/depots/${code}`).then(setDepot).catch(() => router.replace("/depots"));
+    api.get<Division>(`/divisions/${code}`).then(setDepot).catch(() => router.replace("/divisions"));
     fetchConvos();
   }, [code, user, router, fetchConvos]);
 
@@ -98,7 +98,7 @@ export default function MessagesPage() {
     }
   };
 
-  if (!depot) return null;
+  if (!division) return null;
 
   return (
     <div
@@ -113,10 +113,10 @@ export default function MessagesPage() {
         ) : "↓ Pull to refresh"}
       </div>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/depot/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="back" s={16} />
         </button>
-        <DepotBadge depot={depot} size={38} />
+        <DivisionBadge division={division} size={38} />
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: C.white, display: "flex", alignItems: "center", gap: 8 }}>
             Messages
@@ -182,7 +182,7 @@ export default function MessagesPage() {
                   <div key={conv.counterpartId} style={{ animation: `fadeUp .4s cubic-bezier(.4,0,.2,1) ${idx * 0.05}s both` }}>
                     <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
                       <button
-                        onClick={() => { if (isTargeted) setDeleteTarget(null); else router.push(`/depot/${code}/messages/${conv.counterpartId}`); }}
+                        onClick={() => { if (isTargeted) setDeleteTarget(null); else router.push(`/division/${code}/messages/${conv.counterpartId}`); }}
                         style={{
                           flex: 1, textAlign: "left", border: "none", cursor: "pointer",
                           background: isTargeted ? "rgba(255,71,87,.08)" : hasUnread ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.025)",
@@ -240,7 +240,7 @@ export default function MessagesPage() {
         <Footer />
       </main>
 
-      <BottomNav active="messages" depotCode={code} />
+      <BottomNav active="messages" divisionCode={code} />
 
       {clearAllConfirm && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 500, padding: 20 }} onClick={() => setClearAllConfirm(false)}>

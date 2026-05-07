@@ -66,9 +66,9 @@ export async function GET(
 
   <h2 style="font-size:14px;font-weight:700;color:${brand.colors.red};text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">Getting started</h2>
   <ol style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.8;margin:0 0 20px;padding-left:20px">
-    <li><strong style="color:#fff">Pick your depot.</strong> This is your home base — you'll see swaps from your depot first.</li>
+    <li><strong style="color:#fff">Pick your division.</strong> This is your home base — you'll see swaps from your division first.</li>
     <li><strong style="color:#fff">Post a swap or browse.</strong> Need a Saturday off? Post it. Looking to pick up a Tuesday shift? Browse.</li>
-    <li><strong style="color:#fff">Message, agree, print.</strong> Talk it out in-app, confirm with the other supervisor, print the agreement, follow your depot's normal approval steps.</li>
+    <li><strong style="color:#fff">Message, agree, print.</strong> Talk it out in-app, confirm with the other supervisor, print the agreement, follow your division's normal approval steps.</li>
   </ol>
 
   <h2 style="font-size:14px;font-weight:700;color:${brand.colors.red};text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 8px">Almost done</h2>
@@ -105,9 +105,9 @@ ${brand.name} coordinates swaps but doesn't approve them — every swap still ha
 
 GETTING STARTED
 
-1. Pick your depot. This is your home base — you'll see swaps from your depot first.
+1. Pick your division. This is your home base — you'll see swaps from your division first.
 2. Post a swap or browse. Need a Saturday off? Post it. Looking to pick up a Tuesday shift? Browse.
-3. Message, agree, print. Talk it out in-app, confirm with the other supervisor, print the agreement, follow your depot's normal approval steps.
+3. Message, agree, print. Talk it out in-app, confirm with the other supervisor, print the agreement, follow your division's normal approval steps.
 
 ALMOST DONE
 

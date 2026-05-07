@@ -18,7 +18,7 @@ export async function GET(
 
   const u = await prisma.user.findUnique({
     where: { id },
-    include: { depot: { select: { name: true, code: true, borough: true } } },
+    include: { division: { select: { name: true, code: true } } },
   });
   if (!u) return err("User not found", 404);
 
@@ -45,7 +45,7 @@ export async function GET(
     email: isSubAdmin ? null : u.email,
     role: u.role,
     createdAt: u.createdAt,
-    depot: u.depot,
+    division: u.division,
     flexibleMode: u.flexibleMode,
     reputation,
     swapCount,
