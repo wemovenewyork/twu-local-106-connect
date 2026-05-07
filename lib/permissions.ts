@@ -113,3 +113,57 @@ export async function canManageNews(
 
   return false;
 }
+
+/**
+ * Authorize manage (edit/delete) actions on a document record.
+ *
+ *   - localAdmin / superAdmin: any document
+ *   - owner of a selfOnly document: their own
+ *   - uploader: documents they uploaded (within their authority)
+ *   - divisionAdmin: division/subUnit documents scoped to their division
+ */
+type DocumentLike = {
+  visibility: string;
+  divisionId: string | null;
+  subUnitId: string | null;
+  ownerUserId: string | null;
+  uploaderId: string;
+};
+export function canManageDocument(
+  user: RoleLike & { id: string },
+  doc: DocumentLike
+): boolean {
+  if (isLocalOrSuperAdmin(user)) return true;
+  if (doc.visibility === "selfOnly" && doc.ownerUserId === user.id) return true;
+  if (doc.uploaderId === user.id) return true;
+  if (
+    user.role === "divisionAdmin" &&
+    user.divisionId &&
+    user.divisionId === doc.divisionId
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Authorize view access on a document record.
+ *
+ *   - all: any authenticated user
+ *   - division: caller's divisionId matches
+ *   - subUnit: caller's subUnitId matches
+ *   - selfOnly: caller is owner
+ *
+ * localAdmin / superAdmin can always view.
+ */
+export function canViewDocument(
+  user: RoleLike & { id: string; subUnitId?: string | null },
+  doc: DocumentLike
+): boolean {
+  if (isLocalOrSuperAdmin(user)) return true;
+  if (doc.visibility === "all") return true;
+  if (doc.visibility === "division") return !!user.divisionId && user.divisionId === doc.divisionId;
+  if (doc.visibility === "subUnit") return !!user.subUnitId && user.subUnitId === doc.subUnitId;
+  if (doc.visibility === "selfOnly") return doc.ownerUserId === user.id;
+  return false;
+}
