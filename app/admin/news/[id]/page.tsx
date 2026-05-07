@@ -24,6 +24,7 @@ export default function NewsEditorPage() {
   const isNew = id === "new";
 
   const [news, setNews] = useState<News | null>(null);
+  const [canManage, setCanManage] = useState(true);
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -44,9 +45,10 @@ export default function NewsEditorPage() {
 
   useEffect(() => {
     if (!isAuthorized || isNew) return;
-    api.get<{ news: News }>(`/admin/news/${id}`)
+    api.get<{ news: News; canManage: boolean }>(`/admin/news/${id}`)
       .then(r => {
         setNews(r.news);
+        setCanManage(r.canManage);
         setTitle(r.news.title);
         setBody(r.news.body);
         setDivisionId(r.news.divisionId);
@@ -66,10 +68,11 @@ export default function NewsEditorPage() {
   const isAdminTier = !!user && ["divisionAdmin", "localAdmin", "superAdmin"].includes(user.role);
   const canEdit = useMemo(() => {
     if (isNew) return true;
+    if (!canManage) return false;
     if (status === "draft") return isAuthor;
     if (status === "inReview") return !isAuthor && isAdminTier;
     return false;
-  }, [isNew, status, isAuthor, isAdminTier]);
+  }, [isNew, canManage, status, isAuthor, isAdminTier]);
 
   const canSetAllDivisions = !!user && isLocalOrSuperAdmin(user);
 
@@ -164,6 +167,12 @@ export default function NewsEditorPage() {
       {!isNew && status === "inReview" && isAuthor && (
         <div style={{ padding: "10px 14px", borderRadius: 12, marginBottom: 12, fontSize: 13, background: "rgba(217,119,6,.10)", border: `1px solid rgba(217,119,6,.35)`, color: "#FBBF24" }}>
           Awaiting review by another admin. You can&apos;t edit or approve your own post.
+        </div>
+      )}
+
+      {!isNew && !canManage && (
+        <div style={{ padding: "10px 14px", borderRadius: 12, marginBottom: 12, fontSize: 13, background: "rgba(255,255,255,.03)", border: `1px solid ${C.bd}`, color: C.m }}>
+          Read-only — this post is outside your division. You can view it but not edit or change its status.
         </div>
       )}
 

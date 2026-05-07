@@ -115,6 +115,10 @@ async function loadCaller(userId: string) {
 }
 
 // GET /api/admin/news/[id]
+//
+// Returns the news + a `canManage` flag. Users with view-only access
+// (e.g. a divisionAdmin looking at an all-divisions published post) get the
+// payload back so the admin UI can render in read-only mode instead of 403'ing.
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -131,9 +135,18 @@ export async function GET(
     include: NEWS_INCLUDE,
   });
   if (!news) return err("News not found", 404);
-  if (!(await canManageNews(caller, news))) return err("Forbidden", 403);
 
-  return ok({ news });
+  const canManage = await canManageNews(caller, news);
+  if (!canManage) {
+    // View-only access: published news visible to caller's division (or
+    // all-divisions). Drafts/in-review remain manage-only.
+    const callerCanView =
+      news.status === "published" &&
+      (news.divisionId === null || news.divisionId === caller.divisionId);
+    if (!callerCanView) return err("Forbidden", 403);
+  }
+
+  return ok({ news, canManage });
 }
 
 // PATCH /api/admin/news/[id]

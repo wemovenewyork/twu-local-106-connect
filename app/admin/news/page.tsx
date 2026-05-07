@@ -5,9 +5,26 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import { C } from "@/constants/colors";
-import { News, NewsStatus } from "@/types";
+import { News, NewsStatus, User } from "@/types";
 
 const STATUS_ORDER: NewsStatus[] = ["draft", "inReview", "published", "archived"];
+
+// Mirrors lib/permissions.ts canManageNews. Kept in sync manually.
+function canManageNewsClient(user: User, news: News): boolean {
+  if (user.role === "localAdmin" || user.role === "superAdmin") return true;
+  if (user.role === "divisionAdmin" && news.divisionId && news.divisionId === user.divisionId) {
+    return true;
+  }
+  if (
+    user.role === "editor" &&
+    news.authorId === user.id &&
+    news.status === "draft" &&
+    news.divisionId === user.divisionId
+  ) {
+    return true;
+  }
+  return false;
+}
 
 const STATUS_BADGE: Record<NewsStatus, { bg: string; bd: string; c: string; label: string }> = {
   draft: { bg: "rgba(255,255,255,.08)", bd: "rgba(255,255,255,.18)", c: C.m, label: "Draft" },
@@ -97,9 +114,17 @@ export default function AdminNewsPage() {
               {badge.label} ({items.length})
             </h2>
             <div style={{ display: "grid", gap: 10 }}>
-              {items.map(n => (
-                <NewsRow key={n.id} news={n} onClick={() => router.push(`/admin/news/${n.id}`)} />
-              ))}
+              {items.map(n => {
+                const manage = canManageNewsClient(user, n);
+                return (
+                  <NewsRow
+                    key={n.id}
+                    news={n}
+                    canManage={manage}
+                    onClick={() => router.push(manage ? `/admin/news/${n.id}` : `/news/${n.id}`)}
+                  />
+                );
+              })}
             </div>
           </section>
         );
@@ -114,7 +139,7 @@ export default function AdminNewsPage() {
   );
 }
 
-function NewsRow({ news, onClick }: { news: News; onClick: () => void }) {
+function NewsRow({ news, canManage, onClick }: { news: News; canManage: boolean; onClick: () => void }) {
   const badge = STATUS_BADGE[news.status];
   const divisionLabel = news.division?.name ?? (news.divisionId === null ? "All Divisions" : "—");
   return (
@@ -141,6 +166,15 @@ function NewsRow({ news, onClick }: { news: News; onClick: () => void }) {
           {badge.label}
         </span>
         <span style={{ fontSize: 11, color: C.m }}>{divisionLabel}</span>
+        {!canManage && (
+          <span style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase",
+            padding: "2px 8px", borderRadius: 999,
+            background: "rgba(255,255,255,.04)", border: `1px solid ${C.bd}`, color: C.m,
+          }}>
+            Read-only
+          </span>
+        )}
         <span style={{ fontSize: 11, color: C.m, marginLeft: "auto" }}>{formatAge(news.updatedAt)}</span>
       </div>
       <div style={{ fontSize: 15, fontWeight: 700, color: C.white, marginBottom: 4 }}>
