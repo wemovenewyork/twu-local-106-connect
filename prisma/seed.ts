@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import bcrypt from "bcryptjs";
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
@@ -42,22 +41,11 @@ async function main() {
     });
   }
 
-  console.log("Seeding admin account...");
-  const adminHash = await bcrypt.hash("L106connect0334", 10);
-  await prisma.user.upsert({
-    where: { email: "wemovenewyork.net@gmail.com" },
-    update: {},
-    create: {
-      email: "wemovenewyork.net@gmail.com",
-      passwordHash: adminHash,
-      firstName: "Admin",
-      lastName: "Local106",
-      verified: true,
-      role: "superAdmin",
-    },
-  });
-
   console.log("Seed complete.");
+  console.log("");
+  console.log("To create an admin account, use the CLI script:");
+  console.log("  npm run create-admin -- --email=you@example.com --role=superAdmin");
+  console.log("");
 }
 
 main()

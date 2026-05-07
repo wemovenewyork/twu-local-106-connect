@@ -66,7 +66,7 @@ export interface User {
   reputation?: RepScore;
   jobTitle?: string | null;
   divisionSetAt?: string | null;
-  verifiedOperator?: boolean;
+  verifiedMember?: boolean;
 }
 
 export interface Announcement {

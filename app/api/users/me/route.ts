@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
     reputation,
     jobTitle: dbUser.jobTitle,
     divisionSetAt: dbUser.divisionSetAt?.toISOString() ?? null,
-    verifiedOperator: dbUser.verifiedOperator,
+    verifiedMember: dbUser.verifiedMember,
   });
 }
 

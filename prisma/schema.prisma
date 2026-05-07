@@ -60,7 +60,7 @@ model User {
   lastActiveAt       DateTime?          @map("last_active_at")
   jobTitle           String?            @map("job_title")
   divisionSetAt      DateTime?          @map("division_set_at")
-  verifiedOperator   Boolean            @default(false) @map("verified_operator")
+  verifiedMember     Boolean            @default(false) @map("verified_member")
   dispatcherVerified Boolean            @default(false) @map("dispatcher_verified")
   dispatcherBadge    String?            @map("dispatcher_badge")
 

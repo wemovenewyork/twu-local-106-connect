@@ -48,8 +48,8 @@ export async function PATCH(req: NextRequest) {
 
   const patchBody = await parseBody(req, BODY_2KB);
   if (patchBody instanceof NextResponse) return patchBody;
-  const { userId, role, divisionId, suspendedUntil, verifiedOperator } = patchBody as {
-    userId: string; role?: string; divisionId?: string | null; suspendedUntil?: string; verifiedOperator?: boolean;
+  const { userId, role, divisionId, suspendedUntil, verifiedMember } = patchBody as {
+    userId: string; role?: string; divisionId?: string | null; suspendedUntil?: string; verifiedMember?: boolean;
   };
   if (!userId) return err("userId required", 400);
   if (userId === user.userId) return err("Cannot change your own role", 400);
@@ -73,7 +73,7 @@ export async function PATCH(req: NextRequest) {
         divisionSetAt: new Date(), // Admin resets the lock timer
       }),
       ...(suspendedUntil !== undefined && { suspendedUntil: new Date(suspendedUntil) }),
-      ...(verifiedOperator !== undefined && { verifiedOperator }),
+      ...(verifiedMember !== undefined && { verifiedMember }),
     } as Parameters<typeof prisma.user.update>[0]["data"],
     select: { id: true, firstName: true, lastName: true, role: true, divisionId: true, suspendedUntil: true, division: { select: { name: true, code: true } } },
   });
