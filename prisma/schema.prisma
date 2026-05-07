@@ -55,6 +55,8 @@ model User {
   newsReviewed       News[]             @relation("NewsReviewer")
   documentsUploaded  Document[]         @relation("DocumentUploader")
   documentsOwned     Document[]         @relation("DocumentOwner")
+  registrationApproval        RegistrationApproval?
+  registrationsReviewed       RegistrationApproval[] @relation("RegistrationReviewer")
   lastActiveAt       DateTime?          @map("last_active_at")
   jobTitle           String?            @map("job_title")
   divisionSetAt      DateTime?          @map("division_set_at")
@@ -77,6 +79,8 @@ model Division {
   subUnits      SubUnit[]
   news          News[]
   documents     Document[]
+  declaredRegistrations RegistrationApproval[] @relation("DeclaredDivision")
+  assignedRegistrations RegistrationApproval[] @relation("AssignedDivision")
 
   @@map("divisions")
 }
@@ -92,6 +96,8 @@ model SubUnit {
   users       User[]
   swaps       Swap[]
   documents   Document[]
+  declaredRegistrations RegistrationApproval[] @relation("DeclaredSubUnit")
+  assignedRegistrations RegistrationApproval[] @relation("AssignedSubUnit")
 
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -430,4 +436,41 @@ enum NotificationCategory {
   benefit
   swapMatch
   systemAlert
+}
+
+enum RegistrationStatus {
+  pending
+  approved
+  reassigned
+  rejected
+}
+
+model RegistrationApproval {
+  id              String             @id @default(cuid())
+  userId          String             @unique @map("user_id")
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  declaredDivisionId String?         @map("declared_division_id")
+  declaredDivision   Division?       @relation("DeclaredDivision", fields: [declaredDivisionId], references: [id], onDelete: SetNull)
+  declaredSubUnitId  String?         @map("declared_sub_unit_id")
+  declaredSubUnit    SubUnit?        @relation("DeclaredSubUnit", fields: [declaredSubUnitId], references: [id], onDelete: SetNull)
+
+  assignedDivisionId String?         @map("assigned_division_id")
+  assignedDivision   Division?       @relation("AssignedDivision", fields: [assignedDivisionId], references: [id], onDelete: SetNull)
+  assignedSubUnitId  String?         @map("assigned_sub_unit_id")
+  assignedSubUnit    SubUnit?        @relation("AssignedSubUnit", fields: [assignedSubUnitId], references: [id], onDelete: SetNull)
+
+  status          RegistrationStatus @default(pending)
+  reviewedAt      DateTime?          @map("reviewed_at")
+  reviewerId      String?            @map("reviewer_id")
+  reviewer        User?              @relation("RegistrationReviewer", fields: [reviewerId], references: [id])
+  rejectionReason String?            @map("rejection_reason")
+
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  @@map("registration_approvals")
+  @@index([status])
+  @@index([declaredDivisionId])
+  @@index([assignedDivisionId])
 }
