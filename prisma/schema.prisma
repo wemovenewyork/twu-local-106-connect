@@ -13,6 +13,7 @@ model User {
   firstName          String    @map("first_name")
   lastName           String    @map("last_name")
   divisionId         String?   @map("division_id")
+  subUnitId          String?   @map("sub_unit_id")
   role               UserRole  @default(member)
   language           String    @default("en")
   avatarUrl          String?   @map("avatar_url")
@@ -31,6 +32,7 @@ model User {
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
   division           Division?          @relation(fields: [divisionId], references: [id])
+  subUnit            SubUnit?           @relation(fields: [subUnitId], references: [id], onDelete: SetNull)
   inviter            User?              @relation("Invites", fields: [invitedBy], references: [id])
   invitees           User[]             @relation("Invites")
   swaps              Swap[]
@@ -68,8 +70,27 @@ model Division {
   users         User[]
   swaps         Swap[]
   announcements Announcement[]
+  subUnits      SubUnit[]
 
   @@map("divisions")
+}
+
+model SubUnit {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  description String?
+  divisionId  String   @map("division_id")
+  division    Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+
+  users       User[]
+  swaps       Swap[]
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("sub_units")
+  @@index([divisionId])
 }
 
 model Announcement {
@@ -92,6 +113,7 @@ model Swap {
   id           String       @id @default(uuid())
   userId       String       @map("user_id")
   divisionId   String       @map("division_id")
+  subUnitId    String?      @map("sub_unit_id")
   category     SwapCategory
   status       SwapStatus   @default(open)
   date         DateTime?    @db.Date
@@ -115,6 +137,7 @@ model Swap {
 
   user       User            @relation(fields: [userId], references: [id])
   division   Division        @relation(fields: [divisionId], references: [id])
+  subUnit    SubUnit?        @relation(fields: [subUnitId], references: [id], onDelete: SetNull)
   messages   Message[]
   reviews    Review[]
   reports    Report[]

@@ -23,6 +23,25 @@ async function main() {
     });
   }
 
+  console.log("Seeding sub-units...");
+  const mabstoa = await prisma.division.findUnique({ where: { code: "MABSTOA" } });
+  const mtabus = await prisma.division.findUnique({ where: { code: "MTABUS" } });
+  if (!mabstoa || !mtabus) throw new Error("MABSTOA or MTABUS division missing");
+
+  const SUB_UNITS = [
+    { code: "OATRANS", name: "OA Transportation", divisionId: mabstoa.id },
+    { code: "OAMAINT", name: "OA Maintenance", divisionId: mabstoa.id },
+    { code: "MTABUSTRANS", name: "MTA Bus Trans", divisionId: mtabus.id },
+    { code: "MTABUSMAINT", name: "MTA Bus Maint", divisionId: mtabus.id },
+  ];
+  for (const su of SUB_UNITS) {
+    await prisma.subUnit.upsert({
+      where: { code: su.code },
+      update: { name: su.name, divisionId: su.divisionId },
+      create: su,
+    });
+  }
+
   console.log("Seeding admin account...");
   const adminHash = await bcrypt.hash("L106connect0334", 10);
   await prisma.user.upsert({
