@@ -6,35 +6,12 @@ import crypto from "crypto";
 const adapter = new PrismaPg(process.env.DATABASE_URL!);
 const prisma = new PrismaClient({ adapter });
 
-const DEPOTS = [
-  { name: "Baisley Park Division", code: "BP", borough: "Queens", operator: "MTA Bus" },
-  { name: "Casey Stengel Division", code: "CS", borough: "Queens", operator: "NYCT" },
-  { name: "Castleton Division", code: "CA", borough: "Staten Island", operator: "NYCT" },
-  { name: "Charleston Division", code: "CH", borough: "Staten Island", operator: "NYCT" },
-  { name: "College Point Division", code: "CP", borough: "Queens", operator: "MTA Bus" },
-  { name: "East New York Division", code: "EN", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Eastchester Division", code: "EC", borough: "Bronx", operator: "MTA Bus" },
-  { name: "Far Rockaway Division", code: "FR", borough: "Queens", operator: "MTA Bus" },
-  { name: "Flatbush Division", code: "FB", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Fresh Pond Division", code: "FP", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Grand Avenue Division", code: "GA", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Gun Hill Division", code: "GH", borough: "Bronx", operator: "MaBSTOA" },
-  { name: "Jackie Gleason Division", code: "JG", borough: "Brooklyn", operator: "NYCT" },
-  { name: "Jamaica Division", code: "JA", borough: "Queens", operator: "NYCT" },
-  { name: "JFK Division", code: "JF", borough: "Queens", operator: "MTA Bus" },
-  { name: "Kingsbridge Division", code: "KB", borough: "Bronx", operator: "MaBSTOA" },
-  { name: "LaGuardia Division", code: "LG", borough: "Queens", operator: "MTA Bus" },
-  { name: "Manhattanville Division", code: "MV", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Meredith Division", code: "ME", borough: "Staten Island", operator: "NYCT" },
-  { name: "Michael J. Quill Division", code: "MQ", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Mother Clara Hale Division", code: "MC", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Queens Village Division", code: "QV", borough: "Queens", operator: "NYCT" },
-  { name: "Spring Creek Division", code: "SC", borough: "Brooklyn", operator: "MTA Bus" },
-  { name: "Tuskegee Airmen Division", code: "TA", borough: "Manhattan", operator: "MaBSTOA" },
-  { name: "Ulmer Park Division", code: "UP", borough: "Brooklyn", operator: "NYCT" },
-  { name: "West Farms Division", code: "WF", borough: "Bronx", operator: "MaBSTOA" },
-  { name: "Yonkers Division", code: "YK", borough: "Bronx", operator: "MTA Bus" },
-  { name: "Yukon Division", code: "YU", borough: "Staten Island", operator: "NYCT" },
+const DIVISIONS = [
+  { code: "MABSTOA", name: "MaBSTOA", description: "Manhattan and Bronx Surface Transit Operating Authority" },
+  { code: "MSII", name: "MSII", description: "Maintenance Support Section II" },
+  { code: "MTABUS", name: "MTA Bus", description: "MTA Bus Company" },
+  { code: "QUEENS", name: "Queens Division", description: "Queens Division" },
+  { code: "TSC", name: "TSC", description: "Transit Services Center" },
 ];
 
 function genCode(): string {
@@ -48,10 +25,10 @@ function genCode(): string {
 
 async function main() {
   console.log("Seeding divisions...");
-  for (const d of DEPOTS) {
+  for (const d of DIVISIONS) {
     await prisma.division.upsert({
       where: { code: d.code },
-      update: {},
+      update: { name: d.name, description: d.description },
       create: d,
     });
   }
