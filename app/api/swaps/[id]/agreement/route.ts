@@ -91,7 +91,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     title: "Someone wants to swap with you!",
     body: `${proposer?.firstName ?? "A member"} proposed an agreement on your swap`,
     url: `/division/${divisionCode?.code ?? swap.divisionId}/swaps/${id}`,
-  });
+  }, "swapMatch");
 
   return ok(agreement, 201);
 }
@@ -170,7 +170,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       title: "Agreement cancelled",
       body: "The swap agreement was cancelled",
       url: `/division/${divisionId}/swaps/${id}`,
-    });
+    }, "swapMatch");
 
     return ok(updated);
   }
@@ -211,7 +211,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
           title: "Swap has been filled",
           body: "A swap you were interested in has been filled — check the board for new ones",
           url: `/division/${divisionId}/swaps`,
-        });
+        }, "swapMatch");
       }
     };
 
@@ -252,7 +252,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         title: "Swap confirmed! 🎉",
         body: "Your swap is locked in. Show the agreement to your supervisor or manager for approval.",
         url: `/division/${divisionId}/swaps/${id}`,
-      });
+      }, "swapMatch");
       // Also tell other interested operators the swap is gone
       await notifyInterestedOperators([agreement.userAId]);
       return ok(updated);
@@ -265,7 +265,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         title: "Swap agreement completed!",
         body: "Both members confirmed. Your swap is locked in.",
         url: `/division/${divisionId}/swaps/${id}`,
-      });
+      }, "swapMatch");
       await notifyInterestedOperators([agreement.userBId]);
       return ok(updated);
     }

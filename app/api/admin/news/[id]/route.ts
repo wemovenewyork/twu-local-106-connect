@@ -74,18 +74,15 @@ async function notifyAudience(newsId: string, params: {
 }) {
   const { title, body, divisionId } = params;
 
-  // Audience: members in the division (or everyone for all-divisions news).
-  // Limit to verified+approved roles (anyone who can sign in counts —
-  // we keep the gate light since downstream notifyMany handles fan-out).
-  const where: Record<string, unknown> = divisionId === null
-    ? {}
-    : { divisionId };
-
+  // Audience: approved members in the division (or all approved members for
+  // all-divisions news). Pending/rejected/unassigned users are excluded —
+  // they can't read division-scoped news yet, and blasting them creates a
+  // notification for content they're walled off from.
   const audience = await prisma.user.findMany({
     where: {
-      ...where,
+      ...(divisionId === null ? { divisionId: { not: null } } : { divisionId }),
       verified: true,
-      // Don't blast suspended/deleted accounts.
+      registrationApproval: { is: { status: "approved" } },
       email: { not: { endsWith: "@deleted.invalid" } },
     },
     select: { id: true },
@@ -93,11 +90,15 @@ async function notifyAudience(newsId: string, params: {
   if (!audience.length) return;
 
   const preview = stripMarkdown(body).slice(0, 150);
-  await notifyMany(audience.map(u => u.id), {
-    title,
-    body: preview,
-    url: `/news/${newsId}`,
-  });
+  await notifyMany(
+    audience.map(u => u.id),
+    {
+      title,
+      body: preview,
+      url: `/news/${newsId}`,
+    },
+    "news",
+  );
 }
 
 const NEWS_INCLUDE = {

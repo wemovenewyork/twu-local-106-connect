@@ -211,7 +211,7 @@ export async function DELETE(
         title: "Swap deleted",
         body: "The poster cancelled this swap. Check the board for other options.",
         url: `/division/${divisionCode}/swaps`,
-      });
+      }, "swapMatch");
     } catch { /* notification is best-effort */ }
   }
 

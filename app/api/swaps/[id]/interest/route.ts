@@ -75,7 +75,8 @@ export async function POST(
       url: `/division/${divisionCode}/swaps/${id}`,
     },
     "New interest in your swap",
-    emailHtml
+    emailHtml,
+    "swapMatch",
   );
 
   return ok(message, 201);
