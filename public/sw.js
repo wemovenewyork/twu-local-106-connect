@@ -7,7 +7,7 @@ const CACHE_NAME = "local106-shell-v1";
 const SHELL_URLS = [
   "/",
   "/login",
-  "/depots",
+  "/divisions",
   "/manifest.json",
   "/favicon.png",
   "/icons/icon-192.png",
