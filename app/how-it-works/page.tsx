@@ -267,8 +267,7 @@ export default function HowItWorksPage() {
           </div>
           <h1 style={{
             fontSize: "clamp(26px,5vw,36px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 14,
-            background: `linear-gradient(135deg,${C.white} 30%,${C.gold})`,
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            color: "white",
           }}>
             How TWU Local 106<br />Connect Works
           </h1>

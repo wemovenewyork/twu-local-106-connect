@@ -123,10 +123,7 @@ export default function LandingPage() {
           fontWeight: 900,
           letterSpacing: -1.2,
           lineHeight: 1.05,
-          background: `linear-gradient(135deg, #ffffff 0%, ${C.gold} 45%, #ffffff 100%)`,
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
+          color: "white",
           margin: 0,
         }}>
           The Official App of<br />TWU Local 106
