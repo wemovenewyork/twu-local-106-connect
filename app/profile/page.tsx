@@ -144,7 +144,7 @@ export default function ProfilePage() {
 
   const divisionLocked = (() => {
     if (!user.divisionId) return false;
-    if (user.role === "admin" || user.role === "subAdmin") return false;
+    if (user.role === "superAdmin" || user.role === "localAdmin") return false;
     if (!user.divisionSetAt) return false;
     return (Date.now() - new Date(user.divisionSetAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
   })();

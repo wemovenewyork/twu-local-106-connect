@@ -13,7 +13,7 @@ model User {
   firstName          String    @map("first_name")
   lastName           String    @map("last_name")
   divisionId         String?   @map("division_id")
-  role               UserRole  @default(operator)
+  role               UserRole  @default(member)
   language           String    @default("en")
   avatarUrl          String?   @map("avatar_url")
   verified           Boolean   @default(false)
@@ -256,11 +256,12 @@ enum ReportStatus {
 }
 
 enum UserRole {
-  operator
-  dispatcher
-  depotRep
-  subAdmin
-  admin
+  member
+  contributor
+  editor
+  divisionAdmin
+  localAdmin
+  superAdmin
 }
 
 enum AgreementStatus {

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // Same-division restriction. Admins can DM anyone (for support/moderation),
   // but regular operators are limited to their own division to prevent
   // cross-division harassment after we expand beyond Queens Village.
-  const isAdmin = dbSender.role === "admin" || dbSender.role === "subAdmin";
+  const isAdmin = dbSender.role === "superAdmin" || dbSender.role === "localAdmin";
   if (!isAdmin && (!dbSender.divisionId || dbSender.divisionId !== toUser.divisionId)) {
     return err("User not found", 404);
   }

@@ -11,9 +11,9 @@ export async function GET(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser || !["admin", "subAdmin"].includes(dbUser.role)) return err("Forbidden", 403);
+  if (!dbUser || !["superAdmin", "localAdmin"].includes(dbUser.role)) return err("Forbidden", 403);
 
-  const isSubAdmin = dbUser.role === "subAdmin";
+  const isSubAdmin = dbUser.role === "localAdmin";
   const url = new URL(req.url);
   const q = url.searchParams.get("q") ?? "";
 
@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser || dbUser.role !== "admin") return err("Forbidden", 403);
+  if (!dbUser || dbUser.role !== "superAdmin") return err("Forbidden", 403);
 
   const patchBody = await parseBody(req, BODY_2KB);
   if (patchBody instanceof NextResponse) return patchBody;
@@ -58,10 +58,10 @@ export async function PATCH(req: NextRequest) {
   if (!target) return err("User not found", 404);
 
   // Validate role if provided
-  if (role !== undefined && !["operator", "depotRep", "subAdmin", "admin"].includes(role)) {
+  if (role !== undefined && !["member", "divisionAdmin", "localAdmin", "superAdmin"].includes(role)) {
     return err("Invalid role", 400);
   }
-  if (role === "depotRep" && !divisionId) return err("Division is required for division rep role", 400);
+  if (role === "divisionAdmin" && !divisionId) return err("Division is required for division rep role", 400);
 
   const updated = await prisma.user.update({
     where: { id: userId },
@@ -110,7 +110,7 @@ export async function DELETE(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser || dbUser.role !== "admin") return err("Forbidden", 403);
+  if (!dbUser || dbUser.role !== "superAdmin") return err("Forbidden", 403);
 
   const delBody = await parseBody(req, BODY_1KB);
   if (delBody instanceof NextResponse) return delBody;

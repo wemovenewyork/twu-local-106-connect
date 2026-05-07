@@ -11,12 +11,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ code
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
   if (!dbUser) return err("User not found", 404);
-  if (dbUser.role !== "depotRep" && dbUser.role !== "admin") return err("Forbidden", 403);
+  if (dbUser.role !== "divisionAdmin" && dbUser.role !== "superAdmin") return err("Forbidden", 403);
 
   const { code } = await params;
   const division = await prisma.division.findUnique({ where: { code } });
   if (!division) return err("Division not found", 404);
-  if (dbUser.role === "depotRep" && dbUser.divisionId !== division.id) return err("You can only view your own division", 403);
+  if (dbUser.role === "divisionAdmin" && dbUser.divisionId !== division.id) return err("You can only view your own division", 403);
 
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);

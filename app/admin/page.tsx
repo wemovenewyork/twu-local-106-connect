@@ -22,13 +22,13 @@ interface Report {
 
 interface AdminUser {
   id: string; firstName: string; lastName: string; email: string;
-  role: "operator" | "depotRep" | "subAdmin" | "admin"; createdAt: string;
+  role: "member" | "contributor" | "editor" | "divisionAdmin" | "localAdmin" | "superAdmin"; createdAt: string;
   lastActiveAt: string | null; suspendedUntil: string | null;
   division: { name: string; code: string } | null;
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  operator: C.blue, depotRep: C.gold, subAdmin: "#F97316", admin: PURPLE,
+  member: C.blue, contributor: C.blue, editor: C.gold, divisionAdmin: C.gold, localAdmin: "#F97316", superAdmin: PURPLE,
 };
 
 const lb: React.CSSProperties = { display: "block", marginBottom: 6, fontSize: 11, fontWeight: 700, color: C.m, letterSpacing: 2, textTransform: "uppercase" };
@@ -75,23 +75,23 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && !["admin", "subAdmin"].includes(user.role)) router.replace("/divisions");
+    if (!loading && user && !["superAdmin", "localAdmin"].includes(user.role)) router.replace("/divisions");
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (!user || !["admin", "subAdmin"].includes(user.role)) return;
+    if (!user || !["superAdmin", "localAdmin"].includes(user.role)) return;
     api.get<Stats>("/admin/stats").then(setStats).catch(() => {});
     api.get<Report[]>("/admin/reports").then(setReports).catch(() => {});
     api.get<{ id: string; name: string; code: string }[]>("/divisions").then(setDivisions).catch(() => {});
   }, [user]);
 
   useEffect(() => {
-    if ((tab !== "users" && !(tab === "broadcast" && bcTarget === "user")) || !user || !["admin", "subAdmin"].includes(user.role)) return;
+    if ((tab !== "users" && !(tab === "broadcast" && bcTarget === "user")) || !user || !["superAdmin", "localAdmin"].includes(user.role)) return;
     api.get<AdminUser[]>(`/admin/users${userQ ? `?q=${encodeURIComponent(userQ)}` : ""}`).then(setUsers).catch(() => {});
   }, [tab, userQ, user, bcTarget]);
 
   useEffect(() => {
-    if (tab !== "audit" || !user || user.role !== "admin") return;
+    if (tab !== "audit" || !user || user.role !== "superAdmin") return;
     api.get<typeof auditLogs>("/admin/audit-log").then(setAuditLogs).catch(() => {});
   }, [tab, user]);
 
@@ -108,7 +108,7 @@ export default function AdminPage() {
   };
 
   const handleRoleChange = async (userId: string, role: string) => {
-    if (role === "depotRep") {
+    if (role === "divisionAdmin") {
       // Stage the role change — wait for division selection before calling API
       setPendingDivision(prev => ({ ...prev, [userId]: "" }));
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: role as AdminUser["role"] } : u));
@@ -131,7 +131,7 @@ export default function AdminPage() {
     if (!divisionId) { showToast("Select a division first"); return; }
     setBusy(userId);
     try {
-      const updated = await api.patch<AdminUser>("/admin/users", { userId, role: "depotRep", divisionId });
+      const updated = await api.patch<AdminUser>("/admin/users", { userId, role: "divisionAdmin", divisionId });
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, ...updated } : u));
       setPendingDivision(prev => { const next = { ...prev }; delete next[userId]; return next; });
       showToast("Division rep assigned");
@@ -170,7 +170,7 @@ export default function AdminPage() {
 
   const handleBulkRoleChange = async () => {
     if (!bulkRole || selectedUsers.size === 0 || bulkBusy) return;
-    if (bulkRole === "depotRep") { showToast("Division rep requires individual division assignment"); return; }
+    if (bulkRole === "divisionAdmin") { showToast("Division rep requires individual division assignment"); return; }
     setBulkBusy(true);
     try {
       await Promise.all([...selectedUsers].map(userId =>
@@ -241,8 +241,8 @@ export default function AdminPage() {
     } finally { setBusy(null); }
   };
 
-  const isSubAdmin = user?.role === "subAdmin";
-  if (!user || !["admin", "subAdmin"].includes(user.role)) return null;
+  const isSubAdmin = user?.role === "localAdmin";
+  if (!user || !["superAdmin", "localAdmin"].includes(user.role)) return null;
 
   const statCards = stats ? [
     { l: "Users", v: stats.totalUsers, c: C.blue },
@@ -368,9 +368,9 @@ export default function AdminPage() {
                       style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${PURPLE}44`, background: PURPLE + "10", color: PURPLE, fontSize: 12, cursor: "pointer", appearance: "auto" }}
                     >
                       <option value="">— Set role —</option>
-                      <option value="operator">Operator</option>
-                      <option value="subAdmin">Sub Admin</option>
-                      <option value="admin">Admin</option>
+                      <option value="member">Member</option>
+                      <option value="localAdmin">Local Admin</option>
+                      <option value="superAdmin">Super Admin</option>
                     </select>
                     <button
                       onClick={handleBulkRoleChange}
@@ -445,16 +445,18 @@ export default function AdminPage() {
                             onChange={e => handleRoleChange(u.id, e.target.value)}
                             style={{ padding: "6px 10px", borderRadius: 8, border: `1px solid ${rc}44`, background: rc + "12", color: rc, fontSize: 12, fontWeight: 700, cursor: "pointer", appearance: "auto", opacity: isBusy || isConfirming ? 0.5 : 1 }}
                           >
-                            <option value="operator">Operator</option>
-                            <option value="depotRep">Division Rep</option>
-                            <option value="subAdmin">Sub Admin</option>
-                            <option value="admin">Admin</option>
+                            <option value="member">Member</option>
+                            <option value="contributor">Contributor</option>
+                            <option value="editor">Editor</option>
+                            <option value="divisionAdmin">Division Admin</option>
+                            <option value="localAdmin">Local Admin</option>
+                            <option value="superAdmin">Super Admin</option>
                           </select>
                         )}
                         {isSubAdmin && (
                           <span style={{ padding: "4px 10px", borderRadius: 8, background: rc + "18", border: `1px solid ${rc}33`, fontSize: 11, fontWeight: 700, color: rc }}>{u.role}</span>
                         )}
-                        {u.role === "depotRep" && u.division && pendingDivision[u.id] === undefined && (
+                        {u.role === "divisionAdmin" && u.division && pendingDivision[u.id] === undefined && (
                           <div style={{ fontSize: 10, fontWeight: 600, color: C.gold, textAlign: "right" }}>{u.division.name} ({u.division.code})</div>
                         )}
                         {pendingDivision[u.id] !== undefined && (

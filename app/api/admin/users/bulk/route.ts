@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser || dbUser.role !== "admin") return err("Forbidden", 403);
+  if (!dbUser || dbUser.role !== "superAdmin") return err("Forbidden", 403);
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   if (userIds.length > 50) return err("Maximum 50 users per bulk operation", 400);
   if (userIds.includes(user.userId)) return err("Cannot bulk-update your own account", 400);
 
-  if (role !== undefined && !["operator", "depotRep", "subAdmin"].includes(role)) {
+  if (role !== undefined && !["member", "divisionAdmin", "localAdmin"].includes(role)) {
     return err("Invalid role — bulk role changes cannot promote to admin", 400);
   }
 

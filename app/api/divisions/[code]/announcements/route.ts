@@ -38,13 +38,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ cod
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
   if (!dbUser) return err("User not found", 404);
-  if (dbUser.role !== "depotRep" && dbUser.role !== "admin") return err("Only division reps can post announcements", 403);
+  if (dbUser.role !== "divisionAdmin" && dbUser.role !== "superAdmin") return err("Only division reps can post announcements", 403);
 
   const { code } = await params;
   const division = await prisma.division.findUnique({ where: { code } });
   if (!division) return err("Division not found", 404);
 
-  if (dbUser.role === "depotRep" && dbUser.divisionId !== division.id) {
+  if (dbUser.role === "divisionAdmin" && dbUser.divisionId !== division.id) {
     return err("You can only post announcements for your own division", 403);
   }
 

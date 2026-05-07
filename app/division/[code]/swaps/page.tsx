@@ -70,7 +70,7 @@ export default function BrowsePage() {
       sessionStorage.removeItem(scrollKey);
     }
   }, [scrollKey]);
-  const isRep = user?.role === "depotRep" || user?.role === "admin";
+  const isRep = user?.role === "divisionAdmin" || user?.role === "superAdmin";
 
   const [cat, setCat] = useState("all");
   const [q, setQ] = useState("");
@@ -91,7 +91,7 @@ export default function BrowsePage() {
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
     if (!loading && user && !user.divisionId) router.replace("/setup-profile");
-    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
+    if (!loading && user?.division && user.division.code !== code && user.role !== "superAdmin" && user.role !== "localAdmin") router.replace(`/division/${user.division.code}/swaps`);
     if (!loading && user) markChecklistItem(user.id, "browsed");
   }, [user, loading, router, code]);
 

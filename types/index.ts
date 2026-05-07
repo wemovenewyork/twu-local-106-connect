@@ -48,7 +48,7 @@ export interface RepScore {
   total: number;
 }
 
-export type UserRole = "operator" | "depotRep" | "subAdmin" | "admin";
+export type UserRole = "member" | "contributor" | "editor" | "divisionAdmin" | "localAdmin" | "superAdmin";
 export type AgreementStatus = "pending" | "userA_confirmed" | "completed" | "cancelled";
 
 export interface User {

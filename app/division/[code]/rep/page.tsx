@@ -89,7 +89,7 @@ export default function RepDashboardPage() {
 
   useEffect(() => {
     if (!user) return;
-    if (user.role !== "depotRep" && user.role !== "admin") {
+    if (user.role !== "divisionAdmin" && user.role !== "superAdmin") {
       setError("Access restricted to division reps and admins.");
       return;
     }

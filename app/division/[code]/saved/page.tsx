@@ -30,7 +30,7 @@ export default function SavedSwapsPage() {
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
     if (!loading && user && !user.divisionId) router.replace("/setup-profile");
-    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
+    if (!loading && user?.division && user.division.code !== code && user.role !== "superAdmin" && user.role !== "localAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {

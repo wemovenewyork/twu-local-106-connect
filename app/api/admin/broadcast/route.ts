@@ -12,9 +12,9 @@ export async function POST(req: NextRequest) {
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const admin = await prisma.user.findUnique({ where: { id: token.userId } });
-  if (!admin || !["admin", "subAdmin"].includes(admin.role)) return err("Forbidden", 403);
+  if (!admin || !["superAdmin", "localAdmin"].includes(admin.role)) return err("Forbidden", 403);
 
-  const isSubAdmin = admin.role === "subAdmin";
+  const isSubAdmin = admin.role === "localAdmin";
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser || dbUser.role !== "admin") return err("Forbidden", 403);
+  if (!dbUser || dbUser.role !== "superAdmin") return err("Forbidden", 403);
 
   const logs = await prisma.auditLog.findMany({
     orderBy: { createdAt: "desc" },

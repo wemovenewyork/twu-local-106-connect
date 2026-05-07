@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     // comma-separated list ("QV,WF,MV"). When the env var is unset, no
     // restriction applies.
     if (
-      !["admin", "subAdmin"].includes(user.role) &&
+      !["superAdmin", "localAdmin"].includes(user.role) &&
       user.divisionId &&
       !isDivisionInSoftLaunch(user.division?.code)
     ) {

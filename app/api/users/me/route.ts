@@ -123,7 +123,7 @@ export async function PUT(req: NextRequest) {
       where: { id: user.userId },
       select: { divisionId: true, divisionSetAt: true, role: true },
     });
-    const isAdmin = dbUser?.role === "admin" || dbUser?.role === "subAdmin";
+    const isAdmin = dbUser?.role === "superAdmin" || dbUser?.role === "localAdmin";
     if (!isAdmin && dbUser?.divisionId && dbUser.divisionId !== divisionId && divisionId !== null) {
       const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
       if (dbUser.divisionSetAt && (Date.now() - dbUser.divisionSetAt.getTime()) < sevenDaysMs) {

@@ -34,7 +34,7 @@ export default function ActionPage() {
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
     if (!loading && user && !user.divisionId) router.replace("/setup-profile");
-    if (!loading && user?.division && user.division.code !== code && user.role !== "admin" && user.role !== "subAdmin") router.replace(`/division/${user.division.code}/swaps`);
+    if (!loading && user?.division && user.division.code !== code && user.role !== "superAdmin" && user.role !== "localAdmin") router.replace(`/division/${user.division.code}/swaps`);
   }, [user, loading, router, code]);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function ActionPage() {
     { k: "messages", ic: "msg", label: t("messages", lang) || "My Messages", cl: "#C084FC", href: `/division/${code}/messages`, badge: unread },
     { k: "saved", ic: "saved", label: t("saved", lang) || "My Saved Swaps", cl: C.gold, href: `/division/${code}/saved` },
     { k: "history", ic: "clk", label: t("history", lang) || "My Swaps", cl: "#60A5FA", href: `/division/${code}/history` },
-    ...(user?.role === "depotRep" || user?.role === "admin"
+    ...(user?.role === "divisionAdmin" || user?.role === "superAdmin"
       ? [{ k: "rep", ic: "shield", label: "Rep Dashboard", cl: "#C084FC", href: `/division/${code}/rep` }]
       : []),
   ];

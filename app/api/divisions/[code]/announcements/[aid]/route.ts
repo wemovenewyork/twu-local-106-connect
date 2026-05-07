@@ -13,11 +13,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ co
   const { aid } = await params;
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
   if (!dbUser) return err("User not found", 404);
-  if (dbUser.role !== "depotRep" && dbUser.role !== "admin") return err("Forbidden", 403);
+  if (dbUser.role !== "divisionAdmin" && dbUser.role !== "superAdmin") return err("Forbidden", 403);
 
   const ann = await prisma.announcement.findUnique({ where: { id: aid } });
   if (!ann) return err("Announcement not found", 404);
-  if (dbUser.role === "depotRep" && ann.authorId !== user.userId) return err("You can only edit your own announcements", 403);
+  if (dbUser.role === "divisionAdmin" && ann.authorId !== user.userId) return err("You can only edit your own announcements", 403);
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
@@ -52,11 +52,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ c
   const { aid } = await params;
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
   if (!dbUser) return err("User not found", 404);
-  if (dbUser.role !== "depotRep" && dbUser.role !== "admin") return err("Forbidden", 403);
+  if (dbUser.role !== "divisionAdmin" && dbUser.role !== "superAdmin") return err("Forbidden", 403);
 
   const ann = await prisma.announcement.findUnique({ where: { id: aid } });
   if (!ann) return err("Announcement not found", 404);
-  if (dbUser.role === "depotRep" && ann.authorId !== user.userId) return err("You can only delete your own announcements", 403);
+  if (dbUser.role === "divisionAdmin" && ann.authorId !== user.userId) return err("You can only delete your own announcements", 403);
 
   await prisma.announcement.delete({ where: { id: aid } });
   return ok({ deleted: true });

@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser || !["admin", "subAdmin"].includes(dbUser.role)) return err("Forbidden", 403);
+  if (!dbUser || !["superAdmin", "localAdmin"].includes(dbUser.role)) return err("Forbidden", 403);
 
   const [totalUsers, totalSwaps, openSwaps, pendingReports, totalDivisions, completedAgreements] = await Promise.all([
     prisma.user.count(),

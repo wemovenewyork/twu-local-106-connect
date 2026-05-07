@@ -34,7 +34,7 @@ async function main() {
       firstName: "Admin",
       lastName: "Local106",
       verified: true,
-      role: "admin",
+      role: "superAdmin",
     },
   });
 

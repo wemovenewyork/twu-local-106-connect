@@ -139,7 +139,7 @@ export async function POST(req: NextRequest) {
 
   // Hard caps to prevent spam, enforced via DB queries (not Redis) so they
   // hold even if the rate limiter has issues. Admins and depotReps bypass.
-  const isPrivileged = ["admin", "subAdmin", "depotRep"].includes(dbUser.role);
+  const isPrivileged = ["superAdmin", "localAdmin", "divisionAdmin"].includes(dbUser.role);
   if (!isPrivileged) {
     // Cap concurrent open/pending swaps. Real operators rarely have more than
     // 2-3 open at once; 4 is generous. A spammer can't accumulate a backlog.
