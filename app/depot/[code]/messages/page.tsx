@@ -164,7 +164,7 @@ export default function MessagesPage() {
                 <Icon n="msg" s={28} c={C.m} />
               </div>
               <div style={{ fontSize: 16, fontWeight: 700, color: C.white, marginBottom: 8 }}>No messages yet</div>
-              <div style={{ fontSize: 13, color: C.m }}>Your direct messages with other operators will appear here.</div>
+              <div style={{ fontSize: 13, color: C.m }}>Your direct messages with other members will appear here.</div>
             </div>
           );
           if (filtered.length === 0) return (

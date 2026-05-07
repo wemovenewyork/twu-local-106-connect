@@ -275,7 +275,7 @@ export default function ProfilePage() {
                 <div style={{ fontSize: 10, color: C.m }}>{(user.inviteCodes ?? []).filter(c => c.isValid).length} remaining</div>
               </div>
               <div style={{ fontSize: 11, color: C.m, lineHeight: 1.6, marginBottom: 12 }}>
-                To protect the integrity of this site, invite codes must only be shared with verified bus operators. Under no circumstances are invite codes to be distributed to anyone who is not authorized to access this site.
+                To protect the integrity of this site, invite codes must only be shared with verified TWU Local 106 members. Under no circumstances are invite codes to be distributed to anyone who is not authorized to access this site.
               </div>
               <div style={{ display: "grid", gap: 6 }}>
                 {(user.inviteCodes ?? []).map(cd => (

@@ -41,7 +41,7 @@ export default function FirstSwapBanner({ depotCode }: { depotCode: string }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: C.white, marginBottom: 3 }}>Post your first swap</div>
           <div style={{ fontSize: 12, color: C.m, lineHeight: 1.5 }}>
-            You haven&apos;t posted a swap yet. Let other operators know what you&apos;re looking for — it only takes 30 seconds.
+            You haven&apos;t posted a swap yet. Let other members know what you&apos;re looking for — it only takes 30 seconds.
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
             <button

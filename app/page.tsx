@@ -25,15 +25,15 @@ const IconSun = () => (
 );
 
 const features = [
-  { Icon: IconArrows, color: C.blue,    title: "Swap Work Days", desc: "Trade shifts with operators at your depot" },
-  { Icon: IconCalendar, color: C.gold,  title: "Swap Days Off",  desc: "Coordinate RDOs without the runaround" },
-  { Icon: IconSun, color: "#00C9A7",    title: "Swap Vacation",  desc: "Exchange vacation picks with mutual agreements" },
+  { Icon: IconArrows, color: C.blue,    title: "Find a Shift Swap",      desc: "Post your shift, browse swaps in your division, and connect with members who can cover." },
+  { Icon: IconCalendar, color: C.gold,  title: "Stay Informed",          desc: "Get push notifications about contract updates, division announcements, and union news." },
+  { Icon: IconSun, color: "#00C9A7",    title: "Access Your Resources",  desc: "Forms, contracts, and benefits info — searchable, organized by division, always current." },
 ];
 
 const stats = [
-  { value: "100%", label: "Peer to peer" },
-  { value: "24/7",  label: "Always available" },
-  { value: "Free",  label: "No cost to use" },
+  { value: "5 Divisions", label: "MABSTOA · MSII · MTA Bus · Queens · TSC" },
+  { value: "24/7",         label: "Always Available" },
+  { value: "Official",     label: "TWU Local 106 Members" },
 ];
 
 export default function LandingPage() {
@@ -101,10 +101,10 @@ export default function LandingPage() {
         maxWidth: 320,
       }}>
         <Image
-          src="/bus-logo.png"
-          alt="TWU Local 106"
-          width={640}
-          height={304}
+          src="/branding/tso-logo.png"
+          alt="The TSO logo — TWU Local 106 / Transit Supervisors Organization"
+          width={400}
+          height={400}
           style={{ width: "100%", height: "auto", display: "block" }}
           priority
         />
@@ -119,17 +119,17 @@ export default function LandingPage() {
         marginBottom: 14,
       }}>
         <h1 style={{
-          fontSize: "clamp(36px,9vw,72px)",
+          fontSize: "clamp(30px,7vw,56px)",
           fontWeight: 900,
-          letterSpacing: -1.5,
-          lineHeight: 1.0,
+          letterSpacing: -1.2,
+          lineHeight: 1.05,
           background: `linear-gradient(135deg, #ffffff 0%, ${C.gold} 45%, #ffffff 100%)`,
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",
           margin: 0,
         }}>
-          Swapping Shifts<br />Made Simple
+          The Official App of<br />TWU Local 106
         </h1>
       </div>
 
@@ -145,7 +145,7 @@ export default function LandingPage() {
         transform: v ? "translateY(0)" : "translateY(20px)",
         transition: "all .6s ease .45s",
       }}>
-        Peer-to-peer shift coordination for NYC bus operators. No paperwork, no middleman — just operators helping operators.
+        Find shift swaps, stay connected to your division, and get the news that affects you — all in one place.
       </p>
 
       {/* Feature cards */}
@@ -184,14 +184,14 @@ export default function LandingPage() {
 
       {/* Stats row */}
       <div style={{
-        display: "flex", gap: 24, justifyContent: "center",
-        marginBottom: 36,
+        display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap",
+        marginBottom: 36, maxWidth: 560, width: "100%",
         opacity: v ? 1 : 0, transition: "opacity .6s ease .8s",
       }}>
         {stats.map((s, i) => (
-          <div key={s.label} style={{ textAlign: "center", opacity: v ? 1 : 0, transform: v ? "translateY(0)" : "translateY(12px)", transition: `all .5s ease ${.8 + i * .1}s` }}>
-            <div style={{ fontSize: 22, fontWeight: 900, color: C.gold, letterSpacing: -0.5 }}>{s.value}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: 1.5 }}>{s.label}</div>
+          <div key={s.label} style={{ textAlign: "center", flex: "1 1 160px", minWidth: 140, opacity: v ? 1 : 0, transform: v ? "translateY(0)" : "translateY(12px)", transition: `all .5s ease ${.8 + i * .1}s` }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: C.gold, letterSpacing: -0.5, marginBottom: 2 }}>{s.value}</div>
+            <div style={{ fontSize: 9.5, color: "rgba(255,255,255,.4)", textTransform: "uppercase", letterSpacing: 1.2, lineHeight: 1.4 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -241,7 +241,7 @@ export default function LandingPage() {
         maxWidth: 300, lineHeight: 1.6,
         opacity: v ? 1 : 0, transition: "opacity .5s ease 1.1s",
       }}>
-        Invite code required · For authorized bus operators only
+        For TWU Local 106 members. Registration requires division admin approval.
       </p>
     </main>
   );

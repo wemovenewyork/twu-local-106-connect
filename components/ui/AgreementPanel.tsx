@@ -84,7 +84,7 @@ export default function AgreementPanel({ swap, agreement, isOwner, currentUserId
           Agree to Swap
         </button>
         <div style={{ fontSize: 10, color: C.m, textAlign: "center", marginTop: 8, lineHeight: 1.5 }}>
-          Creates a timestamped record both operators can show their dispatcher.
+          Creates a timestamped record both members can show their supervisor or manager.
         </div>
       </div>
     );

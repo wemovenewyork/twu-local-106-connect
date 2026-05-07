@@ -114,7 +114,7 @@ export default function InboxPage() {
             </div>
             <div style={{ fontSize: 18, fontWeight: 700, color: C.white, marginBottom: 8 }}>No messages yet</div>
             <div style={{ fontSize: 13, color: C.m, lineHeight: 1.6 }}>
-              Your direct messages with other operators<br />will appear here.
+              Your direct messages with other members<br />will appear here.
             </div>
           </div>
         ) : (

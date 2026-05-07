@@ -9,7 +9,7 @@ const SHELL_URLS = [
   "/login",
   "/depots",
   "/manifest.json",
-  "/favicon.svg",
+  "/favicon.png",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
 ];
@@ -71,7 +71,7 @@ self.addEventListener("fetch", (event) => {
   if (
     url.pathname.startsWith("/icons/") ||
     url.pathname === "/manifest.json" ||
-    url.pathname === "/favicon.svg"
+    url.pathname === "/favicon.png"
   ) {
     event.respondWith(
       caches.match(request).then((cached) => cached ?? fetch(request))

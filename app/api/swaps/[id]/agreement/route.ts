@@ -89,7 +89,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const depotCode = await prisma.depot.findUnique({ where: { id: swap.depotId }, select: { code: true } });
   await notifyUser(swap.userId, {
     title: "Someone wants to swap with you!",
-    body: `${proposer?.firstName ?? "An operator"} proposed an agreement on your swap`,
+    body: `${proposer?.firstName ?? "A member"} proposed an agreement on your swap`,
     url: `/depot/${depotCode?.code ?? swap.depotId}/swaps/${id}`,
   });
 
@@ -250,7 +250,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       const updated = await completeAgreement(note ?? null, true);
       await notifyUser(agreement.userAId, {
         title: "Swap confirmed! 🎉",
-        body: "Your swap is locked in. Print the agreement to show your dispatcher.",
+        body: "Your swap is locked in. Show the agreement to your supervisor or manager for approval.",
         url: `/depot/${depotId}/swaps/${id}`,
       });
       // Also tell other interested operators the swap is gone
@@ -263,7 +263,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       const updated = await completeAgreement(null, false);
       await notifyUser(agreement.userBId, {
         title: "Swap agreement completed!",
-        body: "Both operators confirmed. Your swap is locked in.",
+        body: "Both members confirmed. Your swap is locked in.",
         url: `/depot/${depotId}/swaps/${id}`,
       });
       await notifyInterestedOperators([agreement.userBId]);

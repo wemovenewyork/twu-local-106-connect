@@ -52,7 +52,7 @@ const STEPS = [
     n: "06",
     color: "#2ED573",
     title: "Print & Present",
-    desc: "Once both members confirm, a timestamped agreement is generated. Print it or show it on your phone to your dispatcher.",
+    desc: "Once both members confirm, a timestamped agreement is generated. Show the agreement on your phone to your supervisor or manager — they handle approval the same way they always have.",
     detail: "The agreement still requires supervisor approval per your depot's procedures — TWU Local 106 Connect coordinates the swap, it doesn't replace management sign-off.",
     visual: <PrintVisual />,
   },
@@ -263,17 +263,17 @@ export default function HowItWorksPage() {
         {/* Hero */}
         <div style={{ textAlign: "center", padding: "48px 16px 40px" }}>
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-            <Image src="/bus-logo.png" alt="TWU Local 106" width={200} height={95} style={{ width: 200, height: "auto" }} />
+            <Image src="/branding/tso-logo.png" alt="The TSO logo — TWU Local 106 / Transit Supervisors Organization" width={160} height={160} style={{ width: 160, height: "auto" }} />
           </div>
           <h1 style={{
             fontSize: "clamp(26px,5vw,36px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 14,
             background: `linear-gradient(135deg,${C.white} 30%,${C.gold})`,
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
           }}>
-            Swapping Shifts<br />Made Simple
+            How TWU Local 106<br />Connect Works
           </h1>
           <p style={{ fontSize: 15, color: C.m, lineHeight: 1.7, maxWidth: 340, margin: "0 auto" }}>
-            Six steps from sign-up to confirmed swap — all on your phone, all peer to peer.
+            Six steps from sign-up to confirmed swap — all on your phone, member to member.
           </p>
         </div>
 

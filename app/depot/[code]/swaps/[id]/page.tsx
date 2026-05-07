@@ -318,7 +318,7 @@ export default function SwapDetailPage() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.75)", display: "flex", alignItems: "flex-end", zIndex: 200 }} onClick={() => setProposeModal(false)}>
           <div style={{ width: "100%", background: "rgb(4,3,45)", borderRadius: "24px 24px 0 0", padding: "24px 20px 44px", maxWidth: 520, margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }} onClick={e => e.stopPropagation()}>
             <div style={{ fontSize: 16, fontWeight: 800, color: C.white, marginBottom: 4 }}>Agree to Swap</div>
-            <div style={{ fontSize: 12, color: C.m, lineHeight: 1.5, marginBottom: 18 }}>Enter your schedule — both operators must confirm to complete the swap.</div>
+            <div style={{ fontSize: 12, color: C.m, lineHeight: 1.5, marginBottom: 18 }}>Enter your schedule — both members must confirm to complete the swap.</div>
 
             {swap.category === "work" && (
               <>

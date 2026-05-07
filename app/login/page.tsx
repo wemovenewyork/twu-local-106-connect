@@ -91,7 +91,7 @@ export default function LoginPage() {
     else if (pw.length < 12) errs.pw = "Must be at least 12 characters";
     if (!pw2) errs.pw2 = "Required";
     else if (pw !== pw2) errs.pw2 = "Passwords don't match";
-    if (!invCode.trim()) errs.inv = "Required — ask a fellow operator";
+    if (!invCode.trim()) errs.inv = "Required — your division admin will approve your registration";
     setFieldErrs(errs);
     return Object.keys(errs).length === 0;
   };
@@ -212,7 +212,7 @@ export default function LoginPage() {
         `}</style>
         <div style={{ textAlign: "center", marginBottom: 20 }}>
           <div style={{ animation: "loginBusDriveIn .7s cubic-bezier(.34,1.2,.64,1) both, loginBusFloat 5s ease-in-out 0.8s infinite, loginBusGlow 4s ease-in-out 0.8s infinite", display: "inline-block", marginBottom: 10 }}>
-            <Image src="/bus-logo.png" alt="TWU Local 106" width={320} height={152} style={{ width: 220, height: "auto", display: "block" }} priority />
+            <Image src="/branding/tso-logo.png" alt="The TSO logo — TWU Local 106 / Transit Supervisors Organization" width={220} height={220} style={{ width: 180, height: "auto", display: "block" }} priority />
           </div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: C.white }}>{mode === "signin" ? "Sign In" : "Create Account"}</h1>
         </div>

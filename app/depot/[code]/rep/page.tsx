@@ -252,7 +252,7 @@ export default function RepDashboardPage() {
         <div style={{ background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16, border: `1px solid ${C.bd}`, marginBottom: 16 }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>QR Onboarding</div>
           <p style={{ fontSize: 12, color: C.m, marginBottom: 12, lineHeight: 1.6 }}>
-            Select an unused invite code to generate a QR code. New operators scan it to register with the code pre-filled.
+            Select an unused invite code to generate a QR code. New members scan it to register with the code pre-filled.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
             {inviteCodes.filter(c => c.isValid).map(c => (

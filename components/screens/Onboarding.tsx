@@ -142,8 +142,8 @@ function IllustrationConfirm() {
 const STEPS = [
   {
     color: C.gold,
-    title: "Swapping Shifts\nMade Simple",
-    body: "TWU Local 106 Connect is the fastest way for supervisors to swap work days, days off, and vacation weeks — peer to peer, no paperwork.",
+    title: "Welcome to\nTWU Local 106 Connect",
+    body: "TWU Local 106 Connect is the fastest way for TSO members to swap work days, days off, and vacation weeks — member to member, no paperwork.",
     Illustration: IllustrationSwap,
   },
   {
@@ -155,13 +155,13 @@ const STEPS = [
   {
     color: "#00C9A7",
     title: "Find Your Match",
-    body: "Browse open swaps or let the auto-matcher pair you with an operator whose schedule complements yours.",
+    body: "Browse open swaps or let the auto-matcher pair you with another member whose schedule complements yours.",
     Illustration: IllustrationMatch,
   },
   {
     color: "#C084FC",
     title: "Lock It In",
-    body: "Both operators confirm. A timestamped agreement is created — print it and bring it to your dispatcher.",
+    body: "Both members confirm. A timestamped agreement is created — show it to your supervisor or manager for approval the same way you always do.",
     Illustration: IllustrationConfirm,
   },
 ];
