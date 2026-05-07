@@ -221,6 +221,80 @@ async function seedNews(superUserId: string): Promise<number> {
   return created;
 }
 
+interface DemoDoc {
+  uploaderEmail: string;
+  title: string;
+  description: string;
+  fileUrl: string;
+  fileSize: number;
+  mimeType: string;
+  visibility: "all" | "division" | "subUnit" | "selfOnly";
+  divisionCode: string | null;
+}
+
+const DEMO_DOCS: DemoDoc[] = [
+  {
+    uploaderEmail: "wemovenewyork.net@gmail.com",
+    title: "TWU Local 106 — Member Handbook",
+    description: "The complete member handbook covering rights, responsibilities, and resources.",
+    fileUrl: "https://example.com/placeholder-handbook.pdf",
+    fileSize: 1024 * 500,
+    mimeType: "application/pdf",
+    visibility: "all",
+    divisionCode: null,
+  },
+  {
+    uploaderEmail: "demo+admin-mabstoa-1@local106.test",
+    title: "OA Transportation: Q2 Bid Schedule",
+    description: "The current quarter bid schedule for OA Transportation.",
+    fileUrl: "https://example.com/placeholder-bid-schedule.pdf",
+    fileSize: 1024 * 200,
+    mimeType: "application/pdf",
+    visibility: "division",
+    divisionCode: "MABSTOA",
+  },
+];
+
+async function seedDocuments(): Promise<number> {
+  let created = 0;
+  for (const doc of DEMO_DOCS) {
+    const uploader = await prisma.user.findUnique({ where: { email: doc.uploaderEmail } });
+    if (!uploader) {
+      console.warn(`  Skipping doc "${doc.title}" — uploader ${doc.uploaderEmail} not found`);
+      continue;
+    }
+    let divisionId: string | null = null;
+    if (doc.divisionCode) {
+      const d = await prisma.division.findUnique({ where: { code: doc.divisionCode } });
+      if (!d) {
+        console.warn(`  Skipping doc "${doc.title}" — division ${doc.divisionCode} not found`);
+        continue;
+      }
+      divisionId = d.id;
+    }
+    // Idempotent: skip if a doc with the same uploader + title already exists.
+    const existing = await prisma.document.findFirst({
+      where: { uploaderId: uploader.id, title: doc.title },
+    });
+    if (existing) continue;
+
+    await prisma.document.create({
+      data: {
+        title: doc.title,
+        description: doc.description,
+        fileUrl: doc.fileUrl,
+        fileSize: doc.fileSize,
+        mimeType: doc.mimeType,
+        visibility: doc.visibility,
+        divisionId,
+        uploaderId: uploader.id,
+      },
+    });
+    created++;
+  }
+  return created;
+}
+
 async function main() {
   console.log("Seeding demo data...");
   console.log("");
@@ -234,6 +308,7 @@ async function main() {
   const superUser = await prisma.user.findUnique({ where: { email: SUPER[0].email } });
   if (!superUser) throw new Error("Super user missing after seed");
   const newsCreated = await seedNews(superUser.id);
+  const docsCreated = await seedDocuments();
 
   const all = [...SUPER, ...DIVISION_ADMINS, ...MEMBERS];
   const bar = "━".repeat(60);
@@ -245,6 +320,7 @@ async function main() {
   console.log(`    Division:  ${DIVISION_ADMINS.length}`);
   console.log(`    Members:   ${MEMBERS.length}`);
   console.log(`  News posts created this run: ${newsCreated} (target: ${NEWS_POSTS.length})`);
+  console.log(`  Documents created this run:  ${docsCreated} (target: ${DEMO_DOCS.length})`);
   console.log("");
   console.log(`  Password (all demo users): ${DEMO_PASSWORD}`);
   console.log(bar);
