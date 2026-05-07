@@ -55,6 +55,7 @@ model User {
   newsReviewed       News[]             @relation("NewsReviewer")
   documentsUploaded  Document[]         @relation("DocumentUploader")
   documentsOwned     Document[]         @relation("DocumentOwner")
+  notificationPreference NotificationPreference?
   registrationApproval        RegistrationApproval?
   registrationsReviewed       RegistrationApproval[] @relation("RegistrationReviewer")
   lastActiveAt       DateTime?          @map("last_active_at")
@@ -477,4 +478,25 @@ model RegistrationApproval {
   @@index([status])
   @@index([declaredDivisionId])
   @@index([assignedDivisionId])
+}
+
+model NotificationPreference {
+  id                  String   @id @default(cuid())
+  userId              String   @unique @map("user_id")
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  contractEnabled     Boolean  @default(true) @map("contract_enabled")
+  safetyEnabled       Boolean  @default(true) @map("safety_enabled")
+  rallyEnabled        Boolean  @default(true) @map("rally_enabled")
+  newsEnabled         Boolean  @default(true) @map("news_enabled")
+  benefitEnabled      Boolean  @default(true) @map("benefit_enabled")
+  swapMatchEnabled    Boolean  @default(true) @map("swap_match_enabled")
+  systemAlertEnabled  Boolean  @default(true) @map("system_alert_enabled")
+
+  pushEnabled         Boolean  @default(true) @map("push_enabled")
+
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt      @map("updated_at")
+
+  @@map("notification_preferences")
 }
