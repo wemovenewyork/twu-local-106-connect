@@ -1,4 +1,4 @@
-# We Move NY — Operations Runbook
+# TWU Local 106 Connect — Operations Runbook
 
 ## Quick Reference
 
@@ -138,7 +138,7 @@ Cron schedules are in `vercel.json`. All require the `CRON_SECRET` env var as a 
 | Job | Schedule | Purpose |
 |---|---|---|
 | `/api/cron/expire-swaps` | Daily | Mark past-date swaps as expired |
-| `/api/cron/expiring-soon` | Daily | Notify operators of swaps expiring tomorrow (NYC time) |
+| `/api/cron/expiring-soon` | Daily | Notify members of swaps expiring tomorrow (NYC time) |
 | `/api/cron/cleanup-swaps` | Weekly | Delete swaps expired >7 days ago |
 | `/api/cron/expire-announcements` | Daily | Delete expired depot announcements |
 | `/api/cron/daily-digest` | Daily morning | Send new-swaps digest to subscribers |
