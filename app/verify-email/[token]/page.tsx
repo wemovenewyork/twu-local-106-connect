@@ -45,13 +45,13 @@ export default function VerifyEmailPage() {
             <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
             <h1 style={{ fontSize: 22, fontWeight: 800, color: C.white, marginBottom: 8 }}>Email verified!</h1>
             <p style={{ color: C.m, fontSize: 14, lineHeight: 1.6, marginBottom: 28 }}>
-              Your email has been verified. You can now sign in to TWU Local 106 Connect.
+              Thanks. Your registration is now in your division admin&apos;s queue. You&apos;ll receive an email when they approve you (typically within 1–2 business days).
             </p>
             <button
               onClick={() => router.push("/login")}
               style={{ display: "inline-block", padding: "14px 32px", borderRadius: 12, background: C.gold, color: C.bg, fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer", width: "100%" }}
             >
-              Sign In
+              Go to Sign In
             </button>
           </>
         )}

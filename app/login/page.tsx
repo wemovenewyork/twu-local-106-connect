@@ -10,6 +10,13 @@ import { C } from "@/constants/colors";
 import Intro from "@/components/screens/Intro";
 import MagneticButton from "@/components/ui/MagneticButton";
 
+interface DivisionOption {
+  id: string;
+  code: string;
+  name: string;
+  subUnits?: { code: string; name: string }[];
+}
+
 const lb: React.CSSProperties = { display: "block", marginBottom: 8, fontSize: 12, fontWeight: 600, color: C.m, letterSpacing: 2, textTransform: "uppercase" };
 
 function pwStrength(pw: string): { score: number; label: string; color: string } {
@@ -52,8 +59,23 @@ export default function LoginPage() {
   });
   const [needsVerification, setNeedsVerification] = useState(false);
   const [resendStatus, setResendStatus] = useState<"" | "sending" | "sent">("");
+  const [divisions, setDivisions] = useState<DivisionOption[]>([]);
+  const [divisionCode, setDivisionCode] = useState("");
+  const [subUnitCode, setSubUnitCode] = useState("");
 
   const strength = pwStrength(pw);
+  const selectedDivision = divisions.find(d => d.code === divisionCode);
+  const requiresSubUnit = !!selectedDivision?.subUnits?.length;
+
+  useEffect(() => {
+    if (mode !== "register" || divisions.length) return;
+    (async () => {
+      try {
+        const data = await api.get<DivisionOption[]>("/divisions?withSubUnits=1");
+        setDivisions(data);
+      } catch { /* user can retry by switching tabs */ }
+    })();
+  }, [mode, divisions.length]);
 
   const setErrWithShake = (msg: string) => {
     setErr(msg);
@@ -63,6 +85,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!loading && user && !showConsentFlow && !showTerms) {
+      const regStatus = user.registrationApproval?.status;
+      if (regStatus === "pending" || regStatus === "rejected") {
+        router.replace("/pending-approval");
+        return;
+      }
       if (user.termsVersion !== CURRENT_TERMS_VERSION) {
         setShowTerms(true);
       } else if (!user.divisionId) {
@@ -83,6 +110,8 @@ export default function LoginPage() {
     else if (pw.length < 12) errs.pw = "Must be at least 12 characters";
     if (!pw2) errs.pw2 = "Required";
     else if (pw !== pw2) errs.pw2 = "Passwords don't match";
+    if (!divisionCode) errs.division = "Required";
+    if (requiresSubUnit && !subUnitCode) errs.subUnit = "Required";
     setFieldErrs(errs);
     return Object.keys(errs).length === 0;
   };
@@ -94,10 +123,18 @@ export default function LoginPage() {
     if (Object.keys(errs).length) { setFieldErrs(errs); setShaking(true); setTimeout(() => setShaking(false), 500); return; }
     setSubmitting(true); setErr(""); setFieldErrs({}); setNeedsVerification(false); setResendStatus("");
     try {
-      const data = await api.post<{ user: { id: string; firstName: string; lastName: string; email: string; divisionId?: string | null; language: string } }>("/auth/login", { email: em, password: pw });
+      const data = await api.post<{ user: Parameters<typeof login>[0] }>("/auth/login", { email: em, password: pw });
       // Clear any stale "pending verification" state on successful login
       sessionStorage.removeItem("local106-pending-verify-email");
-      login(data.user as Parameters<typeof login>[0]);
+      login(data.user);
+      // Pending/rejected users skip the consent + terms flow — RegistrationGuard
+      // routes them to /pending-approval. Only members who can actually use the
+      // app see the disclaimer + terms gate.
+      const status = data.user.registrationApproval?.status;
+      if (status === "pending" || status === "rejected") {
+        router.replace("/pending-approval");
+        return;
+      }
       setShowConsentFlow(true);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Login failed";
@@ -128,7 +165,7 @@ export default function LoginPage() {
     try {
       await api.post<{ user: { id: string; email: string }; emailVerificationRequired?: boolean }>(
         "/auth/register",
-        { firstName: fn, lastName: ln, email: em, password: pw }
+        { firstName: fn, lastName: ln, email: em, password: pw, divisionCode, subUnitCode: subUnitCode || undefined }
       );
       // No auto-login: user must verify email first. Show the "check your inbox" screen.
       const normalized = em.trim().toLowerCase();
@@ -319,8 +356,40 @@ export default function LoginPage() {
               </div>
               {fieldErrs.pw2 && <div style={{ fontSize: 11, color: C.red, marginTop: 3 }}>{fieldErrs.pw2}</div>}
             </div>
+            <div>
+              <label htmlFor="reg-division" style={lb}>Division</label>
+              <select
+                id="reg-division"
+                value={divisionCode}
+                onChange={e => { setDivisionCode(e.target.value); setSubUnitCode(""); setFieldErrs(p => ({ ...p, division: "", subUnit: "" })); }}
+                style={fieldErrs.division ? { borderColor: C.red + "88" } : {}}
+              >
+                <option value="">Select your division…</option>
+                {divisions.map(d => (
+                  <option key={d.code} value={d.code}>{d.name}</option>
+                ))}
+              </select>
+              {fieldErrs.division && <div style={{ fontSize: 11, color: C.red, marginTop: 3 }}>{fieldErrs.division}</div>}
+            </div>
+            {requiresSubUnit && selectedDivision && (
+              <div>
+                <label htmlFor="reg-subunit" style={lb}>Sub-Unit</label>
+                <select
+                  id="reg-subunit"
+                  value={subUnitCode}
+                  onChange={e => { setSubUnitCode(e.target.value); setFieldErrs(p => ({ ...p, subUnit: "" })); }}
+                  style={fieldErrs.subUnit ? { borderColor: C.red + "88" } : {}}
+                >
+                  <option value="">Select your sub-unit…</option>
+                  {selectedDivision.subUnits!.map(su => (
+                    <option key={su.code} value={su.code}>{su.name}</option>
+                  ))}
+                </select>
+                {fieldErrs.subUnit && <div style={{ fontSize: 11, color: C.red, marginTop: 3 }}>{fieldErrs.subUnit}</div>}
+              </div>
+            )}
             <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: `1px solid ${C.bd}`, fontSize: 12, color: C.m, lineHeight: 1.6 }}>
-              Account requires division admin approval after email verification.
+              After email verification, your division admin reviews your registration. You&apos;ll receive an email when approved (typically within 1–2 business days).
             </div>
             <MagneticButton onClick={doRegister} disabled={submitting} style={{ padding: 16, borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 16, fontWeight: 700, color: C.bg, opacity: submitting ? 0.7 : 1, width: "100%" }}>
               {submitting ? "Creating account..." : "Create Account →"}

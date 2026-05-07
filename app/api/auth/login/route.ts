@@ -30,7 +30,18 @@ export async function POST(req: NextRequest) {
     if (!email || !password) return err("Email and password required", 400);
     if (password.length > 128) return err("Password too long", 400);
 
-    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() }, include: { division: true } });
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      include: {
+        division: true,
+        registrationApproval: {
+          include: {
+            declaredDivision: { select: { code: true, name: true } },
+            declaredSubUnit: { select: { code: true, name: true } },
+          },
+        },
+      },
+    });
     if (!user) return err("Invalid email or password", 401);
 
     // Check email verification
@@ -107,6 +118,14 @@ export async function POST(req: NextRequest) {
         role: user.role,
         language: user.language,
         termsVersion: user.termsVersion,
+        registrationApproval: user.registrationApproval
+          ? {
+              status: user.registrationApproval.status,
+              declaredDivision: user.registrationApproval.declaredDivision,
+              declaredSubUnit: user.registrationApproval.declaredSubUnit,
+              rejectionReason: user.registrationApproval.rejectionReason,
+            }
+          : null,
       },
     });
 

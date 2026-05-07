@@ -1,13 +1,19 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { err } from "@/lib/apiResponse";
 import { getSoftLaunchDivisions } from "@/lib/softLaunch";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const allowlist = getSoftLaunchDivisions();
+    const withSubUnits = req.nextUrl.searchParams.get("withSubUnits") === "1";
+
     const divisions = await prisma.division.findMany({
       where: allowlist ? { code: { in: allowlist } } : undefined,
       orderBy: { name: "asc" },
+      include: withSubUnits
+        ? { subUnits: { select: { code: true, name: true }, orderBy: { name: "asc" } } }
+        : undefined,
     });
     const counts = await prisma.swap.groupBy({
       by: ["divisionId"],

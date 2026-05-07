@@ -11,7 +11,15 @@ export async function GET(req: NextRequest) {
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.userId },
-    include: { division: true },
+    include: {
+      division: true,
+      registrationApproval: {
+        include: {
+          declaredDivision: { select: { code: true, name: true } },
+          declaredSubUnit: { select: { code: true, name: true } },
+        },
+      },
+    },
   });
   if (!dbUser) return err("User not found", 404);
 
@@ -49,6 +57,14 @@ export async function GET(req: NextRequest) {
     jobTitle: dbUser.jobTitle,
     divisionSetAt: dbUser.divisionSetAt?.toISOString() ?? null,
     verifiedMember: dbUser.verifiedMember,
+    registrationApproval: dbUser.registrationApproval
+      ? {
+          status: dbUser.registrationApproval.status,
+          declaredDivision: dbUser.registrationApproval.declaredDivision,
+          declaredSubUnit: dbUser.registrationApproval.declaredSubUnit,
+          rejectionReason: dbUser.registrationApproval.rejectionReason,
+        }
+      : null,
   });
 }
 

@@ -27,8 +27,9 @@ export async function POST(req: NextRequest) {
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
-  const { firstName, lastName, email, password } = body as {
+  const { firstName, lastName, email, password, divisionCode, subUnitCode } = body as {
     firstName: string; lastName: string; email: string; password: string;
+    divisionCode?: string; subUnitCode?: string;
   };
 
   if (!firstName || !lastName || !email || !password) {
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
   if (lastName.trim().length > 50) return err("Last name must be 50 characters or fewer", 400);
   if (password.length < 12) return err("Password must be at least 12 characters", 400);
   if (password.length > 128) return err("Password must be 128 characters or fewer", 400);
+  if (!divisionCode) return err("Division is required", 400);
 
   // Reject passwords that are purely numeric or common patterns
   const hasLetter = /[a-zA-Z]/.test(password);
@@ -46,43 +48,67 @@ export async function POST(req: NextRequest) {
   const hasSpecialOrMixed = /[^a-zA-Z0-9]/.test(password) || (hasLetter && hasNumber);
   if (!hasSpecialOrMixed) return err("Password must contain letters and numbers", 400);
 
+  const division = await prisma.division.findUnique({ where: { code: divisionCode } });
+  if (!division) return err("Selected division does not exist", 400);
+
+  // sub-unit is optional but if provided must belong to the declared division
+  let subUnitId: string | null = null;
+  if (subUnitCode) {
+    const subUnit = await prisma.subUnit.findUnique({ where: { code: subUnitCode } });
+    if (!subUnit) return err("Selected sub-unit does not exist", 400);
+    if (subUnit.divisionId !== division.id) return err("Sub-unit does not belong to selected division", 400);
+    subUnitId = subUnit.id;
+  } else {
+    // If the division has any sub-units, force the user to pick one
+    const subUnitCount = await prisma.subUnit.count({ where: { divisionId: division.id } });
+    if (subUnitCount > 0) return err("Sub-unit is required for this division", 400);
+  }
+
   const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-  if (existing) return err("Email already registered", 409);
+  if (existing) {
+    // If a prior registration was rejected, block re-signup with same email
+    const prior = await prisma.registrationApproval.findUnique({ where: { userId: existing.id } });
+    if (prior?.status === "rejected") {
+      return err("This email cannot be registered. Contact your division admin.", 403);
+    }
+    return err("Email already registered", 409);
+  }
 
   const passwordHash = await bcrypt.hash(password, 10);
   const verifyToken = crypto.randomBytes(32).toString("hex");
 
-  // Layer C2 will wire admin-approval registration: account exists in unverified
-  // pending state, division admin reviews, then approves/reassigns/rejects.
-  // For now, registration creates a user and sends the verification email; the
-  // approval queue and verification → approved gating land in C2.
   let user;
   try {
-    user = await prisma.user.create({
-      data: {
-        email: email.toLowerCase().trim(),
-        passwordHash,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        verified: false,
-        emailVerifyToken: verifyToken,
-        emailVerifyExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-      },
+    user = await prisma.$transaction(async (tx) => {
+      const u = await tx.user.create({
+        data: {
+          email: email.toLowerCase().trim(),
+          passwordHash,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          verified: false,
+          verifiedMember: false,
+          // divisionId stays null until admin approves; assignedDivisionId on the
+          // approval record is the source of truth pre-approval. This keeps
+          // unapproved users out of any division-scoped queries.
+          emailVerifyToken: verifyToken,
+          emailVerifyExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        },
+      });
+      await tx.registrationApproval.create({
+        data: {
+          userId: u.id,
+          declaredDivisionId: division.id,
+          declaredSubUnitId: subUnitId,
+          status: "pending",
+        },
+      });
+      await tx.reputation.create({ data: { userId: u.id } });
+      return u;
     });
   } catch (e: unknown) {
     Sentry.captureException(e, { tags: { source: "register-create-user" } });
     return err("Registration failed — please try again", 500);
-  }
-
-  // Initialize reputation — upsert is safe if this runs more than once (e.g. after a retry)
-  try {
-    await prisma.reputation.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: { userId: user.id },
-    });
-  } catch (e) {
-    Sentry.captureException(e, { tags: { source: "register-reputation" }, extra: { userId: user.id } });
   }
 
   // Send verification email — HTML-escape user-supplied name fields
@@ -121,7 +147,6 @@ export async function POST(req: NextRequest) {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      divisionId: user.divisionId,
       role: user.role,
       language: user.language,
     },

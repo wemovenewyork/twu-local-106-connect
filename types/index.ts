@@ -51,6 +51,15 @@ export interface RepScore {
 export type UserRole = "member" | "contributor" | "editor" | "divisionAdmin" | "localAdmin" | "superAdmin";
 export type AgreementStatus = "pending" | "userA_confirmed" | "completed" | "cancelled";
 
+export type RegistrationStatus = "pending" | "approved" | "reassigned" | "rejected";
+
+export interface RegistrationApprovalSummary {
+  status: RegistrationStatus;
+  declaredDivision?: { code: string; name: string } | null;
+  declaredSubUnit?: { code: string; name: string } | null;
+  rejectionReason?: string | null;
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -67,6 +76,7 @@ export interface User {
   jobTitle?: string | null;
   divisionSetAt?: string | null;
   verifiedMember?: boolean;
+  registrationApproval?: RegistrationApprovalSummary | null;
 }
 
 export interface Announcement {

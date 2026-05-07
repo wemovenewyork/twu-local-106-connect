@@ -6,6 +6,7 @@ import { AuthProvider } from "@/lib/AuthContext";
 import MeshBackground from "@/components/ui/MeshBackground";
 import OfflineBanner from "@/components/ui/OfflineBanner";
 import AnalyticsProvider from "@/components/ui/AnalyticsProvider";
+import RegistrationGuard from "@/components/RegistrationGuard";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { brand } from "@/config/brand";
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         <AuthProvider>
           <AnalyticsProvider>
+            <RegistrationGuard />
             <div style={{ position: "relative", zIndex: 1 }}>
               {children}
             </div>
