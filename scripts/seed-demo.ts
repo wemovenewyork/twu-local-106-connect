@@ -122,6 +122,105 @@ async function upsertUser(u: DemoUser, passwordHash: string) {
   });
 }
 
+interface DemoNews {
+  authorEmail: string;
+  title: string;
+  body: string;
+  divisionCode: string | null; // null = all-divisions
+  publishedDaysAgo: number;
+}
+
+const NEWS_POSTS: DemoNews[] = [
+  {
+    authorEmail: "wemovenewyork.net@gmail.com",
+    title: "Welcome to TWU Local 106 Connect",
+    divisionCode: null,
+    publishedDaysAgo: 7,
+    body: `# Welcome
+
+This is the official member portal for TWU Local 106. You can:
+
+- Find shift swaps in your division
+- Read union news and announcements
+- Access forms and benefits info
+
+Questions? Reach out to your division admin.`,
+  },
+  {
+    authorEmail: "demo+admin-mabstoa-1@local106.test",
+    title: "OA Transportation: New Bid Schedule Posted",
+    divisionCode: "MABSTOA",
+    publishedDaysAgo: 2,
+    body: `The Q2 bid schedule is now available. Bids close Friday at 17:00.
+
+## Key dates
+
+- Bid period: 4/15 – 4/19
+- Posting date: 4/22
+- Effective: 5/1
+
+Reach out to your unit officers with questions.`,
+  },
+  {
+    authorEmail: "demo+admin-queens-1@local106.test",
+    title: "Queens Division Meeting: April 25",
+    divisionCode: "QUEENS",
+    publishedDaysAgo: 1,
+    body: `Monthly division meeting will be held at the union hall on April 25 at 18:00.
+
+Agenda:
+- Contract negotiation update
+- Safety committee report
+- New member welcome
+
+Food will be provided.`,
+  },
+];
+
+async function seedNews(superUserId: string): Promise<number> {
+  let created = 0;
+  for (const post of NEWS_POSTS) {
+    const author = await prisma.user.findUnique({ where: { email: post.authorEmail } });
+    if (!author) {
+      console.warn(`  Skipping news "${post.title}" — author ${post.authorEmail} not found`);
+      continue;
+    }
+    let divisionId: string | null = null;
+    if (post.divisionCode) {
+      const d = await prisma.division.findUnique({ where: { code: post.divisionCode } });
+      if (!d) {
+        console.warn(`  Skipping news "${post.title}" — division ${post.divisionCode} not found`);
+        continue;
+      }
+      divisionId = d.id;
+    }
+    // Idempotent: skip if a post with the same author + title already exists.
+    const existing = await prisma.news.findFirst({
+      where: { authorId: author.id, title: post.title },
+    });
+    if (existing) continue;
+
+    const publishedAt = new Date(Date.now() - post.publishedDaysAgo * 24 * 60 * 60 * 1000);
+    await prisma.news.create({
+      data: {
+        title: post.title,
+        body: post.body,
+        status: "published",
+        divisionId,
+        authorId: author.id,
+        // Seed exempt from two-person rule; reviewer = superAdmin so the
+        // record has a non-null reviewer for display continuity.
+        reviewerId: superUserId,
+        publishedAt,
+        createdAt: publishedAt,
+        updatedAt: publishedAt,
+      },
+    });
+    created++;
+  }
+  return created;
+}
+
 async function main() {
   console.log("Seeding demo data...");
   console.log("");
@@ -132,6 +231,10 @@ async function main() {
   for (const u of DIVISION_ADMINS) await upsertUser(u, passwordHash);
   for (const u of MEMBERS) await upsertUser(u, passwordHash);
 
+  const superUser = await prisma.user.findUnique({ where: { email: SUPER[0].email } });
+  if (!superUser) throw new Error("Super user missing after seed");
+  const newsCreated = await seedNews(superUser.id);
+
   const all = [...SUPER, ...DIVISION_ADMINS, ...MEMBERS];
   const bar = "━".repeat(60);
   console.log(bar);
@@ -141,6 +244,7 @@ async function main() {
   console.log(`    Super:     ${SUPER.length}`);
   console.log(`    Division:  ${DIVISION_ADMINS.length}`);
   console.log(`    Members:   ${MEMBERS.length}`);
+  console.log(`  News posts created this run: ${newsCreated} (target: ${NEWS_POSTS.length})`);
   console.log("");
   console.log(`  Password (all demo users): ${DEMO_PASSWORD}`);
   console.log(bar);
