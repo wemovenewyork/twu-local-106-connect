@@ -81,6 +81,7 @@ model Division {
   subUnits      SubUnit[]
   news          News[]
   documents     Document[]
+  officers      Officer[]              @relation("OfficerDivision")
   declaredRegistrations RegistrationApproval[] @relation("DeclaredDivision")
   assignedRegistrations RegistrationApproval[] @relation("AssignedDivision")
 
@@ -506,6 +507,41 @@ model NotificationPreference {
   updatedAt           DateTime @updatedAt      @map("updated_at")
 
   @@map("notification_preferences")
+}
+
+enum OfficerScope {
+  local
+  division
+  staff
+}
+
+model Officer {
+  id                 String       @id @default(cuid())
+  name               String
+  title              String
+  scope              OfficerScope
+  divisionId         String?      @map("division_id")
+  division           Division?    @relation("OfficerDivision", fields: [divisionId], references: [id], onDelete: SetNull)
+
+  displayOrder       Int          @default(0) @map("display_order")
+
+  bio                String?
+  photoUrl           String?      @map("photo_url")
+  contactEmail       String?      @map("contact_email")
+  contactFormEnabled Boolean      @default(true) @map("contact_form_enabled")
+
+  termStart          DateTime?    @map("term_start")
+  termEnd            DateTime?    @map("term_end")
+
+  active             Boolean      @default(true)
+
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt      @map("updated_at")
+
+  @@map("officers")
+  @@index([scope])
+  @@index([divisionId])
+  @@index([active])
 }
 
 model Page {
