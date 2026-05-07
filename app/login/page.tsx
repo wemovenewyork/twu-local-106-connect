@@ -95,7 +95,7 @@ export default function LoginPage() {
       } else if (!user.divisionId) {
         router.replace("/setup-profile");
       } else {
-        router.replace(user.division?.code ? `/division/${user.division.code}` : "/divisions");
+        router.replace("/dashboard");
       }
     }
   }, [user, loading, router, showConsentFlow, showTerms]);

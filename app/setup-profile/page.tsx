@@ -41,7 +41,7 @@ export default function SetupProfilePage() {
       await refreshUser();
       const selected = divisions.find(d => d.id === divisionId);
       analytics.profileSetupCompleted(selected?.code ?? "");
-      router.replace(selected ? `/division/${selected.code}` : "/divisions");
+      router.replace("/dashboard");
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "Save failed");
     } finally {
