@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import * as Sentry from "@sentry/nextjs";
 import { prisma } from "@/lib/prisma";
-import { genInviteCode } from "@/lib/inviteCode";
 import { err } from "@/lib/apiResponse";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { parseBody, BODY_4KB } from "@/lib/parseBody";
@@ -28,19 +27,16 @@ export async function POST(req: NextRequest) {
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
-  const { firstName, lastName, email, password, inviteCode } = body as {
+  const { firstName, lastName, email, password } = body as {
     firstName: string; lastName: string; email: string; password: string;
-    inviteCode?: string;
   };
 
   if (!firstName || !lastName || !email || !password) {
     return err("All fields are required", 400);
   }
-  if (!inviteCode) return err("Invite code is required", 400);
   if (!email.includes("@")) return err("Invalid email", 400);
   if (firstName.trim().length > 50) return err("First name must be 50 characters or fewer", 400);
   if (lastName.trim().length > 50) return err("Last name must be 50 characters or fewer", 400);
-  if (inviteCode && inviteCode.length > 20) return err("Invalid invite code", 400);
   if (password.length < 12) return err("Password must be at least 12 characters", 400);
   if (password.length > 128) return err("Password must be 128 characters or fewer", 400);
 
@@ -56,80 +52,37 @@ export async function POST(req: NextRequest) {
   const passwordHash = await bcrypt.hash(password, 10);
   const verifyToken = crypto.randomBytes(32).toString("hex");
 
-  let newCodes: string[] = [];
+  // Layer C2 will wire admin-approval registration: account exists in unverified
+  // pending state, division admin reviews, then approves/reassigns/rejects.
+  // For now, registration creates a user and sends the verification email; the
+  // approval queue and verification → approved gating land in C2.
   let user;
+  try {
+    user = await prisma.user.create({
+      data: {
+        email: email.toLowerCase().trim(),
+        passwordHash,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        verified: false,
+        emailVerifyToken: verifyToken,
+        emailVerifyExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+  } catch (e: unknown) {
+    Sentry.captureException(e, { tags: { source: "register-create-user" } });
+    return err("Registration failed — please try again", 500);
+  }
 
-  {
-    const codeUpper = (inviteCode as string).trim().toUpperCase();
-
-    try {
-      user = await prisma.$transaction(async (tx) => {
-        // Atomically claim the invite code — prevents race conditions where two
-        // simultaneous registrations consume the same code
-        const claimed = await tx.inviteCode.updateMany({
-          where: { code: codeUpper, isValid: true },
-          data: { isValid: false },
-        });
-        if (claimed.count === 0) throw new Error("INVALID_INVITE");
-
-        const invite = await tx.inviteCode.findUnique({
-          where: { code: codeUpper },
-          select: { createdBy: true },
-        });
-
-        const newUser = await tx.user.create({
-          data: {
-            email: email.toLowerCase().trim(),
-            passwordHash,
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-            role: "operator",
-            verified: false,
-            emailVerifyToken: verifyToken,
-            emailVerifyExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            ...(invite?.createdBy ? { invitedBy: invite.createdBy } : {}),
-          },
-        });
-
-        await tx.inviteCode.updateMany({
-          where: { code: codeUpper },
-          data: { usedBy: newUser.id },
-        });
-
-        return newUser;
-      });
-    } catch (e: unknown) {
-      if (e instanceof Error && e.message === "INVALID_INVITE") {
-        return err("Invalid invite code", 400);
-      }
-      Sentry.captureException(e, { tags: { source: "register-transaction" } });
-      return err("Registration failed — please try again", 500);
-    }
-
-    // Generate 3 new invite codes for new operator (outside transaction — non-critical)
-    try {
-      for (let i = 0; i < 3; i++) {
-        let code = genInviteCode();
-        while (await prisma.inviteCode.findUnique({ where: { code } })) {
-          code = genInviteCode();
-        }
-        await prisma.inviteCode.create({ data: { code, createdBy: user.id } });
-        newCodes.push(code);
-      }
-    } catch (e) {
-      Sentry.captureException(e, { tags: { source: "register-invite-codes" }, extra: { userId: user.id } });
-    }
-
-    // Initialize reputation — upsert is safe if this runs more than once (e.g. after a retry)
-    try {
-      await prisma.reputation.upsert({
-        where: { userId: user.id },
-        update: {},
-        create: { userId: user.id },
-      });
-    } catch (e) {
-      Sentry.captureException(e, { tags: { source: "register-reputation" }, extra: { userId: user.id } });
-    }
+  // Initialize reputation — upsert is safe if this runs more than once (e.g. after a retry)
+  try {
+    await prisma.reputation.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: { userId: user.id },
+    });
+  } catch (e) {
+    Sentry.captureException(e, { tags: { source: "register-reputation" }, extra: { userId: user.id } });
   }
 
   // Send verification email — HTML-escape user-supplied name fields
@@ -142,7 +95,7 @@ export async function POST(req: NextRequest) {
       `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;background:${brand.colors.navy};color:#fff;border-radius:16px">
         <h1 style="font-size:22px;font-weight:800;margin-bottom:8px">Verify your email</h1>
         <p style="color:rgba(255,255,255,.6);font-size:14px;line-height:1.6;margin-bottom:24px">
-          Hi ${safeFirstName}, thanks for joining ${brand.name}! Please verify your email address to activate your account.
+          Hi ${safeFirstName}, thanks for joining ${brand.name}! Please verify your email address. After verification, your division admin will review your registration to confirm your TSO membership.
           This link expires in 24 hours.
         </p>
         <a href="${verifyLink}" style="display:inline-block;padding:14px 28px;border-radius:12px;background:${brand.colors.red};color:#fff;font-weight:700;font-size:15px;text-decoration:none">
@@ -161,9 +114,7 @@ export async function POST(req: NextRequest) {
     // Non-fatal: user is created, they can use "Resend verification email" if needed
   }
 
-  // No auto-login on register — user must verify email and then log in.
-  // This ensures the email address is real and prevents account claim from
-  // a leaked invite code reaching someone with a stolen/typo'd email.
+  // No auto-login on register — user must verify email and then await admin approval.
   const res = NextResponse.json({
     user: {
       id: user.id,
@@ -174,7 +125,6 @@ export async function POST(req: NextRequest) {
       role: user.role,
       language: user.language,
     },
-    ...(newCodes.length > 0 ? { inviteCodes: newCodes } : {}),
     emailVerificationRequired: true,
   }, { status: 201 });
 

@@ -27,11 +27,6 @@ interface AdminUser {
   division: { name: string; code: string } | null;
 }
 
-interface InviteCode {
-  id: string; code: string; createdAt: string; usedBy: string | null;
-  user: { firstName: string; lastName: string; email: string } | null;
-}
-
 const ROLE_COLORS: Record<string, string> = {
   operator: C.blue, depotRep: C.gold, subAdmin: "#F97316", admin: PURPLE,
 };
@@ -41,15 +36,13 @@ const lb: React.CSSProperties = { display: "block", marginBottom: 6, fontSize: 1
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [tab, setTab] = useState<"reports" | "users" | "invites" | "audit" | "broadcast">("reports");
+  const [tab, setTab] = useState<"reports" | "users" | "audit" | "broadcast">("reports");
   const [stats, setStats] = useState<Stats | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [userQ, setUserQ] = useState("");
   const [divisions, setDivisions] = useState<{ id: string; name: string; code: string }[]>([]);
   const [pendingDivision, setPendingDivision] = useState<Record<string, string>>({});
-  const [invites, setInvites] = useState<InviteCode[]>([]);
-  const [inviteCount, setInviteCount] = useState(5);
   const [busy, setBusy] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -98,36 +91,9 @@ export default function AdminPage() {
   }, [tab, userQ, user, bcTarget]);
 
   useEffect(() => {
-    if (tab !== "invites" || !user || user.role !== "admin") return;
-    api.get<InviteCode[]>("/admin/invites").then(setInvites).catch(() => {});
-  }, [tab, user]);
-
-  useEffect(() => {
     if (tab !== "audit" || !user || user.role !== "admin") return;
     api.get<typeof auditLogs>("/admin/audit-log").then(setAuditLogs).catch(() => {});
   }, [tab, user]);
-
-  const handleGenerate = async () => {
-    setBusy("gen");
-    try {
-      const created = await api.post<InviteCode[]>("/admin/invites", { count: inviteCount });
-      setInvites(prev => [...created, ...prev]);
-      showToast(`${created.length} code${created.length !== 1 ? "s" : ""} created`);
-    } catch (e: unknown) {
-      showToast(e instanceof Error ? e.message : "Failed");
-    } finally { setBusy(null); }
-  };
-
-  const handleRevoke = async (id: string) => {
-    setBusy(id);
-    try {
-      await api.delete("/admin/invites", { id });
-      setInvites(prev => prev.filter(c => c.id !== id));
-      showToast("Code revoked");
-    } catch (e: unknown) {
-      showToast(e instanceof Error ? e.message : "Failed");
-    } finally { setBusy(null); }
-  };
 
   const handleReport = async (reportId: string, action: "dismiss" | "remove") => {
     setBusy(reportId);
@@ -318,12 +284,12 @@ export default function AdminPage() {
 
         {/* Tabs */}
         {(() => {
-          const tabs = ["reports", "users", ...(isSubAdmin ? [] : ["invites", "audit"]), "broadcast"] as const;
+          const tabs = ["reports", "users", ...(isSubAdmin ? [] : ["audit"]), "broadcast"] as const;
           return (
             <div style={{ display: "grid", gridTemplateColumns: `repeat(${tabs.length}, 1fr)`, gap: 4, background: C.s, borderRadius: 12, padding: 4, marginBottom: 16 }}>
               {tabs.map(t => (
                 <button key={t} onClick={() => setTab(t as typeof tab)} style={{ padding: "10px 4px", borderRadius: 10, border: "none", cursor: "pointer", fontSize: 11, fontWeight: 700, background: tab === t ? PURPLE + "22" : "transparent", color: tab === t ? PURPLE : C.m, boxShadow: tab === t ? `inset 0 0 0 1px ${PURPLE}44` : "none" }}>
-                  {t === "reports" ? `Reports${stats?.pendingReports ? ` (${stats.pendingReports})` : ""}` : t === "users" ? "Users" : t === "invites" ? "Invites" : t === "audit" ? "Audit" : "Broadcast"}
+                  {t === "reports" ? `Reports${stats?.pendingReports ? ` (${stats.pendingReports})` : ""}` : t === "users" ? "Users" : t === "audit" ? "Audit" : "Broadcast"}
                 </button>
               ))}
             </div>
@@ -555,60 +521,6 @@ export default function AdminPage() {
             </div>
           </div>
         )}
-        {/* Invites tab */}
-        {tab === "invites" && (
-          <div>
-            {/* Generate row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, padding: "14px 16px", borderRadius: 14, background: PURPLE + "0c", border: `1px solid ${PURPLE}22` }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: C.white, marginBottom: 4 }}>Generate Invite Codes</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <input
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={inviteCount}
-                    onChange={e => setInviteCount(Math.max(1, Math.min(50, Number(e.target.value))))}
-                    style={{ width: 64, height: 36, padding: "0 10px", borderRadius: 8, fontSize: 14, textAlign: "center" }}
-                    aria-label="Number of codes to generate"
-                  />
-                  <span style={{ fontSize: 12, color: C.m }}>code{inviteCount !== 1 ? "s" : ""}</span>
-                </div>
-              </div>
-              <button onClick={handleGenerate} disabled={busy === "gen"} style={{ padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${PURPLE},${PURPLE}cc)`, color: "#fff", fontSize: 13, fontWeight: 700, opacity: busy === "gen" ? 0.6 : 1 }}>
-                {busy === "gen" ? "Creating…" : "Generate"}
-              </button>
-            </div>
-
-            {/* Code list */}
-            <div style={{ display: "grid", gap: 8 }}>
-              {invites.length === 0 && (
-                <div style={{ textAlign: "center", padding: "40px 20px", color: C.m, fontSize: 13 }}>No invite codes yet</div>
-              )}
-              {invites.map(c => {
-                const used = !!c.usedBy;
-                return (
-                  <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderRadius: 14, background: "rgba(255,255,255,.03)", border: `1px solid ${used ? "rgba(255,255,255,.06)" : PURPLE + "22"}` }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: "monospace", fontSize: 15, fontWeight: 700, color: used ? C.m : C.white, letterSpacing: 2 }}>{c.code}</div>
-                      {used && c.user ? (
-                        <div style={{ fontSize: 11, color: C.m, marginTop: 2 }}>Used by {c.user.firstName} {c.user.lastName} · {c.user.email}</div>
-                      ) : (
-                        <div style={{ fontSize: 11, color: PURPLE, marginTop: 2 }}>Unused · {new Date(c.createdAt).toLocaleDateString()}</div>
-                      )}
-                    </div>
-                    {!used && (
-                      <button onClick={() => handleRevoke(c.id)} disabled={busy === c.id} style={{ padding: "7px 14px", borderRadius: 10, border: `1px solid ${C.red}44`, background: C.red + "10", color: C.red, cursor: "pointer", fontSize: 12, fontWeight: 700, opacity: busy === c.id ? 0.5 : 1 }}>
-                        Revoke
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {/* Broadcast tab */}
         {tab === "broadcast" && (
           <div style={{ display: "grid", gap: 16 }}>

@@ -7,7 +7,6 @@ import { api } from "@/lib/api";
 import { C, CM, STC, SWAP_TYPES } from "@/constants/colors";
 import Icon from "@/components/ui/Icon";
 import RepBadge from "@/components/ui/RepBadge";
-import { QRCodeSVG } from "qrcode.react";
 
 interface DayData { date: string; posted: number; agreements: number; }
 
@@ -82,9 +81,6 @@ export default function RepDashboardPage() {
   const [data, setData] = useState<DashData | null>(null);
   const [analytics, setAnalytics] = useState<DayData[]>([]);
   const [error, setError] = useState("");
-  const [inviteCodes, setInviteCodes] = useState<{ code: string; isValid: boolean; usedBy?: string | null }[]>([]);
-  const [qrCode, setQrCode] = useState<string | null>(null);
-  const appUrl = typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_APP_URL ?? "");
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
@@ -102,9 +98,6 @@ export default function RepDashboardPage() {
       .catch((e: unknown) => setError(e instanceof Error ? e.message : "Failed to load"));
     api.get<DayData[]>(`/divisions/${code}/rep-dashboard/analytics`)
       .then(setAnalytics)
-      .catch(() => {});
-    api.get<{ inviteCodes: { code: string; isValid: boolean }[] }>("/users/me")
-      .then(d => setInviteCodes(d.inviteCodes ?? []))
       .catch(() => {});
   }, [user, code]);
 
@@ -246,41 +239,6 @@ export default function RepDashboardPage() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* QR Code Onboarding */}
-        <div style={{ background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16, border: `1px solid ${C.bd}`, marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>QR Onboarding</div>
-          <p style={{ fontSize: 12, color: C.m, marginBottom: 12, lineHeight: 1.6 }}>
-            Select an unused invite code to generate a QR code. New members scan it to register with the code pre-filled.
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
-            {inviteCodes.filter(c => c.isValid).map(c => (
-              <button
-                key={c.code}
-                onClick={() => setQrCode(qrCode === c.code ? null : c.code)}
-                style={{ padding: "8px 14px", borderRadius: 10, border: `1.5px solid ${qrCode === c.code ? C.gold : C.bd}`, background: qrCode === c.code ? C.gold + "15" : C.s, color: qrCode === c.code ? C.gold : C.m, fontSize: 12, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5 }}
-              >
-                {c.code}
-              </button>
-            ))}
-            {inviteCodes.filter(c => c.isValid).length === 0 && (
-              <div style={{ fontSize: 12, color: C.m }}>No unused invite codes — generate more from your profile.</div>
-            )}
-          </div>
-          {qrCode && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: 20, background: C.white, borderRadius: 16 }}>
-              <QRCodeSVG
-                value={`${appUrl}/login?invite=${qrCode}`}
-                size={200}
-                bgColor="#ffffff"
-                fgColor="#1A1F4D"
-                level="M"
-              />
-              <div style={{ fontSize: 11, color: "#1A1F4D", fontWeight: 700, letterSpacing: 2 }}>{qrCode}</div>
-              <div style={{ fontSize: 10, color: "#666", textAlign: "center" }}>Scan to register with this invite code pre-filled</div>
-            </div>
-          )}
         </div>
 
         {/* Recent agreements */}

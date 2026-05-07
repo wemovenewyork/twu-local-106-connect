@@ -33,11 +33,6 @@ export async function GET(req: NextRequest) {
     reviews: reviews.map((r) => r.rating),
   });
 
-  const inviteCodes = await prisma.inviteCode.findMany({
-    where: { createdBy: user.userId },
-    select: { code: true, isValid: true },
-  });
-
   return ok({
     id: dbUser.id,
     firstName: dbUser.firstName,
@@ -51,7 +46,6 @@ export async function GET(req: NextRequest) {
     flexibleMode: dbUser.flexibleMode,
     termsVersion: dbUser.termsVersion,
     reputation,
-    inviteCodes,
     jobTitle: dbUser.jobTitle,
     divisionSetAt: dbUser.divisionSetAt?.toISOString() ?? null,
     verifiedOperator: dbUser.verifiedOperator,

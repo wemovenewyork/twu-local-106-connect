@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
       avatarUrl: null,
       divisionId: null,
       pushSubscriptions: { deleteMany: {} },
-      inviteCodes: { updateMany: { where: {}, data: { isValid: false } } },
     },
   });
 

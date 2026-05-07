@@ -36,8 +36,6 @@ model User {
   swaps              Swap[]
   sentMessages       Message[]          @relation("SentMessages")
   receivedMessages   Message[]          @relation("ReceivedMessages")
-  inviteCodes        InviteCode[]       @relation("CodeCreator")
-  usedCode           InviteCode?        @relation("CodeUser")
   reputation         Reputation?
   reviewsGiven       Review[]           @relation("ReviewsGiven")
   reviewsReceived    Review[]           @relation("ReviewsReceived")
@@ -154,20 +152,6 @@ model Message {
   toUser   User  @relation("ReceivedMessages", fields: [toUserId], references: [id])
 
   @@map("messages")
-}
-
-model InviteCode {
-  id        String   @id @default(uuid())
-  code      String   @unique
-  createdBy String   @map("created_by")
-  usedBy    String?  @unique @map("used_by")
-  isValid   Boolean  @default(true) @map("is_valid")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  creator User  @relation("CodeCreator", fields: [createdBy], references: [id])
-  user    User? @relation("CodeUser", fields: [usedBy], references: [id])
-
-  @@map("invite_codes")
 }
 
 model Reputation {
@@ -336,8 +320,6 @@ model Notification {
 
 enum AuditAction {
   role_change
-  invite_revoke
-  invite_generate
   report_dismiss
   report_review
   user_delete

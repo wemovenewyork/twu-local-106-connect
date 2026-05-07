@@ -262,25 +262,6 @@ export default function ProfilePage() {
               {saving ? "Saving..." : "Save Changes"}
             </button>
 
-            {/* Invite codes */}
-            <div style={{ marginTop: 8, background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16, border: "1px solid " + C.bd }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.gold, textTransform: "uppercase", letterSpacing: 2 }}>My Invite Codes</div>
-                <div style={{ fontSize: 10, color: C.m }}>{(user.inviteCodes ?? []).filter(c => c.isValid).length} remaining</div>
-              </div>
-              <div style={{ fontSize: 11, color: C.m, lineHeight: 1.6, marginBottom: 12 }}>
-                To protect the integrity of this site, invite codes must only be shared with verified TWU Local 106 members. Under no circumstances are invite codes to be distributed to anyone who is not authorized to access this site.
-              </div>
-              <div style={{ display: "grid", gap: 6 }}>
-                {(user.inviteCodes ?? []).map(cd => (
-                  <div key={cd.code} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: !cd.isValid ? "rgba(255,255,255,.02)" : C.gold + "08", border: "1px solid " + (!cd.isValid ? C.bd : C.gold + "22") }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: !cd.isValid ? C.m : C.white, letterSpacing: 2, textDecoration: !cd.isValid ? "line-through" : "none" }}>{cd.code}</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: !cd.isValid ? C.m : "#2ED573", textTransform: "uppercase", letterSpacing: 1 }}>{!cd.isValid ? "Used" : "Active"}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div style={{ marginTop: 8 }}><RepBadge rep={user.reputation} size="full" /></div>
 
             {/* Push Notifications */}

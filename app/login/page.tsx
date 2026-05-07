@@ -36,17 +36,9 @@ export default function LoginPage() {
     if (typeof window === "undefined") return true;
     return !sessionStorage.getItem("intro-seen");
   });
-  const [mode, setMode] = useState<"signin" | "register">(() => {
-    if (typeof window === "undefined") return "signin";
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("invite")) return "register";
-    return "signin";
-  });
+  const [mode, setMode] = useState<"signin" | "register">("signin");
   const [em, setEm] = useState(""); const [pw, setPw] = useState("");
   const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [pw2, setPw2] = useState("");
-  const [invCode, setInvCode] = useState(() =>
-    typeof window !== "undefined" ? (new URLSearchParams(window.location.search).get("invite") ?? "") : ""
-  );
   const [showPw, setShowPw] = useState(false); const [showPw2, setShowPw2] = useState(false);
   const [err, setErr] = useState(""); const [fieldErrs, setFieldErrs] = useState<Record<string, string>>({});
   const [shaking, setShaking] = useState(false); const [submitting, setSubmitting] = useState(false);
@@ -91,7 +83,6 @@ export default function LoginPage() {
     else if (pw.length < 12) errs.pw = "Must be at least 12 characters";
     if (!pw2) errs.pw2 = "Required";
     else if (pw !== pw2) errs.pw2 = "Passwords don't match";
-    if (!invCode.trim()) errs.inv = "Required — your division admin will approve your registration";
     setFieldErrs(errs);
     return Object.keys(errs).length === 0;
   };
@@ -137,7 +128,7 @@ export default function LoginPage() {
     try {
       await api.post<{ user: { id: string; email: string }; emailVerificationRequired?: boolean }>(
         "/auth/register",
-        { firstName: fn, lastName: ln, email: em, password: pw, inviteCode: invCode }
+        { firstName: fn, lastName: ln, email: em, password: pw }
       );
       // No auto-login: user must verify email first. Show the "check your inbox" screen.
       const normalized = em.trim().toLowerCase();
@@ -328,13 +319,8 @@ export default function LoginPage() {
               </div>
               {fieldErrs.pw2 && <div style={{ fontSize: 11, color: C.red, marginTop: 3 }}>{fieldErrs.pw2}</div>}
             </div>
-            <div>
-              <label htmlFor="reg-invite" style={lb}>Invite Code</label>
-              <input id="reg-invite" value={invCode} onChange={e => { setInvCode(e.target.value.toUpperCase()); setFieldErrs(p => ({ ...p, inv: "" })); }} placeholder="e.g. L106-DEMO1" style={{ letterSpacing: 2, textTransform: "uppercase", ...(fieldErrs.inv ? { borderColor: C.red + "88" } : {}) }} />
-              {fieldErrs.inv
-                ? <div style={{ fontSize: 11, color: C.red, marginTop: 3 }}>{fieldErrs.inv}</div>
-                : <div style={{ fontSize: 11, color: C.m, marginTop: 4 }}>Ask a fellow Local 106 member for their invite code</div>
-              }
+            <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.04)", border: `1px solid ${C.bd}`, fontSize: 12, color: C.m, lineHeight: 1.6 }}>
+              Account requires division admin approval after email verification.
             </div>
             <MagneticButton onClick={doRegister} disabled={submitting} style={{ padding: 16, borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 16, fontWeight: 700, color: C.bg, opacity: submitting ? 0.7 : 1, width: "100%" }}>
               {submitting ? "Creating account..." : "Create Account →"}
@@ -415,9 +401,8 @@ export default function LoginPage() {
                 { title: "3. Shift Swap Coordination", body: "TWU Local 106 Connect is a coordination tool only. It does not replace any MTA, TWU, or union collective bargaining agreements. All shift swaps must comply with your division's official procedures and receive supervisor approval. The App makes no guarantee a swap will be approved by management." },
                 { title: "4. User Conduct", body: "You agree not to post false or fraudulent swap listings, harass or threaten other members, share others' personal information without consent, use the App for commercial gain, attempt unauthorized access, or post discriminatory content. Violations may result in immediate account suspension." },
                 { title: "5. Reputation System", body: "Reviews must be honest and based on actual swap experiences. Manipulating ratings — including self-reviewing or fake reviews — is prohibited and may result in account termination." },
-                { title: "6. Invite Codes", body: "You are responsible for who you invite. Do not share invite codes publicly or with non-members. Misuse may result in suspension of your account and the invited account." },
-                { title: "7. Disclaimer of Liability", body: "TWU Local 106 Connect is provided as-is without warranties. We are not responsible for disputes, missed shifts, denied swaps, or disciplinary actions arising from use of this platform." },
-                { title: "8. Changes to Terms", body: "We reserve the right to update these Terms at any time. Continued use after changes are posted constitutes acceptance of the revised terms." },
+                { title: "6. Disclaimer of Liability", body: "TWU Local 106 Connect is provided as-is without warranties. We are not responsible for disputes, missed shifts, denied swaps, or disciplinary actions arising from use of this platform." },
+                { title: "7. Changes to Terms", body: "We reserve the right to update these Terms at any time. Continued use after changes are posted constitutes acceptance of the revised terms." },
               ].map(({ title, body }) => (
                 <div key={title} style={{ marginBottom: 14 }}>
                   <div style={{ fontWeight: 700, color: C.gold, fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 4 }}>{title}</div>

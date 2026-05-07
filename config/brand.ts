@@ -49,10 +49,6 @@ export const brand = {
   // Short-form non-affiliation language for footer / fine print
   // (not the WMNY non-affiliation — Local 106 IS the union; we're disclaiming MTA affiliation)
   affiliationNotice: "Built for and by TWU Local 106. Not affiliated with the MTA, MaBSTOA, or MTA Bus Company.",
-
-  // Invite code prefix (we'll drop invite codes entirely in Layer C, but for now rename so
-  // any leftover paths reference Local 106, not WMNY)
-  inviteCodePrefix: "L106",
 };
 
 export type Brand = typeof brand;

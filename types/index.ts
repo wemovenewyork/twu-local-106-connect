@@ -64,7 +64,6 @@ export interface User {
   flexibleMode: boolean;
   termsVersion?: string | null;
   reputation?: RepScore;
-  inviteCodes?: { code: string; isValid: boolean }[];
   jobTitle?: string | null;
   divisionSetAt?: string | null;
   verifiedOperator?: boolean;
