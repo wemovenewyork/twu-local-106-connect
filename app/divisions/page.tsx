@@ -12,6 +12,7 @@ import Footer from "@/components/ui/Footer";
 import TiltCard from "@/components/ui/TiltCard";
 import NotifIcon from "@/components/ui/NotifIcon";
 import InboxIcon from "@/components/ui/InboxIcon";
+import NewsFeed from "@/components/NewsFeed";
 
 export default function DivisionsPage() {
   const { user, loading } = useAuth();
@@ -56,6 +57,8 @@ export default function DivisionsPage() {
             <span style={{ background: `linear-gradient(135deg,${C.gold},${C.gold}bb)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Division</span>
           </h2>
         </div>
+
+        <NewsFeed />
 
         <div style={{ background: "rgba(255,255,255,.03)", backdropFilter: "blur(12px)", borderRadius: 20, border: "1px solid rgba(255,255,255,.06)", padding: 18, marginBottom: 24 }}>
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search divisions..." style={{ height: 48 }} />
