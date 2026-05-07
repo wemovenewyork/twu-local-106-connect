@@ -55,6 +55,7 @@ model User {
   newsReviewed       News[]             @relation("NewsReviewer")
   documentsUploaded  Document[]         @relation("DocumentUploader")
   documentsOwned     Document[]         @relation("DocumentOwner")
+  pagesAuthored      Page[]             @relation("PageAuthor")
   notificationPreference NotificationPreference?
   registrationApproval        RegistrationApproval?
   registrationsReviewed       RegistrationApproval[] @relation("RegistrationReviewer")
@@ -385,6 +386,8 @@ model News {
   reviewer    User?      @relation("NewsReviewer", fields: [reviewerId], references: [id])
 
   publishedAt DateTime?  @map("published_at")
+  publiclyVisible Boolean @default(false) @map("publicly_visible")
+  publicSlug      String? @unique @map("public_slug")
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
 
@@ -392,6 +395,7 @@ model News {
   @@index([divisionId])
   @@index([status])
   @@index([publishedAt])
+  @@index([publiclyVisible])
 }
 
 enum DocumentVisibility {
@@ -420,6 +424,8 @@ model Document {
   uploaderId  String             @map("uploader_id")
   uploader    User               @relation("DocumentUploader", fields: [uploaderId], references: [id])
 
+  publiclyVisible Boolean        @default(false) @map("publicly_visible")
+
   createdAt   DateTime           @default(now()) @map("created_at")
   updatedAt   DateTime           @updatedAt @map("updated_at")
 
@@ -427,6 +433,7 @@ model Document {
   @@index([divisionId])
   @@index([visibility])
   @@index([ownerUserId])
+  @@index([publiclyVisible])
 }
 
 enum NotificationCategory {
@@ -499,4 +506,24 @@ model NotificationPreference {
   updatedAt           DateTime @updatedAt      @map("updated_at")
 
   @@map("notification_preferences")
+}
+
+model Page {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  body            String
+  metaDescription String?   @map("meta_description")
+  published       Boolean   @default(false)
+  publishedAt     DateTime? @map("published_at")
+
+  authorId        String    @map("author_id")
+  author          User      @relation("PageAuthor", fields: [authorId], references: [id])
+
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt      @map("updated_at")
+
+  @@map("pages")
+  @@index([slug])
+  @@index([published])
 }
