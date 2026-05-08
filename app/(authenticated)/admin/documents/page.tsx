@@ -7,6 +7,7 @@ import { api } from "@/lib/api";
 import { C } from "@/constants/colors";
 
 type Visibility = "all" | "division" | "subUnit" | "selfOnly";
+type DocumentType = "contract" | "form" | "constitution" | "memo" | "other";
 
 interface DocLite {
   id: string;
@@ -16,10 +17,14 @@ interface DocLite {
   mimeType: string | null;
   fileUrl: string;
   visibility: Visibility;
+  documentType: DocumentType;
   publiclyVisible: boolean;
   divisionId: string | null;
   subUnitId: string | null;
   ownerUserId: string | null;
+  needsOCR: boolean;
+  extractedAt: string | null;
+  extractedTextLength: number | null;
   createdAt: string;
   updatedAt: string;
   division?: { id: string; code: string; name: string } | null;
@@ -51,8 +56,12 @@ export default function AdminDocumentsListPage() {
   const [docs, setDocs] = useState<DocLite[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [needsOCROnly, setNeedsOCROnly] = useState(false);
 
   const isAuthorized = !!user && ["divisionAdmin", "localAdmin", "superAdmin"].includes(user.role);
+
+  const ocrNeeded = docs.filter(d => d.documentType === "contract" && d.needsOCR);
+  const visibleDocs = needsOCROnly ? ocrNeeded : docs;
 
   useEffect(() => {
     if (!loading && (!user || !isAuthorized)) router.replace("/");
@@ -96,8 +105,31 @@ export default function AdminDocumentsListPage() {
       )}
       {busy && <div style={{ color: C.m, fontSize: 13, marginBottom: 12 }}>Loading…</div>}
 
+      {ocrNeeded.length > 0 && (
+        <button
+          onClick={() => setNeedsOCROnly(v => !v)}
+          aria-pressed={needsOCROnly}
+          style={{
+            width: "100%", textAlign: "left", padding: "12px 14px", marginBottom: 12,
+            borderRadius: 12, fontSize: 13,
+            background: needsOCROnly ? "rgba(217,119,6,.18)" : "rgba(217,119,6,.10)",
+            border: `1px solid ${needsOCROnly ? "rgba(217,119,6,.55)" : "rgba(217,119,6,.35)"}`,
+            color: "#FFD088", cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 10,
+          }}
+        >
+          <span aria-hidden="true">⚠</span>
+          <span style={{ flex: 1 }}>
+            <strong>{ocrNeeded.length} contract{ocrNeeded.length === 1 ? "" : "s"} need OCR</strong> before they can be searched.
+          </span>
+          <span style={{ fontWeight: 700 }}>
+            {needsOCROnly ? "Show all →" : "List them →"}
+          </span>
+        </button>
+      )}
+
       <div style={{ display: "grid", gap: 8 }}>
-        {docs.map(d => (
+        {visibleDocs.map(d => (
           <button
             key={d.id}
             onClick={() => router.push(`/admin/documents/${d.id}`)}
@@ -120,6 +152,42 @@ export default function AdminDocumentsListPage() {
                   Public
                 </span>
               )}
+              {d.documentType !== "other" && (
+                <span style={{
+                  fontSize: 10, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase",
+                  padding: "2px 8px", borderRadius: 999,
+                  background: "rgba(2,73,181,.12)", border: "1px solid rgba(2,73,181,.30)", color: "#7CB1FF",
+                }}>
+                  {d.documentType}
+                </span>
+              )}
+              {d.documentType === "contract" && (
+                d.needsOCR ? (
+                  <span title="Scanned PDF — text extraction yielded too little content; not searchable until OCR is done" style={{
+                    fontSize: 10, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase",
+                    padding: "2px 8px", borderRadius: 999,
+                    background: "rgba(217,119,6,.12)", border: "1px solid rgba(217,119,6,.40)", color: "#FFD088",
+                  }}>
+                    OCR needed
+                  </span>
+                ) : d.extractedAt ? (
+                  <span title={`Searchable — extracted ${d.extractedTextLength?.toLocaleString() ?? "?"} characters`} style={{
+                    fontSize: 10, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase",
+                    padding: "2px 8px", borderRadius: 999,
+                    background: "rgba(46,213,115,.10)", border: "1px solid rgba(46,213,115,.35)", color: "#2ED573",
+                  }}>
+                    Searchable
+                  </span>
+                ) : (
+                  <span title="Not yet extracted" style={{
+                    fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase",
+                    padding: "2px 8px", borderRadius: 999,
+                    background: "rgba(255,255,255,.04)", border: `1px solid ${C.bd}`, color: C.m,
+                  }}>
+                    —
+                  </span>
+                )
+              )}
               {d.division && (
                 <span style={{ fontSize: 11, color: C.m }}>{d.division.name}</span>
               )}
@@ -138,6 +206,11 @@ export default function AdminDocumentsListPage() {
       {docs.length === 0 && !busy && (
         <div style={{ padding: 32, textAlign: "center", color: C.m, fontSize: 13, background: "rgba(255,255,255,.02)", border: `1px solid ${C.bd}`, borderRadius: 16 }}>
           No documents yet. <a onClick={() => router.push("/admin/documents/new")} style={{ color: C.white, cursor: "pointer", textDecoration: "underline" }}>Upload the first one →</a>
+        </div>
+      )}
+      {needsOCROnly && visibleDocs.length === 0 && !busy && (
+        <div style={{ padding: 24, textAlign: "center", color: C.m, fontSize: 13, background: "rgba(255,255,255,.02)", border: `1px dashed ${C.bd}`, borderRadius: 14 }}>
+          No contracts currently flagged for OCR.
         </div>
       )}
     </main>

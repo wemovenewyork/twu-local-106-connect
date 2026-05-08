@@ -56,6 +56,13 @@ export default function QuickActions() {
       count: null,
     },
     {
+      title: "Contract Search",
+      description: "Search union contracts",
+      href: "/portal/search",
+      icon: "srch",
+      count: null,
+    },
+    {
       title: "Contact",
       description: "Reach your reps",
       href: "/contact",
