@@ -30,7 +30,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const existing = await prisma.overtimeRequest.findUnique({
     where: { id },
-    select: { id: true, status: true },
+    select: {
+      id: true, status: true, requestedDate: true, type: true,
+      submitter: { select: { firstName: true, lastName: true } },
+    },
   });
   if (!existing) return err("Not found", 404);
   if (existing.status !== "submitted") {
@@ -46,12 +49,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     },
   });
 
+  const dateStr = existing.requestedDate.toISOString().slice(0, 10);
+  const typeStr = existing.type === "rdo" ? "RDO" : "Double Shift";
+  const submitterName = `${existing.submitter.firstName} ${existing.submitter.lastName}`.trim();
   writeAuditLog({
     adminId: caller.id,
     action: "overtimeRequestAcknowledge",
     targetId: id,
     targetType: "overtimeRequest",
-    detail: "Marked OT request acknowledged",
+    detail: `Acknowledged ${typeStr} OT for ${dateStr} (submitter: ${submitterName})`,
     ip: clientIp(req),
   });
 

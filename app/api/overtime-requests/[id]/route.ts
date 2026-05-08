@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const existing = await prisma.overtimeRequest.findUnique({
     where: { id },
-    select: { id: true, submitterId: true, status: true },
+    select: { id: true, submitterId: true, status: true, requestedDate: true, type: true },
   });
   if (!existing) return err("Not found", 404);
   if (existing.submitterId !== token.userId) return err("Forbidden", 403);
@@ -35,12 +35,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     data: { status: "withdrawn", withdrawnAt: new Date() },
   });
 
+  const dateStr = existing.requestedDate.toISOString().slice(0, 10);
+  const typeStr = existing.type === "rdo" ? "RDO" : "Double Shift";
   writeAuditLog({
     adminId: token.userId,
     action: "overtimeRequestWithdraw",
     targetId: id,
     targetType: "overtimeRequest",
-    detail: "Withdrew own OT request",
+    detail: `Withdrew own ${typeStr} OT for ${dateStr}`,
     ip: clientIp(req),
   });
 

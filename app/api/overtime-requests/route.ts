@@ -99,12 +99,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Mask the payroll number — last 3 chars only — so audit logs don't
+    // become a secondary store of payroll numbers (the whole point of
+    // keeping them per-request rather than on User).
+    const masked = payrollNumber.length <= 3
+      ? "***"
+      : `***${payrollNumber.slice(-3)}`;
+
     writeAuditLog({
       adminId: me.id,
       action: "overtimeRequestCreate",
       targetId: created.id,
       targetType: "overtimeRequest",
-      detail: `Submitted ${type} OT for ${requestedDateStr}`,
+      detail: `Submitted ${type === "rdo" ? "RDO" : "Double Shift"} OT for ${requestedDateStr} (payroll ${masked})`,
       ip: clientIp(req),
     });
 
