@@ -18,6 +18,7 @@ import FlexibleStrip from "@/components/ui/FlexibleStrip";
 import PostAnnouncementModal from "@/components/ui/PostAnnouncementModal";
 import NotifIcon from "@/components/ui/NotifIcon";
 import InboxIcon from "@/components/ui/InboxIcon";
+import MemberPortalHeader from "@/components/ui/MemberPortalHeader";
 import FirstSwapBanner from "@/components/ui/FirstSwapBanner";
 import CountUp from "@/components/ui/CountUp";
 import OfflineBanner from "@/components/ui/OfflineBanner";
@@ -287,12 +288,16 @@ export default function BrowsePage() {
           <span style={{ display: "inline-block", width: 14, height: 14, border: `2px solid ${C.m}`, borderTopColor: "transparent", borderRadius: "50%", animation: "rotateLogo 0.6s linear infinite", verticalAlign: "middle" }} />
         ) : "↓ Pull to refresh"}
       </div>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "12px 12px", display: "flex", alignItems: "center", gap: 6 }}>
+      <MemberPortalHeader>
+        <NotifIcon />
+        <InboxIcon />
+      </MemberPortalHeader>
+
+      {/* Sub-header: page-specific identity (back button, division, +Post). */}
+      <div style={{ position: "sticky", top: 56, zIndex: 99, background: "rgba(26,31,77,.75)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${C.bd}`, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
         <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon n="back" s={15} /></button>
         <DivisionBadge division={division} size={32} />
         <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: C.white, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{division.name}</div>
-        <NotifIcon />
-        <InboxIcon />
         <button onClick={() => router.push(`/division/${code}/saved`)} aria-label="Saved swaps" title="Saved Swaps" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: C.m, flexShrink: 0 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
         </button>
@@ -306,7 +311,7 @@ export default function BrowsePage() {
             </button>
           </>
         )}
-        <button onClick={() => { playClick(); router.push(`/division/${code}/post`); }} style={{ padding: "7px 12px", borderRadius: 10, border: "none", cursor: "pointer", background: "#AD1B27", fontSize: 12, fontWeight: 700, color: "#1A1F4D", flexShrink: 0 }}>+ Post</button>
+        <button onClick={() => { playClick(); router.push(`/division/${code}/post`); }} style={{ padding: "7px 12px", borderRadius: 10, border: "none", cursor: "pointer", background: "#AD1B27", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>+ Post</button>
       </div>
 
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 720, margin: "0 auto", padding: "0 20px" }}>

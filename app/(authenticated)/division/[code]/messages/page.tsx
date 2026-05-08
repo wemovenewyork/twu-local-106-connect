@@ -126,7 +126,7 @@ export default function MessagesPage() {
               </span>
             )}
           </div>
-          <div style={{ fontSize: 10, color: C.m }}>Operator conversations</div>
+          <div style={{ fontSize: 10, color: C.m }}>Member conversations</div>
         </div>
         <NotifIcon />
         {convos.length > 0 && (

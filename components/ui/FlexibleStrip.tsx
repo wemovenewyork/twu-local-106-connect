@@ -48,7 +48,7 @@ export default function FlexibleStrip({ operators, onMessage, currentUserId, isF
 
       {operators.length === 0 ? (
         <div style={{ padding: "12px 14px", borderRadius: 12, background: "rgba(255,255,255,.02)", border: `1px solid rgba(255,255,255,.05)`, fontSize: 12, color: C.m, textAlign: "center" }}>
-          No flexible operators right now.{" "}
+          No flexible members right now.{" "}
           {!isFlexible && <span style={{ color: GREEN }}>Toggle &quot;Join&quot; to be the first.</span>}
         </div>
       ) : (

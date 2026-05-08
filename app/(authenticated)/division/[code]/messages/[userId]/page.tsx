@@ -76,7 +76,7 @@ export default function ThreadPage() {
       if (!cp) {
         const sent = msgs.find(m => m.fromUserId === user.id);
         if (sent) {
-          setCounterpart({ id: counterpartId, firstName: "Operator", lastName: "" });
+          setCounterpart({ id: counterpartId, firstName: "Member", lastName: "" });
         }
       } else {
         setCounterpart(cp);
@@ -214,7 +214,7 @@ export default function ThreadPage() {
         </div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: C.white }}>{counterpartName}</div>
-          <div style={{ fontSize: 10, color: C.m }}>Operator</div>
+          <div style={{ fontSize: 10, color: C.m }}>Member</div>
         </div>
         <button
           onClick={() => setBlockConfirm(true)}

@@ -63,7 +63,7 @@ export default function PostAnnouncementModal({ divisionCode, onPosted, onClose 
         style={{ width: "100%", background: "rgb(6,5,52)", borderRadius: "20px 20px 0 0", padding: "24px 20px 44px", maxWidth: 520, margin: "0 auto" }}
       >
         <h2 id={titleId} style={{ fontSize: 16, fontWeight: 800, color: C.white, marginBottom: 4 }}>Post Announcement</h2>
-        <div style={{ fontSize: 12, color: C.m, marginBottom: 18 }}>Visible to all operators at your division</div>
+        <div style={{ fontSize: 12, color: C.m, marginBottom: 18 }}>Visible to all members at your division</div>
 
         {error && (
           <div role="alert" aria-live="assertive" style={{ padding: "10px 14px", borderRadius: 10, background: `${C.red}15`, border: `1px solid ${C.red}33`, fontSize: 12, color: C.red, marginBottom: 14 }}>

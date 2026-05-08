@@ -224,7 +224,7 @@ export default function RepDashboardPage() {
 
         {/* Top operators */}
         <div style={{ background: "rgba(255,255,255,.03)", borderRadius: 14, padding: 16, border: `1px solid ${C.bd}`, marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Top Operators</div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: C.gold, textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Top Members</div>
           <div style={{ display: "grid", gap: 8 }}>
             {data.topOperators.map((op, i) => (
               <div key={op.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: i === 0 ? C.gold + "08" : "rgba(255,255,255,.02)", border: `1px solid ${i === 0 ? C.gold + "22" : "rgba(255,255,255,.04)"}` }}>

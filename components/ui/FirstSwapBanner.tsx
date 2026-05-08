@@ -65,7 +65,7 @@ export default function FirstSwapBanner({ divisionCode }: { divisionCode: string
         {[
           { n: "1", t: "Pick a type", s: "Work, days off, or vacation" },
           { n: "2", t: "Add details", s: "Date, run, shift info" },
-          { n: "3", t: "Post it", s: "Operators at your division will see it" },
+          { n: "3", t: "Post it", s: "TSO members at your division will see it" },
         ].map(step => (
           <div key={step.n} style={{ textAlign: "center" }}>
             <div style={{ width: 20, height: 20, borderRadius: "50%", background: C.gold, color: C.bg, fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 4px" }}>{step.n}</div>

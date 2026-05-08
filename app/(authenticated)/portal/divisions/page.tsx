@@ -13,6 +13,7 @@ import TiltCard from "@/components/ui/TiltCard";
 import NotifIcon from "@/components/ui/NotifIcon";
 import InboxIcon from "@/components/ui/InboxIcon";
 import NewsFeed from "@/components/NewsFeed";
+import MemberPortalHeader from "@/components/ui/MemberPortalHeader";
 
 export default function DivisionsPage() {
   const { user, loading } = useAuth();
@@ -36,8 +37,7 @@ export default function DivisionsPage() {
 
   return (
     <div className="page-enter" style={{ minHeight: "100vh", background: C.bg }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ fontWeight: 700, fontSize: 16, color: C.white, letterSpacing: 3, flex: 1 }}>TWU LOCAL 106</div>
+      <MemberPortalHeader>
         {user?.role === "superAdmin" && (
           <button onClick={() => router.push("/admin")} aria-label="Admin dashboard" style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid #C084FC33", background: "#C084FC12", color: "#C084FC", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Icon n="shield" s={15} c="#C084FC" />
@@ -48,7 +48,7 @@ export default function DivisionsPage() {
         <button onClick={() => router.push("/profile")} aria-label="Profile" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="usr" s={15} />
         </button>
-      </div>
+      </MemberPortalHeader>
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 720, margin: "0 auto", padding: "0 20px" }}>
         <div style={{ padding: "40px 0 28px", textAlign: "center" }}>
           <div style={{ fontSize: 14, color: C.gold, marginBottom: 10 }}>Welcome, {user?.firstName}</div>

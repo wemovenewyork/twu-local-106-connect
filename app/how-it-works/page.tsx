@@ -125,8 +125,8 @@ function MatchVisual() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%", maxWidth: 260 }}>
       {[
-        { op: "Operator A", day: "Mon Off → wants to work", color: C.blue, match: true },
-        { op: "Operator B", day: "Mon Work → wants off", color: "#00C9A7", match: true },
+        { op: "Member A", day: "Mon Off → wants to work", color: C.blue, match: true },
+        { op: "Member B", day: "Mon Work → wants off", color: "#00C9A7", match: true },
       ].map((r, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, background: `${r.color}10`, border: `1px solid ${r.color}33` }}>
           <div style={{ width: 32, height: 32, borderRadius: "50%", background: `${r.color}20`, border: `1px solid ${r.color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: r.color, flexShrink: 0 }}>{i === 0 ? "A" : "B"}</div>
@@ -150,8 +150,8 @@ function AgreementVisual() {
       <div style={{ borderRadius: 14, border: `1px solid rgba(192,132,252,.2)`, background: "rgba(192,132,252,.05)", padding: 14 }}>
         <div style={{ fontSize: 10, color: "#C084FC", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>Swap Agreement</div>
         {[
-          { label: "Operator A", value: "John D." },
-          { label: "Operator B", value: "Maria S." },
+          { label: "Member A", value: "John D." },
+          { label: "Member B", value: "Maria S." },
           { label: "Swap Date", value: "Monday, April 14" },
         ].map(f => (
           <div key={f.label} style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", fontSize: 11 }}>

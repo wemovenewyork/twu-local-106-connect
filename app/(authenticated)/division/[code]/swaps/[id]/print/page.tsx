@@ -230,12 +230,12 @@ export default function PrintAgreementPage() {
           <div className="section-title">Signatures</div>
           <div className="grid">
             <div>
-              <div className="field-label" style={{ marginBottom: 6 }}>Operator 1 Signature</div>
+              <div className="field-label" style={{ marginBottom: 6 }}>Member 1 Signature</div>
               <div className="sig-box" />
               <div style={{ fontSize: 11, color: "#888", marginTop: 6 }}>Print Name / Badge # / Date</div>
             </div>
             <div>
-              <div className="field-label" style={{ marginBottom: 6 }}>Operator 2 Signature</div>
+              <div className="field-label" style={{ marginBottom: 6 }}>Member 2 Signature</div>
               <div className="sig-box" />
               <div style={{ fontSize: 11, color: "#888", marginTop: 6 }}>Print Name / Badge # / Date</div>
             </div>
