@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import { C, CM, STC, SWAP_TYPES } from "@/constants/colors";
 import Icon from "@/components/ui/Icon";
+import MemberPortalHeader from "@/components/ui/MemberPortalHeader";
 import RepBadge from "@/components/ui/RepBadge";
 
 interface DayData { date: string; posted: number; agreements: number; }
@@ -131,16 +132,20 @@ export default function RepDashboardPage() {
   return (
     <div style={{ minHeight: "100vh", paddingBottom: 40 }}>
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon n="back" s={16} />
-        </button>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: C.white }}>Rep Dashboard</div>
-          <div style={{ fontSize: 10, color: C.gold, letterSpacing: 2, textTransform: "uppercase" }}>{data.division.name} — Read Only</div>
-        </div>
+      <MemberPortalHeader>
         <div style={{ width: 36, height: 36, borderRadius: 10, background: "#C084FC18", border: "1px solid #C084FC33", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Icon n="shield" s={18} c="#C084FC" />
+        </div>
+      </MemberPortalHeader>
+
+      {/* Sub-header: page-specific identity */}
+      <div style={{ position: "sticky", top: 56, zIndex: 99, background: "rgba(26,31,77,.85)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${C.bd}`, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon n="back" s={15} />
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: C.white }}>Rep Dashboard</div>
+          <div style={{ fontSize: 10, color: C.gold, letterSpacing: 2, textTransform: "uppercase" }}>{data.division.name} — Read Only</div>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import DivisionBadge from "@/components/ui/DivisionBadge";
 import BottomNav from "@/components/ui/BottomNav";
 import Footer from "@/components/ui/Footer";
 import NotifIcon from "@/components/ui/NotifIcon";
+import MemberPortalHeader from "@/components/ui/MemberPortalHeader";
 import { timeAgo } from "@/lib/format";
 
 interface Conversation {
@@ -112,13 +113,18 @@ export default function MessagesPage() {
           <span style={{ display: "inline-block", width: 14, height: 14, border: `2px solid ${C.m}`, borderTopColor: "transparent", borderRadius: "50%", animation: "rotateLogo 0.6s linear infinite", verticalAlign: "middle" }} />
         ) : "↓ Pull to refresh"}
       </div>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon n="back" s={16} />
+      <MemberPortalHeader>
+        <NotifIcon />
+      </MemberPortalHeader>
+
+      {/* Sub-header: page-specific identity */}
+      <div style={{ position: "sticky", top: 56, zIndex: 99, background: "rgba(26,31,77,.75)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${C.bd}`, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon n="back" s={15} />
         </button>
-        <DivisionBadge division={division} size={38} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.white, display: "flex", alignItems: "center", gap: 8 }}>
+        <DivisionBadge division={division} size={32} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.white, display: "flex", alignItems: "center", gap: 8 }}>
             Messages
             {totalUnread > 0 && (
               <span role="status" aria-label={`${totalUnread} unread`} style={{ background: C.red, color: "#fff", fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 10 }}>
@@ -128,10 +134,9 @@ export default function MessagesPage() {
           </div>
           <div style={{ fontSize: 10, color: C.m }}>Member conversations</div>
         </div>
-        <NotifIcon />
         {convos.length > 0 && (
-          <button onClick={() => setClearAllConfirm(true)} aria-label="Clear all messages" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid rgba(255,71,87,.3)`, background: "rgba(255,71,87,.08)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <Icon n="del" s={15} c={C.red} />
+          <button onClick={() => setClearAllConfirm(true)} aria-label="Clear all messages" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid rgba(255,71,87,.3)`, background: "rgba(255,71,87,.08)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <Icon n="del" s={14} c={C.red} />
           </button>
         )}
       </div>

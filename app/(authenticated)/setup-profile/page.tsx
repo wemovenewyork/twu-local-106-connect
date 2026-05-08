@@ -8,9 +8,9 @@ import { Division } from "@/types";
 import { C } from "@/constants/colors";
 import { analytics } from "@/lib/analytics";
 
-// Soft launch: only Bus Operators. Once we expand to other crafts, restore the
-// full list: ["Bus Operator", "Maintainer", "Cleaner", "Station Agent", "Train Operator", "Conductor", "Other"]
-const SOFT_LAUNCH_JOB_TITLE = "Bus Operator";
+// Soft launch: only Supervisors. Once we expand to other crafts, restore the
+// full list: ["Supervisor", "Maintainer", "Cleaner", "Station Agent", "Bus Operator", "Train Operator", "Conductor", "Other"]
+const SOFT_LAUNCH_JOB_TITLE = "Supervisor";
 const lb: React.CSSProperties = { display: "block", marginBottom: 8, fontSize: 12, fontWeight: 600, color: C.m, letterSpacing: 2, textTransform: "uppercase" };
 
 export default function SetupProfilePage() {

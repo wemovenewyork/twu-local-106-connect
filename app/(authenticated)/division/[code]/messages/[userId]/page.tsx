@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import { C } from "@/constants/colors";
 import Icon from "@/components/ui/Icon";
+import MemberPortalHeader from "@/components/ui/MemberPortalHeader";
 
 const formatTime = (d: string) => {
   const date = new Date(d);
@@ -204,33 +205,35 @@ export default function ThreadPage() {
           <span style={{ display: "inline-block", width: 14, height: 14, border: `2px solid ${C.m}`, borderTopColor: "transparent", borderRadius: "50%", animation: "rotateLogo 0.6s linear infinite", verticalAlign: "middle" }} />
         ) : "↓ Pull to refresh"}
       </div>
-      {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.9)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/division/${code}/messages`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon n="back" s={16} />
+      <MemberPortalHeader />
+
+      {/* Sub-header: conversation-scoped (counterpart, not division) */}
+      <div style={{ position: "sticky", top: 56, zIndex: 99, background: "rgba(26,31,77,.85)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${C.bd}`, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={() => router.push(`/division/${code}/messages`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon n="back" s={15} />
         </button>
-        <div style={{ width: 38, height: 38, borderRadius: "50%", background: `linear-gradient(135deg,${C.navy},${C.blue})`, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${C.bd}`, flexShrink: 0 }}>
-          <span style={{ fontSize: 13, fontWeight: 800, color: C.gold }}>{initials}</span>
+        <div style={{ width: 32, height: 32, borderRadius: "50%", background: `linear-gradient(135deg,${C.navy},${C.blue})`, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${C.bd}`, flexShrink: 0 }}>
+          <span style={{ fontSize: 11, fontWeight: 800, color: C.gold }}>{initials}</span>
         </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.white }}>{counterpartName}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.white, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{counterpartName}</div>
           <div style={{ fontSize: 10, color: C.m }}>Member</div>
         </div>
         <button
           onClick={() => setBlockConfirm(true)}
           aria-label="Block user"
           title="Block user"
-          style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: "rgba(255,255,255,.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+          style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: "rgba(255,255,255,.04)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: C.m }}><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: C.m }}><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
         </button>
         {messages.length > 0 && (
           <button
             onClick={() => setClearConvoConfirm(true)}
             aria-label="Delete conversation"
-            style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid rgba(255,71,87,.3)`, background: "rgba(255,71,87,.08)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+            style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid rgba(255,71,87,.3)`, background: "rgba(255,71,87,.08)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
           >
-            <Icon n="del" s={15} c={C.red} />
+            <Icon n="del" s={14} c={C.red} />
           </button>
         )}
       </div>

@@ -75,7 +75,7 @@ function IllustrationMatch() {
         @keyframes matchBadge { 0%{opacity:0;transform:scale(.3) translateY(-50%)} 60%{transform:scale(1.15) translateY(-50%)} 100%{opacity:1;transform:scale(1) translateY(-50%)} }
         @keyframes sparkle { 0%,100%{opacity:0;transform:scale(0)} 50%{opacity:1;transform:scale(1)} }
       `}</style>
-      {/* Operator A */}
+      {/* Member A */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, animation: "opLeft .5s ease both" }}>
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg,${C.blue},${C.navy})`, border: `2px solid ${C.blue}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "#fff" }}>A</div>
         <div style={{ fontSize: 11, color: C.m, fontWeight: 600 }}>Mon Off</div>
@@ -89,7 +89,7 @@ function IllustrationMatch() {
           <div key={i} style={{ position: "absolute", top: y, left: x, width: 4, height: 4, borderRadius: "50%", background: C.gold, animation: `sparkle 1.2s ease-in-out ${.9 + i*.15}s infinite` }} />
         ))}
       </div>
-      {/* Operator B */}
+      {/* Member B */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, animation: "opRight .5s ease both" }}>
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg,#00C9A7,#007a66)`, border: `2px solid #00C9A7`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "#fff" }}>B</div>
         <div style={{ fontSize: 11, color: C.m, fontWeight: 600 }}>Mon Work</div>

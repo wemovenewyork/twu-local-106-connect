@@ -13,6 +13,7 @@ import BottomNav from "@/components/ui/BottomNav";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import NotifIcon from "@/components/ui/NotifIcon";
 import InboxIcon from "@/components/ui/InboxIcon";
+import MemberPortalHeader from "@/components/ui/MemberPortalHeader";
 import Toast from "@/components/ui/Toast";
 import Footer from "@/components/ui/Footer";
 
@@ -72,13 +73,17 @@ export default function MyPostsPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.75)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon n="back" s={16} /></button>
-        <DivisionBadge division={division} size={38} />
-        <div style={{ flex: 1, fontSize: 14, fontWeight: 700, color: C.white }}>My Posts</div>
+      <MemberPortalHeader>
         <NotifIcon />
         <InboxIcon />
-        <button onClick={() => router.push(`/division/${code}/history`)} style={{ padding: "6px 14px", borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, cursor: "pointer", fontSize: 12, fontWeight: 600, flexShrink: 0 }}>History</button>
+      </MemberPortalHeader>
+
+      {/* Sub-header: page-specific identity */}
+      <div style={{ position: "sticky", top: 56, zIndex: 99, background: "rgba(26,31,77,.75)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${C.bd}`, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon n="back" s={15} /></button>
+        <DivisionBadge division={division} size={32} />
+        <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: C.white, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>My Posts</div>
+        <button onClick={() => router.push(`/division/${code}/history`)} style={{ padding: "6px 12px", borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, cursor: "pointer", fontSize: 12, fontWeight: 600, flexShrink: 0 }}>History</button>
       </div>
 
       <main id="main-content" tabIndex={-1} style={{ maxWidth: 720, margin: "0 auto", padding: "16px 20px 50px" }}>

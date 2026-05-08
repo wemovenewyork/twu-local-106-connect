@@ -10,6 +10,7 @@ import Icon from "@/components/ui/Icon";
 import BottomNav from "@/components/ui/BottomNav";
 import NotifIcon from "@/components/ui/NotifIcon";
 import InboxIcon from "@/components/ui/InboxIcon";
+import MemberPortalHeader from "@/components/ui/MemberPortalHeader";
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
@@ -110,23 +111,27 @@ export default function HistoryPage() {
   return (
     <div style={{ minHeight: "100vh", paddingBottom: 80 }}>
       {/* Header */}
-      <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.85)", backdropFilter: "blur(24px)", borderBottom: `1px solid ${C.bd}`, padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
-        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Icon n="back" s={16} />
+      <MemberPortalHeader>
+        <NotifIcon />
+        <InboxIcon />
+      </MemberPortalHeader>
+
+      {/* Sub-header: page-specific identity */}
+      <div style={{ position: "sticky", top: 56, zIndex: 99, background: "rgba(26,31,77,.85)", backdropFilter: "blur(16px)", borderBottom: `1px solid ${C.bd}`, padding: "10px 12px", display: "flex", alignItems: "center", gap: 8 }}>
+        <button onClick={() => router.push(`/division/${code}`)} aria-label="Go back" style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.gold, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <Icon n="back" s={15} />
         </button>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 15, fontWeight: 800, color: C.white }}>My Swaps</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, color: C.white }}>My Swaps</div>
           <div style={{ fontSize: 10, color: C.gold, letterSpacing: 2, textTransform: "uppercase" }}>
             {counts.all} total · {counts.posted} posted · {counts.agreed} agreed
           </div>
         </div>
-        <NotifIcon />
-        <InboxIcon />
         {/* View toggle */}
-        <div style={{ display: "flex", gap: 4, background: C.s, borderRadius: 10, padding: 3 }}>
+        <div style={{ display: "flex", gap: 4, background: C.s, borderRadius: 10, padding: 3, flexShrink: 0 }}>
           {(["list", "calendar"] as const).map(v => (
-            <button key={v} onClick={() => setView(v)} style={{ width: 34, height: 28, borderRadius: 8, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: view === v ? C.gold : "transparent", color: view === v ? C.bg : C.m }}>
-              <Icon n={v === "list" ? "list" : "cal"} s={14} />
+            <button key={v} onClick={() => setView(v)} style={{ width: 30, height: 26, borderRadius: 8, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: view === v ? C.gold : "transparent", color: view === v ? C.bg : C.m }}>
+              <Icon n={v === "list" ? "list" : "cal"} s={13} />
             </button>
           ))}
         </div>
