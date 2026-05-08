@@ -437,6 +437,12 @@ model Document {
 
   publiclyVisible Boolean        @default(false) @map("publicly_visible")
 
+  // Text extraction status (Contract Search v1; only contracts are extracted)
+  chunks               DocumentChunk[]
+  extractedAt          DateTime? @map("extracted_at")
+  extractedTextLength  Int?      @map("extracted_text_length")
+  needsOCR             Boolean   @default(false) @map("needs_ocr")
+
   createdAt   DateTime           @default(now()) @map("created_at")
   updatedAt   DateTime           @updatedAt @map("updated_at")
 
@@ -446,6 +452,26 @@ model Document {
   @@index([ownerUserId])
   @@index([publiclyVisible])
   @@index([documentType])
+}
+
+model DocumentChunk {
+  id          String   @id @default(cuid())
+  documentId  String   @map("document_id")
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  chunkIndex  Int      @map("chunk_index")
+  content     String   // paragraph text
+  pageNumber  Int?     @map("page_number")
+
+  // search_vector is a Postgres-side GENERATED column managed via raw SQL
+  // (see migration in commit 3). Not represented in Prisma's DSL because
+  // tsvector + GENERATED columns aren't first-class types here.
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("document_chunks")
+  @@index([documentId])
+  @@unique([documentId, chunkIndex])
 }
 
 enum NotificationCategory {
