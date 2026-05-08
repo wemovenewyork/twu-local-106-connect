@@ -36,7 +36,7 @@ function formatAge(iso: string | null): string {
   return `${days}d ago`;
 }
 
-export default function NewsFeed() {
+export default function NewsFeed({ limit, hideHeader, hidePushPrompt }: { limit?: number; hideHeader?: boolean; hidePushPrompt?: boolean } = {}) {
   const router = useRouter();
   const [news, setNews] = useState<News[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -44,10 +44,10 @@ export default function NewsFeed() {
 
   useEffect(() => {
     api.get<{ news: News[] }>("/news")
-      .then(r => setNews(r.news))
+      .then(r => setNews(limit ? r.news.slice(0, limit) : r.news))
       .catch(() => {})
       .finally(() => setLoaded(true));
-  }, []);
+  }, [limit]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -70,15 +70,17 @@ export default function NewsFeed() {
   if (!loaded) return null;
   if (news.length === 0) return null;
 
-  const showPushPrompt = pushState === "off";
+  const showPushPrompt = pushState === "off" && !hidePushPrompt;
 
   return (
     <section style={{ marginBottom: 28 }}>
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: C.m, textTransform: "uppercase", letterSpacing: 2 }}>
-          Union News
-        </h2>
-      </div>
+      {!hideHeader && (
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
+          <h2 style={{ fontSize: 13, fontWeight: 700, color: C.m, textTransform: "uppercase", letterSpacing: 2 }}>
+            Union News
+          </h2>
+        </div>
+      )}
       {showPushPrompt && (
         <button
           onClick={() => router.push("/settings/notifications")}
