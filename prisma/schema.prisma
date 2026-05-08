@@ -407,6 +407,14 @@ enum DocumentVisibility {
   selfOnly
 }
 
+enum DocumentType {
+  contract     // CBAs, contract amendments, MOAs
+  form         // HR forms, pension forms, benefit forms
+  constitution // Union constitution, bylaws
+  memo         // Memos, letters, announcements
+  other        // Default catchall
+}
+
 model Document {
   id          String             @id @default(cuid())
   title       String
@@ -416,6 +424,7 @@ model Document {
   mimeType    String?            @map("mime_type")
 
   visibility  DocumentVisibility @default(division)
+  documentType DocumentType      @default(other) @map("document_type")
   divisionId  String?            @map("division_id")
   division    Division?          @relation(fields: [divisionId], references: [id], onDelete: SetNull)
   subUnitId   String?            @map("sub_unit_id")
@@ -436,6 +445,7 @@ model Document {
   @@index([visibility])
   @@index([ownerUserId])
   @@index([publiclyVisible])
+  @@index([documentType])
 }
 
 enum NotificationCategory {
