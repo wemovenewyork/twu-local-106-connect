@@ -59,6 +59,7 @@ model User {
   notificationPreference NotificationPreference?
   registrationApproval        RegistrationApproval?
   registrationsReviewed       RegistrationApproval[] @relation("RegistrationReviewer")
+  overtimeRequests       OvertimeRequest[]      @relation("OvertimeRequestSubmitter")
   lastActiveAt       DateTime?          @map("last_active_at")
   jobTitle           String?            @map("job_title")
   divisionSetAt      DateTime?          @map("division_set_at")
@@ -542,6 +543,46 @@ model Officer {
   @@index([scope])
   @@index([divisionId])
   @@index([active])
+}
+
+enum OvertimeRequestType {
+  rdo          // regular day off (work on scheduled off-day)
+  doubleShift  // extra/double shift on a working day
+}
+
+enum OvertimeRequestStatus {
+  submitted
+  withdrawn
+  acknowledged // assignment desk has seen it (manual marker; not yet wired)
+}
+
+model OvertimeRequest {
+  id             String                @id @default(cuid())
+  submitterId    String                @map("submitter_id")
+  submitter      User                  @relation("OvertimeRequestSubmitter", fields: [submitterId], references: [id], onDelete: Cascade)
+
+  // Payroll number is captured per-request, not stored on User identity.
+  // Storing payroll numbers centrally would create a PII honeypot;
+  // per-submission means a DB compromise leaks only the submissions
+  // (not a master payroll directory).
+  payrollNumber  String                @map("payroll_number")
+
+  requestedDate  DateTime              @map("requested_date") @db.Date
+  type           OvertimeRequestType
+  preferences    String?               // free-text, capped at 500 chars by API
+
+  status         OvertimeRequestStatus @default(submitted)
+  withdrawnAt    DateTime?             @map("withdrawn_at")
+  acknowledgedAt DateTime?             @map("acknowledged_at")
+  acknowledgedById String?             @map("acknowledged_by_id")
+
+  createdAt      DateTime              @default(now()) @map("created_at")
+  updatedAt      DateTime              @updatedAt      @map("updated_at")
+
+  @@map("overtime_requests")
+  @@index([submitterId])
+  @@index([requestedDate])
+  @@index([status])
 }
 
 model Page {
