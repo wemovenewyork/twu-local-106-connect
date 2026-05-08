@@ -295,6 +295,112 @@ async function seedDocuments(): Promise<number> {
   return created;
 }
 
+interface OvertimeSeed {
+  submitterEmail: string;
+  payrollNumber: string;
+  daysFromNow: number; // negative = past
+  type: "rdo" | "doubleShift";
+  preferences: string | null;
+  status: "submitted" | "withdrawn" | "acknowledged";
+}
+
+const DEMO_OVERTIME: OvertimeSeed[] = [
+  {
+    submitterEmail: "demo+member-mabstoa-trans@local106.test",
+    payrollNumber: "A12345",
+    daysFromNow: 1,
+    type: "rdo",
+    preferences: "uptown only, no nights, no mobile",
+    status: "submitted",
+  },
+  {
+    submitterEmail: "demo+member-mabstoa-maint@local106.test",
+    payrollNumber: "B67890",
+    daysFromNow: 2,
+    type: "doubleShift",
+    preferences: "early work preferred",
+    status: "submitted",
+  },
+  {
+    submitterEmail: "demo+member-queens@local106.test",
+    payrollNumber: "Q11111",
+    daysFromNow: 7,
+    type: "rdo",
+    preferences: null,
+    status: "submitted",
+  },
+  {
+    submitterEmail: "demo+member-msii@local106.test",
+    payrollNumber: "M44221",
+    daysFromNow: 4,
+    type: "doubleShift",
+    preferences: "no overnight; available after 14:00",
+    status: "submitted",
+  },
+  {
+    submitterEmail: "demo+member-tsc@local106.test",
+    payrollNumber: "T55903",
+    daysFromNow: -3,
+    type: "rdo",
+    preferences: "any depot",
+    status: "acknowledged",
+  },
+  {
+    submitterEmail: "demo+member-mabstoa-trans@local106.test",
+    payrollNumber: "A12345",
+    daysFromNow: -7,
+    type: "doubleShift",
+    preferences: null,
+    status: "acknowledged",
+  },
+  {
+    submitterEmail: "demo+member-queens@local106.test",
+    payrollNumber: "Q11111",
+    daysFromNow: -10,
+    type: "rdo",
+    preferences: "swapped to acknowledged for demo",
+    status: "withdrawn",
+  },
+];
+
+function dayUTC(daysFromNow: number): Date {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + daysFromNow));
+}
+
+async function seedOvertimeRequests(): Promise<number> {
+  let created = 0;
+  for (const o of DEMO_OVERTIME) {
+    const submitter = await prisma.user.findUnique({ where: { email: o.submitterEmail } });
+    if (!submitter) {
+      console.warn(`  Skipping OT request — submitter ${o.submitterEmail} not found`);
+      continue;
+    }
+    const requestedDate = dayUTC(o.daysFromNow);
+
+    // Idempotent: skip if a request for this submitter + date + type already exists.
+    const existing = await prisma.overtimeRequest.findFirst({
+      where: { submitterId: submitter.id, requestedDate, type: o.type },
+    });
+    if (existing) continue;
+
+    await prisma.overtimeRequest.create({
+      data: {
+        submitterId: submitter.id,
+        payrollNumber: o.payrollNumber,
+        requestedDate,
+        type: o.type,
+        preferences: o.preferences,
+        status: o.status,
+        acknowledgedAt: o.status === "acknowledged" ? new Date() : null,
+        withdrawnAt: o.status === "withdrawn" ? new Date() : null,
+      },
+    });
+    created++;
+  }
+  return created;
+}
+
 async function main() {
   console.log("Seeding demo data...");
   console.log("");
@@ -309,6 +415,7 @@ async function main() {
   if (!superUser) throw new Error("Super user missing after seed");
   const newsCreated = await seedNews(superUser.id);
   const docsCreated = await seedDocuments();
+  const otCreated = await seedOvertimeRequests();
 
   const all = [...SUPER, ...DIVISION_ADMINS, ...MEMBERS];
   const bar = "━".repeat(60);
@@ -321,6 +428,7 @@ async function main() {
   console.log(`    Members:   ${MEMBERS.length}`);
   console.log(`  News posts created this run: ${newsCreated} (target: ${NEWS_POSTS.length})`);
   console.log(`  Documents created this run:  ${docsCreated} (target: ${DEMO_DOCS.length})`);
+  console.log(`  OT requests created this run: ${otCreated} (target: ${DEMO_OVERTIME.length})`);
   console.log("");
   console.log(`  Password (all demo users): ${DEMO_PASSWORD}`);
   console.log(bar);
