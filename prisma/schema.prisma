@@ -454,6 +454,17 @@ model Document {
   @@index([documentType])
 }
 
+model SearchQuery {
+  id          String   @id @default(cuid())
+  query       String
+  resultCount Int      @map("result_count")
+  // No userId: search queries are anonymized for privacy.
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("search_queries")
+  @@index([createdAt])
+}
+
 model DocumentChunk {
   id          String   @id @default(cuid())
   documentId  String   @map("document_id")
@@ -463,9 +474,12 @@ model DocumentChunk {
   content     String   // paragraph text
   pageNumber  Int?     @map("page_number")
 
-  // search_vector is a Postgres-side GENERATED column managed via raw SQL
-  // (see migration in commit 3). Not represented in Prisma's DSL because
-  // tsvector + GENERATED columns aren't first-class types here.
+  // search_vector is a Postgres GENERATED tsvector column managed by raw
+  // SQL (commit 3 migration). Not declared in Prisma's DSL because the
+  // GENERATED ALWAYS AS expression isn't representable here. Prisma db
+  // push warns about an "extra" column; that's expected — leave it alone.
+  // Definition in SQL:
+  //   tsvector GENERATED ALWAYS AS (to_tsvector('english', content)) STORED
 
   createdAt   DateTime @default(now()) @map("created_at")
 
