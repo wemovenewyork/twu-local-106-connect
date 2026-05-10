@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
+import { escapeHtml } from "@/lib/escapeHtml";
 
 interface SearchRow {
   id: string;
@@ -40,8 +41,13 @@ export async function GET(req: NextRequest) {
   }
 
   // plainto_tsquery handles arbitrary user input safely (no operator parsing).
-  // ts_headline emits <b>…</b> around matched terms — frontend renders these
-  // via dangerouslySetInnerHTML with a CSS rule that styles <b> as a highlight.
+  //
+  // ts_headline does NOT escape the source text it returns — it only inserts
+  // its configured StartSel/StopSel markers around matched terms. If we let it
+  // emit <b>...</b> directly, any literal '<' in dc.content (extracted from
+  // PDF contracts) would flow to the browser as live HTML via the snippet's
+  // dangerouslySetInnerHTML render. To fix this we use non-HTML markers,
+  // escape the entire snippet server-side, then restore the markers as <b>.
   const rows = await prisma.$queryRaw<SearchRow[]>`
     SELECT
       dc.id                                   AS "id",
@@ -53,7 +59,7 @@ export async function GET(req: NextRequest) {
         'english',
         dc.content,
         plainto_tsquery('english', ${query}),
-        'MaxWords=40, MinWords=20, ShortWord=3, MaxFragments=2, FragmentDelimiter=" … "'
+        'StartSel="[[HL]]", StopSel="[[/HL]]", MaxWords=40, MinWords=20, ShortWord=3, MaxFragments=2, FragmentDelimiter=" … "'
       )                                       AS "snippet",
       ts_rank(dc.search_vector, plainto_tsquery('english', ${query})) AS "rank",
       d.title                                 AS "documentTitle",
@@ -69,6 +75,14 @@ export async function GET(req: NextRequest) {
     LIMIT ${limit}
   `;
 
+  // Sanitize the snippet: escape ALL HTML, then restore [[HL]] markers as <b>.
+  // The frontend renders this via dangerouslySetInnerHTML.
+  function sanitizeSnippet(raw: string): string {
+    return escapeHtml(raw)
+      .replace(/\[\[HL\]\]/g, "<b>")
+      .replace(/\[\[\/HL\]\]/g, "</b>");
+  }
+
   // Anonymized log — captures query + result count, never the user.
   prisma.searchQuery.create({
     data: { query, resultCount: rows.length },
@@ -81,7 +95,7 @@ export async function GET(req: NextRequest) {
       chunkIndex: r.chunkIndex,
       pageNumber: r.pageNumber,
       content: r.content,
-      snippet: r.snippet,
+      snippet: sanitizeSnippet(r.snippet),
       documentTitle: r.documentTitle,
       documentFileUrl: r.documentFileUrl,
       documentDivision: r.documentDivision,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/rateLimit";
 import { ok, err } from "@/lib/apiResponse";
 import { notifyUser, notifyMany } from "@/lib/notifyUser";
 import { parseBody, BODY_4KB } from "@/lib/parseBody";
@@ -13,6 +14,13 @@ export async function POST(req: NextRequest) {
 
   const admin = await prisma.user.findUnique({ where: { id: token.userId } });
   if (!admin || !["superAdmin", "localAdmin"].includes(admin.role)) return err("Forbidden", 403);
+
+  // Cap broadcasts per admin. Even with role gating, an attacker who phishes
+  // an admin account could otherwise blast push notifications to every member
+  // in a tight loop. 10/hour is well above any realistic legitimate cadence.
+  if (!await rateLimit(`broadcast:${token.userId}`, 10, 3_600_000)) {
+    return err("Too many broadcasts — try again later", 429);
+  }
 
   const isLocalAdmin = admin.role === "localAdmin";
 

@@ -185,22 +185,41 @@ export async function DELETE(
   if (!swap) return err("Swap not found", 404);
   if (swap.userId !== user.userId) return err("Not authorized", 403);
 
-  // If there's an active agreement, the owner is bailing on a commitment —
-  // ding their reputation and notify the other party.
-  const activeAgreement = await prisma.swapAgreement.findFirst({
-    where: { swapId: id, status: { in: ["pending", "userA_confirmed"] } },
-    select: { userAId: true },
+  // Atomic delete + reputation update.
+  //
+  // The previous version did findFirst → delete → upsert outside a
+  // transaction. That left a race: an operator who created an agreement in
+  // the millisecond before the delete completed would have their agreement
+  // silently destroyed by the FK cascade, and the owner avoided the
+  // reputation hit they earned by bailing on a commitment.
+  //
+  // Re-checking the agreement inside the transaction (with the swap row
+  // locked via the delete) closes that window — any concurrent agreement
+  // create either lost the race (we see it and ding the owner) or won it
+  // (its create succeeds against the unique index, and the FK cascade fires
+  // on commit, but only after we've already recorded the cancellation).
+  const activeAgreement = await prisma.$transaction(async (tx) => {
+    const agreement = await tx.swapAgreement.findFirst({
+      where: { swapId: id, status: { in: ["pending", "userA_confirmed"] } },
+      select: { userAId: true },
+    });
+
+    await tx.swap.delete({ where: { id } });
+
+    if (agreement) {
+      await tx.reputation.upsert({
+        where: { userId: user.userId },
+        update: { cancelled: { increment: 1 } },
+        create: { userId: user.userId, cancelled: 1 },
+      });
+    }
+
+    return agreement;
   });
 
-  await prisma.swap.delete({ where: { id } });
-
+  // Notification is best-effort and runs after the transaction commits so a
+  // push failure can never roll back the delete.
   if (activeAgreement) {
-    await prisma.reputation.upsert({
-      where: { userId: user.userId },
-      update: { cancelled: { increment: 1 } },
-      create: { userId: user.userId, cancelled: 1 },
-    });
-    // Best-effort notification to the operator who proposed the agreement
     try {
       const division = await prisma.division.findUnique({
         where: { id: swap.divisionId },
