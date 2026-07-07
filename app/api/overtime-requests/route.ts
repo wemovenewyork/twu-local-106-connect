@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const gate = await requireApprovedMember(token.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const gate = await requireApprovedMember(token.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
   const me = gate.user;
 
   let body: { requestedDate?: unknown; type?: unknown; payrollNumber?: unknown; preferences?: unknown };

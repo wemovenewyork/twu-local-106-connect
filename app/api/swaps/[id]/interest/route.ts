@@ -22,7 +22,7 @@ export async function POST(
   }
 
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;

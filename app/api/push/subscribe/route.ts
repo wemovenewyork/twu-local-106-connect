@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const body = await parseBody(req, BODY_2KB);
   if (body instanceof NextResponse) return body;

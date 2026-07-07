@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const swap = await prisma.swap.findUnique({ where: { id } });
   if (!swap) return err("Swap not found", 404);

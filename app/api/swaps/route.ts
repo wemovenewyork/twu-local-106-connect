@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
   if (!gate.user.divisionId) return err("Set your division first", 400);
   touchLastActive(user.userId);
 
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
   if (!await rateLimit(`post30s:${user.userId}`, 2, 30_000)) return err("Please wait 30 seconds between posts", 429);
 
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.userId },

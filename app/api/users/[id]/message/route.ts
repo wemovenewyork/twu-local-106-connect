@@ -18,7 +18,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { id: toUserId } = await params;
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
   if (toUserId === user.userId) return err("Cannot message yourself", 400);
 
   const toUser = await prisma.user.findUnique({ where: { id: toUserId } });

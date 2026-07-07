@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const gate = await requireApprovedMember(token.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
   const caller = gate.user;
 
   // Local/super admins see everything. Others see by-visibility OR clauses.
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const gate = await requireApprovedMember(token.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
   const caller = gate.user;
 
   let formData: FormData;

@@ -43,7 +43,7 @@ export async function GET(
 
   // Division scoping
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
   if (swap.divisionId !== gate.user.divisionId) return err("Not authorized", 403);
 
   // If either party has blocked the other, treat the swap as not found.
@@ -78,7 +78,7 @@ export async function PUT(
   }
 
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const swap = await prisma.swap.findUnique({ where: { id } });
   if (!swap) return err("Swap not found", 404);
@@ -179,7 +179,7 @@ export async function DELETE(
   const { id } = await params;
 
   const gate = await requireApprovedMember(user.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const swap = await prisma.swap.findUnique({ where: { id } });
   if (!swap) return err("Swap not found", 404);

@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
   const gate = await requireApprovedMember(token.userId);
-  if (gate.error) return err(gate.error, gate.status);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const url = new URL(req.url);
   const query = (url.searchParams.get("q") ?? "").trim();
