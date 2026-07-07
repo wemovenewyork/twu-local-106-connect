@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { requireApprovedMember } from "@/lib/approval";
 import { ok, err } from "@/lib/apiResponse";
 import { escapeHtml } from "@/lib/escapeHtml";
 
@@ -24,12 +26,8 @@ export async function GET(req: NextRequest) {
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  // Sanity-check the user is real (rejects stale tokens fast).
-  const me = await prisma.user.findUnique({
-    where: { id: token.userId },
-    select: { id: true },
-  });
-  if (!me) return err("Unauthorized", 401);
+  const gate = await requireApprovedMember(token.userId);
+  if (gate.error) return err(gate.error, gate.status);
 
   const url = new URL(req.url);
   const query = (url.searchParams.get("q") ?? "").trim();
@@ -39,6 +37,18 @@ export async function GET(req: NextRequest) {
   if (query.length < 2) {
     return ok({ results: [], total: 0 });
   }
+
+  // Document visibility filter (mirrors GET /api/admin/documents): local/super
+  // see everything; everyone else is scoped by the visibility OR clauses.
+  const seesAll = ["localAdmin", "superAdmin"].includes(gate.user.role);
+  const visibilityFilter = seesAll
+    ? Prisma.sql`TRUE`
+    : Prisma.sql`(
+        d.visibility = 'all'
+        OR (d.visibility = 'division' AND d.division_id = ${gate.user.divisionId})
+        OR (d.visibility = 'subUnit'  AND d.sub_unit_id  = ${gate.user.subUnitId})
+        OR (d.visibility = 'selfOnly' AND d.owner_user_id = ${gate.user.id})
+      )`;
 
   // plainto_tsquery handles arbitrary user input safely (no operator parsing).
   //
@@ -71,6 +81,7 @@ export async function GET(req: NextRequest) {
     WHERE dc.search_vector @@ plainto_tsquery('english', ${query})
       AND d.document_type = 'contract'
       AND d.needs_ocr = false
+      AND ${visibilityFilter}
     ORDER BY rank DESC, d.title ASC, dc.chunk_index ASC
     LIMIT ${limit}
   `;
