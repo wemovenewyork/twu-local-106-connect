@@ -38,7 +38,7 @@ export default function ProfilePage() {
   const { user, logout, updateUser, loading, refreshUser } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<"profile" | "security">("profile");
-  const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [email, setEmail] = useState(""); const [lang, setLang] = useState("en"); const [divisionId, setDivisionId] = useState("");
+  const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [email, setEmail] = useState(""); const [lang, setLang] = useState("en"); const [emailPw, setEmailPw] = useState("");
   const [curPw, setCurPw] = useState(""); const [newPw, setNewPw] = useState(""); const [newPw2, setNewPw2] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePw, setDeletePw] = useState(""); const [deleteErr, setDeleteErr] = useState(""); const [deleting, setDeleting] = useState(false);
@@ -55,7 +55,7 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (user) { setFn(user.firstName); setLn(user.lastName); setEmail(user.email); setLang(user.language || "en"); setDivisionId(user.divisionId ?? ""); }
+    if (user) { setFn(user.firstName); setLn(user.lastName); setEmail(user.email); setLang(user.language || "en"); }
     api.get<Division[]>("/divisions").then(setDivisions).catch(() => {});
   }, [user]);
 
@@ -116,10 +116,15 @@ export default function ProfilePage() {
   };
 
   const saveProfile = async () => {
+    const emailChanged = !!user && email.toLowerCase().trim() !== user.email.toLowerCase();
     setSaving(true);
     try {
-      const data = await api.put("/users/me", { firstName: fn, lastName: ln, email, language: lang, divisionId });
+      const data = await api.put("/users/me", {
+        firstName: fn, lastName: ln, email, language: lang,
+        ...(emailChanged && { currentPassword: emailPw }),
+      });
       updateUser(data as Parameters<typeof updateUser>[0]);
+      setEmailPw("");
       showToast("Saved!");
     } catch (e: unknown) { showToast(e instanceof Error ? e.message : "Save failed"); }
     setSaving(false);
@@ -141,16 +146,7 @@ export default function ProfilePage() {
 
   if (!user) return null;
   const division = user.division ?? divisions.find(d => d.id === user.divisionId) ?? null;
-
-  const divisionLocked = (() => {
-    if (!user.divisionId) return false;
-    if (user.role === "superAdmin" || user.role === "localAdmin") return false;
-    if (!user.divisionSetAt) return false;
-    return (Date.now() - new Date(user.divisionSetAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
-  })();
-  const divisionUnlocksAt = user.divisionSetAt
-    ? new Date(new Date(user.divisionSetAt).getTime() + 7 * 24 * 60 * 60 * 1000)
-    : null;
+  const emailChanged = email.toLowerCase().trim() !== user.email.toLowerCase();
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg }}>
@@ -211,6 +207,13 @@ export default function ProfilePage() {
               <div><label htmlFor="prof-ln" style={lb}>Last Name</label><input id="prof-ln" value={ln} onChange={e => setLn(e.target.value)} /></div>
             </div>
             <div><label htmlFor="prof-email" style={lb}>Email Address</label><input id="prof-email" type="email" value={email} onChange={e => setEmail(e.target.value)} /></div>
+            {emailChanged && (
+              <div>
+                <label htmlFor="prof-emailpw" style={lb}>Current Password</label>
+                <input id="prof-emailpw" type="password" value={emailPw} onChange={e => setEmailPw(e.target.value)} placeholder="Enter current password" />
+                <div style={{ fontSize: 11, color: C.m, marginTop: 6 }}>Required to change your email.</div>
+              </div>
+            )}
             <div>
               <label htmlFor="prof-lang" style={lb}>Language</label>
               <select
@@ -239,24 +242,15 @@ export default function ProfilePage() {
             </div>
             <div>
               <label htmlFor="prof-division" style={lb}>Home Division</label>
-              <select
+              <div
                 id="prof-division"
-                value={divisionId}
-                onChange={e => setDivisionId(e.target.value)}
-                disabled={divisionLocked}
-                style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `1px solid ${C.bd}`, background: C.s, color: divisionId ? C.white : C.m, fontSize: 14, cursor: divisionLocked ? "not-allowed" : "pointer", appearance: "auto", opacity: divisionLocked ? 0.6 : 1 }}
+                style={{ width: "100%", padding: "12px 14px", borderRadius: 12, border: `1px solid ${C.bd}`, background: C.s, color: division ? C.white : C.m, fontSize: 14 }}
               >
-                <option value="">— Select your home division —</option>
-                {divisions.map(d => (
-                  <option key={d.id} value={d.id}>{d.name} ({d.code})</option>
-                ))}
-              </select>
-              {divisionLocked && (
-                <div style={{ fontSize: 11, color: C.gold, marginTop: 6, lineHeight: 1.5 }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{display:"inline",verticalAlign:"middle",marginRight:4}}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                  {divisionUnlocksAt ? `Locked until ${divisionUnlocksAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}` : "Locked"}
-                </div>
-              )}
+                {division ? `${division.name} (${division.code})` : "Not assigned"}
+              </div>
+              <div style={{ fontSize: 11, color: C.m, marginTop: 6 }}>
+                To change your home division, contact your division admin.
+              </div>
             </div>
             <button onClick={saveProfile} disabled={saving} style={{ padding: 16, borderRadius: 14, border: "none", cursor: "pointer", background: `linear-gradient(135deg,${C.gold},${C.gold}dd)`, fontSize: 15, fontWeight: 700, color: C.bg }}>
               {saving ? "Saving..." : "Save Changes"}
