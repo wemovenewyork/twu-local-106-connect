@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { canManageDocument, canViewDocument } from "@/lib/permissions";
@@ -29,8 +30,9 @@ export async function GET(
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  const caller = await loadCaller(token.userId);
-  if (!caller) return err("Unauthorized", 401);
+  const gate = await requireApprovedMember(token.userId);
+  if (gate.error) return err(gate.error, gate.status);
+  const caller = gate.user;
 
   const { id } = await params;
   const document = await prisma.document.findUnique({

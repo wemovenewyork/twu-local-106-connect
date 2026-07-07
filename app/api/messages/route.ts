@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser, checkActive } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rateLimit";
 import { ok, err } from "@/lib/apiResponse";
@@ -27,10 +28,8 @@ export async function POST(req: NextRequest) {
     return err("Slow down! Max 5 messages per minute", 429);
   }
 
-  const dbUser = await prisma.user.findUnique({ where: { id: user.userId }, select: { email: true, suspendedUntil: true } });
-  if (!dbUser) return err("User not found", 404);
-  const activeErr = checkActive(dbUser);
-  if (activeErr) return err(activeErr, 403);
+  const gate = await requireApprovedMember(user.userId);
+  if (gate.error) return err(gate.error, gate.status);
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
