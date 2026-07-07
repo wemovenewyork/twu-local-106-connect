@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser, checkActive } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rateLimit";
 import { ok, err } from "@/lib/apiResponse";
@@ -20,10 +21,8 @@ export async function POST(
     return err("Slow down! Max 5 messages per minute", 429);
   }
 
-  const dbUser = await prisma.user.findUnique({ where: { id: user.userId }, select: { email: true, suspendedUntil: true } });
-  if (!dbUser) return err("User not found", 404);
-  const activeErr = checkActive(dbUser);
-  if (activeErr) return err(activeErr, 403);
+  const gate = await requireApprovedMember(user.userId);
+  if (gate.error) return err(gate.error, gate.status);
 
   const body = await parseBody(req, BODY_4KB);
   if (body instanceof NextResponse) return body;
@@ -35,6 +34,13 @@ export async function POST(
   if (!swap) return err("Swap not found", 404);
   if (swap.userId === user.userId) return err("Cannot message yourself", 400);
   if (swap.status !== "open") return err("Swap is not open", 400);
+
+  // Division containment — swap IDs circulate via share links, so the browse
+  // filter isn't sufficient. Mirrors the 403 in GET /api/swaps/[id] (audit H4).
+  const isAdminTier = ["divisionAdmin", "localAdmin", "superAdmin"].includes(gate.user.role);
+  if (!isAdminTier && gate.user.divisionId !== swap.divisionId) {
+    return err("Not authorized", 403);
+  }
 
   const block = await prisma.block.findFirst({
     where: {
