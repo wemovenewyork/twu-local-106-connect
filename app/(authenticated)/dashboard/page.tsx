@@ -28,8 +28,20 @@ export default function DashboardPage() {
     <div className="page-enter" style={{ minHeight: "100vh", background: C.bg }}>
       <div style={{ position: "sticky", top: 0, zIndex: 100, background: "rgba(26,31,77,.8)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(255,255,255,.06)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 12 }}>
         <div style={{ fontWeight: 700, fontSize: 16, color: C.white, letterSpacing: 3, flex: 1 }}>TWU LOCAL 106</div>
-        {user.role === "superAdmin" && (
-          <button onClick={() => router.push("/admin")} aria-label="Admin dashboard" style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid #C084FC33", background: "#C084FC12", color: "#C084FC", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {["superAdmin", "localAdmin", "divisionAdmin"].includes(user.role) && (
+          <button
+            onClick={() =>
+              router.push(
+                ["superAdmin", "localAdmin"].includes(user.role) ? "/admin" : "/admin/registrations"
+              )
+            }
+            aria-label={
+              ["superAdmin", "localAdmin"].includes(user.role)
+                ? "Admin dashboard"
+                : "Pending registrations"
+            }
+            style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid #C084FC33", background: "#C084FC12", color: "#C084FC", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
             <Icon n="shield" s={15} c="#C084FC" />
           </button>
         )}

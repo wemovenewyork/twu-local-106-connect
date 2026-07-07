@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { parseBody, BODY_2KB } from "@/lib/parseBody";
@@ -11,6 +12,9 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   let user;
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
+
+  const gate = await requireApprovedMember(user.userId);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const body = await parseBody(req, BODY_2KB);
   if (body instanceof NextResponse) return body;

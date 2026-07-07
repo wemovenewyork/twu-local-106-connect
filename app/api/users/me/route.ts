@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 import { requireUser, checkActive } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calcScore } from "@/lib/reputation";
@@ -74,12 +75,12 @@ export async function PUT(req: NextRequest) {
 
   const body = await parseBody(req, BODY_200KB);
   if (body instanceof NextResponse) return body;
-  const { firstName, lastName, email, language, divisionId, jobTitle, avatarUrl } = body as {
+  const { firstName, lastName, email, language, jobTitle, avatarUrl } = body as {
     firstName?: string; lastName?: string; email?: string; language?: string;
-    divisionId?: string; jobTitle?: string; avatarUrl?: string;
+    jobTitle?: string; avatarUrl?: string;
   };
 
-  const callerUser = await prisma.user.findUnique({ where: { id: user.userId }, select: { email: true, suspendedUntil: true } });
+  const callerUser = await prisma.user.findUnique({ where: { id: user.userId }, select: { email: true, suspendedUntil: true, passwordHash: true } });
   if (!callerUser) return err("User not found", 404);
   const activeErr = checkActive(callerUser);
   if (activeErr) return err(activeErr, 403);
@@ -126,27 +127,21 @@ export async function PUT(req: NextRequest) {
     }
   }
 
-  if (email) {
+  // Email change requires the current password (audit B1 bonus finding).
+  // Note: the address is NOT re-verified in v1 — tracked as a follow-up.
+  const normalizedEmail = email ? email.toLowerCase().trim() : undefined;
+  if (normalizedEmail && normalizedEmail !== callerUser.email) {
+    const { currentPassword } = body as { currentPassword?: string };
+    if (!currentPassword) {
+      return err("Enter your current password to change your email", 400);
+    }
+    const validPw = await bcrypt.compare(currentPassword, callerUser.passwordHash);
+    if (!validPw) return err("Current password is incorrect", 403);
+
     const existing = await prisma.user.findFirst({
-      where: { email: email.toLowerCase(), NOT: { id: user.userId } },
+      where: { email: normalizedEmail, NOT: { id: user.userId } },
     });
     if (existing) return err("Email already in use", 409);
-  }
-
-  // Division change enforcement
-  if (divisionId !== undefined) {
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.userId },
-      select: { divisionId: true, divisionSetAt: true, role: true },
-    });
-    const isAdmin = dbUser?.role === "superAdmin" || dbUser?.role === "localAdmin";
-    if (!isAdmin && dbUser?.divisionId && dbUser.divisionId !== divisionId && divisionId !== null) {
-      const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
-      if (dbUser.divisionSetAt && (Date.now() - dbUser.divisionSetAt.getTime()) < sevenDaysMs) {
-        const unlocksAt = new Date(dbUser.divisionSetAt.getTime() + sevenDaysMs);
-        return err(`Home division can only be changed once every 7 days. Unlocks ${unlocksAt.toLocaleDateString("en-US", { month: "long", day: "numeric" })}.`, 403);
-      }
-    }
   }
 
   const updated = await prisma.user.update({
@@ -154,14 +149,10 @@ export async function PUT(req: NextRequest) {
     data: {
       ...(firstName && { firstName: firstName.trim() }),
       ...(lastName && { lastName: lastName.trim() }),
-      ...(email && { email: email.toLowerCase().trim() }),
+      ...(normalizedEmail && { email: normalizedEmail }),
       ...(language && { language }),
       ...(jobTitle !== undefined && { jobTitle }),
       ...(avatarUrl !== undefined && { avatarUrl }),
-      ...(divisionId !== undefined && {
-        divisionId,
-        ...(divisionId ? { divisionSetAt: new Date() } : {}),
-      }),
     },
     include: { division: true },
   });

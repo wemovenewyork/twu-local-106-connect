@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 
@@ -14,18 +15,15 @@ export async function GET(req: NextRequest) {
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  const me = await prisma.user.findUnique({
-    where: { id: token.userId },
-    select: { id: true, divisionId: true },
-  });
-  if (!me) return err("Unauthorized", 401);
+  const gate = await requireApprovedMember(token.userId);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const news = await prisma.news.findMany({
     where: {
       status: "published",
       OR: [
         { divisionId: null },
-        ...(me.divisionId ? [{ divisionId: me.divisionId }] : []),
+        ...(gate.user.divisionId ? [{ divisionId: gate.user.divisionId }] : []),
       ],
     },
     include: NEWS_LIST_INCLUDE,

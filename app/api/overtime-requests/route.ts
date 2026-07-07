@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { writeAuditLog } from "@/lib/audit";
@@ -19,16 +20,13 @@ export async function GET(req: NextRequest) {
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  const me = await prisma.user.findUnique({
-    where: { id: token.userId },
-    select: { id: true },
-  });
-  if (!me) return err("Unauthorized", 401);
+  const gate = await requireApprovedMember(token.userId);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
   const requests = await prisma.overtimeRequest.findMany({
-    where: { submitterId: me.id, createdAt: { gte: since } },
+    where: { submitterId: gate.user.id, createdAt: { gte: since } },
     orderBy: { createdAt: "desc" },
     take: 50,
   });
@@ -42,24 +40,9 @@ export async function POST(req: NextRequest) {
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  const me = await prisma.user.findUnique({
-    where: { id: token.userId },
-    select: { id: true, role: true },
-  });
-  if (!me) return err("Unauthorized", 401);
-
-  // Approval gate: only verified users can submit. Admin tiers bypass the
-  // RegistrationApproval check (some superAdmins/staff don't have one).
-  const isAdminTier = ["editor", "divisionAdmin", "localAdmin", "superAdmin"].includes(me.role);
-  if (!isAdminTier) {
-    const approval = await prisma.registrationApproval.findUnique({
-      where: { userId: me.id },
-      select: { status: true },
-    });
-    if (!approval || approval.status !== "approved") {
-      return err("Your registration must be approved before submitting OT requests", 403);
-    }
-  }
+  const gate = await requireApprovedMember(token.userId);
+  if (!gate.user) return err(gate.error, gate.status);
+  const me = gate.user;
 
   let body: { requestedDate?: unknown; type?: unknown; payrollNumber?: unknown; preferences?: unknown };
   try { body = await req.json(); } catch { return err("Invalid JSON", 400); }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser, checkActive } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rateLimit";
 import { ok, err } from "@/lib/apiResponse";
@@ -13,8 +14,9 @@ export async function GET(req: NextRequest) {
   let user;
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (!dbUser?.divisionId) return err("Set your division first", 400);
+  const gate = await requireApprovedMember(user.userId);
+  if (!gate.user) return err(gate.error, gate.status);
+  if (!gate.user.divisionId) return err("Set your division first", 400);
   touchLastActive(user.userId);
 
   const { searchParams } = new URL(req.url);
@@ -29,7 +31,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(Math.max(limitParam, 1), 50);
 
   // Build where clause
-  const andClauses: Record<string, unknown>[] = [{ divisionId: dbUser.divisionId }];
+  const andClauses: Record<string, unknown>[] = [{ divisionId: gate.user.divisionId }];
 
   // Hide swaps from operators the current user has blocked, and from operators
   // who have blocked the current user. Symmetric, same as the messaging filter.
@@ -129,13 +131,14 @@ export async function POST(req: NextRequest) {
   if (!await rateLimit(`post:${user.userId}`, 5, 3_600_000)) return err("Rate limit: max 5 posts per hour", 429);
   if (!await rateLimit(`post30s:${user.userId}`, 2, 30_000)) return err("Please wait 30 seconds between posts", 429);
 
+  const gate = await requireApprovedMember(user.userId);
+  if (!gate.user) return err(gate.error, gate.status);
+
   const dbUser = await prisma.user.findUnique({
     where: { id: user.userId },
     include: { division: { select: { code: true } } },
   });
   if (!dbUser?.divisionId) return err("Set your division first", 400);
-  const activeErr = checkActive(dbUser);
-  if (activeErr) return err(activeErr, 403);
 
   // Hard caps to prevent spam, enforced via DB queries (not Redis) so they
   // hold even if the rate limiter has issues. Admins and depotReps bypass.

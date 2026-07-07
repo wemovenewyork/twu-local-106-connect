@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser, checkActive } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { rateLimit } from "@/lib/rateLimit";
 import { calcScore } from "@/lib/reputation";
@@ -41,8 +42,9 @@ export async function GET(
   if (!swap) return err("Swap not found", 404);
 
   // Division scoping
-  const dbUser = await prisma.user.findUnique({ where: { id: user.userId } });
-  if (swap.divisionId !== dbUser?.divisionId) return err("Not authorized", 403);
+  const gate = await requireApprovedMember(user.userId);
+  if (!gate.user) return err(gate.error, gate.status);
+  if (swap.divisionId !== gate.user.divisionId) return err("Not authorized", 403);
 
   // If either party has blocked the other, treat the swap as not found.
   // Owners can always see their own swap.
@@ -75,13 +77,8 @@ export async function PUT(
     return err("Rate limit: max 10 edits per hour", 429);
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.userId },
-    select: { email: true, suspendedUntil: true },
-  });
-  if (!dbUser) return err("User not found", 404);
-  const activeErr = checkActive(dbUser);
-  if (activeErr) return err(activeErr, 403);
+  const gate = await requireApprovedMember(user.userId);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const swap = await prisma.swap.findUnique({ where: { id } });
   if (!swap) return err("Swap not found", 404);
@@ -180,6 +177,9 @@ export async function DELETE(
   let user;
   try { user = requireUser(req); } catch { return err("Unauthorized", 401); }
   const { id } = await params;
+
+  const gate = await requireApprovedMember(user.userId);
+  if (!gate.user) return err(gate.error, gate.status);
 
   const swap = await prisma.swap.findUnique({ where: { id } });
   if (!swap) return err("Swap not found", 404);

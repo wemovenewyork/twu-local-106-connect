@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { ok, err } from "@/lib/apiResponse";
 import { isLocalAdmin } from "@/lib/permissions";
@@ -35,11 +36,9 @@ export async function GET(req: NextRequest) {
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  const caller = await prisma.user.findUnique({
-    where: { id: token.userId },
-    select: { id: true, role: true, divisionId: true, subUnitId: true },
-  });
-  if (!caller) return err("Unauthorized", 401);
+  const gate = await requireApprovedMember(token.userId);
+  if (!gate.user) return err(gate.error, gate.status);
+  const caller = gate.user;
 
   // Local/super admins see everything. Others see by-visibility OR clauses.
   const where: Record<string, unknown> = isLocalAdmin(caller)
@@ -74,11 +73,9 @@ export async function POST(req: NextRequest) {
   let token;
   try { token = requireUser(req); } catch { return err("Unauthorized", 401); }
 
-  const caller = await prisma.user.findUnique({
-    where: { id: token.userId },
-    select: { id: true, role: true, divisionId: true, subUnitId: true },
-  });
-  if (!caller) return err("Unauthorized", 401);
+  const gate = await requireApprovedMember(token.userId);
+  if (!gate.user) return err(gate.error, gate.status);
+  const caller = gate.user;
 
   let formData: FormData;
   try {

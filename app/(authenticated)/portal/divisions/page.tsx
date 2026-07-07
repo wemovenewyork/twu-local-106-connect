@@ -38,8 +38,20 @@ export default function DivisionsPage() {
   return (
     <div className="page-enter" style={{ minHeight: "100vh", background: C.bg }}>
       <MemberPortalHeader>
-        {user?.role === "superAdmin" && (
-          <button onClick={() => router.push("/admin")} aria-label="Admin dashboard" style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid #C084FC33", background: "#C084FC12", color: "#C084FC", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {["superAdmin", "localAdmin", "divisionAdmin"].includes(user?.role ?? "") && (
+          <button
+            onClick={() =>
+              router.push(
+                ["superAdmin", "localAdmin"].includes(user?.role ?? "") ? "/admin" : "/admin/registrations"
+              )
+            }
+            aria-label={
+              ["superAdmin", "localAdmin"].includes(user?.role ?? "")
+                ? "Admin dashboard"
+                : "Pending registrations"
+            }
+            style={{ width: 36, height: 36, borderRadius: 10, border: "1px solid #C084FC33", background: "#C084FC12", color: "#C084FC", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
             <Icon n="shield" s={15} c="#C084FC" />
           </button>
         )}

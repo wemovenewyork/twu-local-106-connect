@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireUser, checkActive } from "@/lib/auth";
+import { requireUser } from "@/lib/auth";
+import { requireApprovedMember } from "@/lib/approval";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, clientIp } from "@/lib/rateLimit";
 import { parseBody, BODY_2KB } from "@/lib/parseBody";
@@ -16,13 +17,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!await rateLimit(`dm:${user.userId}`, 10, 3_600_000)) return err("Rate limit: max 10 direct messages per hour", 429);
 
   const { id: toUserId } = await params;
-  const dbSender = await prisma.user.findUnique({
-    where: { id: user.userId },
-    select: { email: true, suspendedUntil: true, divisionId: true, role: true },
-  });
-  if (!dbSender) return err("User not found", 404);
-  const activeErr = checkActive(dbSender);
-  if (activeErr) return err(activeErr, 403);
+  const gate = await requireApprovedMember(user.userId);
+  if (!gate.user) return err(gate.error, gate.status);
   if (toUserId === user.userId) return err("Cannot message yourself", 400);
 
   const toUser = await prisma.user.findUnique({ where: { id: toUserId } });
@@ -31,8 +27,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // Same-division restriction. Admins can DM anyone (for support/moderation),
   // but regular operators are limited to their own division to prevent
   // cross-division harassment after we expand beyond Queens Village.
-  const isAdmin = dbSender.role === "superAdmin" || dbSender.role === "localAdmin";
-  if (!isAdmin && (!dbSender.divisionId || dbSender.divisionId !== toUser.divisionId)) {
+  const isAdmin = gate.user.role === "superAdmin" || gate.user.role === "localAdmin";
+  if (!isAdmin && (!gate.user.divisionId || gate.user.divisionId !== toUser.divisionId)) {
     return err("User not found", 404);
   }
 
