@@ -10,6 +10,10 @@ registration; InviteCode removal) are still pending. References to "WMNY" or
 files, and explanatory code comments are intentional fork attribution and
 historical context — do not blanket-rewrite them.
 
+## Deferred
+
+- **i18n:** ES/中文 string tables cover legacy swap screens only; switcher hidden for v1. Translating the new surfaces (dashboard, news, documents, portal, overtime, registration) is a post-launch work order.
+
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
