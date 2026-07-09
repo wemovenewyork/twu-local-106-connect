@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { brand } from "@/config/brand";
 import { prisma } from "@/lib/prisma";
 
@@ -64,7 +65,7 @@ export default async function LeadershipPage() {
       <p style={{ fontSize: 17, lineHeight: 1.6, color: brand.colors.mutedForeground, margin: "0 0 48px", maxWidth: 720 }}>
         Local 106 is led by elected officers across the local and each division,
         supported by union staff. Reach an officer directly through the{" "}
-        <a href="/contact" style={{ color: brand.colors.accent }}>contact page</a>.
+        <Link href="/contact" style={{ color: brand.colors.accent }}>contact page</Link>.
       </p>
 
       {officers.length === 0 && (
@@ -155,12 +156,12 @@ function OfficerGrid({ officers }: { officers: Array<{
             </p>
           )}
           {o.contactFormEnabled && (
-            <a href="/contact" style={{
+            <Link href="/contact" style={{
               fontSize: 13, color: brand.colors.accent, textDecoration: "none",
               fontWeight: 600, marginTop: "auto",
             }}>
               Contact →
-            </a>
+            </Link>
           )}
         </div>
       ))}

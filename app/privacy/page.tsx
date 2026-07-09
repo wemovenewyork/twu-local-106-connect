@@ -34,7 +34,7 @@ export default function PrivacyPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>1. Overview</h2>
-          <p style={s.p}>TWU Local 106 Connect ("we," "us") is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your data. By using the App, you agree to the practices described in this policy.</p>
+          <p style={s.p}>TWU Local 106 Connect (&quot;we,&quot; &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your data. By using the App, you agree to the practices described in this policy.</p>
         </div>
 
         <hr style={s.divider} />

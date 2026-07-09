@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import { CURRENT_TERMS_VERSION } from "@/lib/termsVersion";
@@ -247,7 +248,7 @@ export default function LoginPage() {
 
         <p style={{ fontSize: 11, color: "rgba(255,255,255,.35)", textAlign: "center", marginBottom: 16, lineHeight: 1.5 }}>
           Not affiliated with the MTA, NYCT, or any labor union. Unofficial peer-to-peer tool.{" "}
-          <a href="/disclaimer" style={{ color: "rgba(255,255,255,.45)", textDecoration: "underline" }}>Disclaimer</a>
+          <Link href="/disclaimer" style={{ color: "rgba(255,255,255,.45)", textDecoration: "underline" }}>Disclaimer</Link>
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, background: C.s, borderRadius: 12, padding: 4, marginBottom: 18 }}>

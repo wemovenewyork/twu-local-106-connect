@@ -13,6 +13,7 @@ blanket-rewrite them.
 ## Deferred
 
 - **i18n:** ES/中文 string tables cover legacy swap screens only; switcher hidden for v1. Translating the new surfaces (dashboard, news, documents, portal, overtime, registration) is a post-launch work order.
+- **react-hooks lint cleanup:** 13 warnings across ~10 components (set-state-in-effect, purity, use-memo). Downgraded to warn pre-launch; fix as a dedicated work order with device verification.
 
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know

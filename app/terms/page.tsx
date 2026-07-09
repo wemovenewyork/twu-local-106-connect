@@ -34,7 +34,7 @@ export default function TermsPage() {
 
         <div style={s.section}>
           <h2 style={s.h2}>1. Acceptance of Terms</h2>
-          <p style={s.p}>By accessing or using TWU Local 106 Connect ("the App"), you agree to be bound by these Terms of Use. If you do not agree to these terms, do not use the App. These terms apply to all users of the platform.</p>
+          <p style={s.p}>By accessing or using TWU Local 106 Connect (&quot;the App&quot;), you agree to be bound by these Terms of Use. If you do not agree to these terms, do not use the App. These terms apply to all users of the platform.</p>
         </div>
 
         <hr style={s.divider} />
