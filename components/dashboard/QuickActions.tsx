@@ -44,7 +44,7 @@ export default function QuickActions() {
     {
       title: "News",
       description: "Read union news",
-      href: "/news",
+      href: "/portal/news",
       icon: "list",
       count: null,
     },
