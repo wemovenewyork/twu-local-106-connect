@@ -103,6 +103,32 @@ To disable: remove or set to `false`, redeploy.
 
 ---
 
+## Soft launch
+
+`SOFT_LAUNCH_DIVISIONS` (legacy alias: `SOFT_LAUNCH_DEPOT`) is a comma-separated
+list of division codes permitted during a limited rollout (e.g. `QV,WF,MV`).
+Empty or unset = all divisions (full launch). Set it in Vercel env, then redeploy.
+
+**Enforcement is not uniform — it touches three surfaces:**
+
+1. **Login — hard gate.** A member of a division *not* on the allowlist is blocked
+   at sign-in with a `403` ("limited soft launch… we'll be at your division soon").
+   `superAdmin` and `localAdmin` are exempt so support can always get in.
+2. **Division picker — filtered.** `GET /api/divisions` (which the signup form
+   consumes) only returns allowlisted divisions, so non-listed divisions are not
+   selectable in the UI.
+3. **Register endpoint — NOT gated.** `POST /api/auth/register` accepts any valid
+   division code. Registration is restricted at the UI layer only: someone who
+   bypasses the picker (crafting the request directly) can create an account —
+   but they still land in the approval queue and are blocked at login by (1). This
+   gap is tracked as audit finding **M7**; the recommended fix is to have the
+   register endpoint call `isDivisionInSoftLaunch()` on the submitted code.
+
+To go to full launch: clear `SOFT_LAUNCH_DIVISIONS` (and remove the legacy
+`SOFT_LAUNCH_DEPOT` if still set), then redeploy.
+
+---
+
 ## Emergency User Actions
 
 All admin actions require an account with `role = "admin"` or `"subAdmin"`.
