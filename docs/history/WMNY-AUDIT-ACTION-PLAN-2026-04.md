@@ -1,3 +1,5 @@
+> _Historical snapshot from the parent WMNY Shift Swap repo (pre-fork). Not this app's audit — see TWU-106 audit 2026-07._
+
 # Audit Action Plan
 
 Generated from `PRELAUNCH_AUDIT.md` — 2026-04-16.  

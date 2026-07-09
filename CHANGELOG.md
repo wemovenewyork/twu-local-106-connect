@@ -2,6 +2,26 @@
 
 ---
 
+## Pre-Launch Security Audit Fixes — July 2026 (PR #1, `fix/prelaunch-audit`)
+
+Hardened registration/approval enforcement and access scoping ahead of launch
+(audit findings B1/H1/H3/H4/M1/M2). In one merge:
+
+- New shared server-side gate `requireApprovedMember` (exists → not
+  deleted/suspended → admin-approved) applied across member API routes.
+- Closed the self-service division path: `PUT /api/users/me` no longer accepts
+  `divisionId`; division is admin-controlled via registration approval. Email
+  changes now require the current password.
+- Division containment enforced on swap interest/agreement POSTs (swap IDs leak
+  via share links).
+- Contract search now applies document-visibility scoping (all/division/subUnit/
+  selfOnly) so members can't search documents they can't see.
+- Division admins get a dashboard entry point to their registration queue.
+- Server-side approval + suspension gate on the remaining member routes
+  (messages, DMs, push, news, documents, overtime, swaps).
+
+---
+
 ## TWU Local 106 Connect — Layer A Rebrand
 
 This is a forked codebase. The fork point was 2026-05-06 from
@@ -22,11 +42,11 @@ TWU Local 106 Connect, the official member portal for TWU Local 106
 - Static legal pages updated (terms, privacy, disclaimer)
 - Print agreement page reflects Local 106 footer
 
-### Layers still pending
+### Layers B & C — shipped
 
-- **Layer B**: Depot → Division entity rename (~580 lines, structural)
+- **Layer B**: Depot → Division entity rename (~580 lines, structural) — done
 - **Layer C**: Schema additions (Division/SubUnit/News/Document), role refactor,
-  registration flow change (admin approval), drop InviteCode model
+  registration flow change (admin approval), drop InviteCode model — done
 
 ---
 

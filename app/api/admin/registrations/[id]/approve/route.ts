@@ -98,7 +98,7 @@ export async function POST(
   await notifyUser(reg.userId, {
     title: "Registration approved",
     body: `Welcome to ${brand.appShortName}. Tap to open.`,
-    url: "/divisions",
+    url: "/dashboard",
   });
 
   return ok({ approved: true });
