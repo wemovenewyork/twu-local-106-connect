@@ -57,10 +57,11 @@ export function PublicHeader() {
         >
           <Image
             src="/branding/tso-logo.png"
-            alt={`${brand.organizationName} logo`}
-            width={44}
-            height={44}
-            style={{ width: 44, height: 44, objectFit: "contain" }}
+            alt={`${brand.organizationName} official seal`}
+            width={938}
+            height={938}
+            sizes="36px"
+            style={{ width: 36, height: 36, objectFit: "contain" }}
             priority
           />
           <span style={{ fontWeight: 800, fontSize: 16, letterSpacing: -0.3, lineHeight: 1.2 }}>
