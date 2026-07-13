@@ -102,7 +102,7 @@ export default async function PublicHome() {
               fontSize: 20, lineHeight: 1.55, color: "rgba(255,255,255,.78)",
               margin: "0 0 12px", fontWeight: 500,
             }}>
-              Representing NYC transit supervisors across MaBSTOA, MTA Bus, MSII, Queens, and TSC.
+              Representing NYC transit supervisors across the five divisions of the MTA bus and rail system.
             </p>
             <p style={{
               fontSize: 16, lineHeight: 1.7, color: "rgba(255,255,255,.62)",
