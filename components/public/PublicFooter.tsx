@@ -7,10 +7,10 @@ export function PublicFooter() {
 
   return (
     <footer
+      className="tso-footer"
       style={{
         background: brand.colors.navy,
         color: "#fff",
-        marginTop: 64,
       }}
     >
       <div
