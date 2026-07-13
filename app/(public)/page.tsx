@@ -1,6 +1,69 @@
 import Link from "next/link";
+import Image from "next/image";
 import { brand } from "@/config/brand";
 import { getPublicNews, newsExcerpt } from "@/lib/news";
+
+// Divisions represented by Local 106. Static, non-interactive (hero pills).
+const DIVISIONS = ["MaBSTOA", "MTA Bus", "MSII", "Queens", "TSC"];
+
+// This is a server component, so :hover and media queries can't be expressed as
+// inline styles — they live here. Colors are derived from config/brand.ts tokens
+// via custom properties; the light-red eyebrow and light-navy subhead are tints
+// of those tokens (mixed toward white) so they stay legible reversed on navy.
+const heroCss = `
+/* Declared on :root, not .tso-hero — the red rule and the news cards are
+   siblings of the hero, not descendants, so hero-scoped custom properties
+   would not inherit to them. */
+:root {
+  --tso-navy: ${brand.colors.navy};
+  --tso-red: ${brand.colors.red};
+}
+.tso-hero {
+  background: var(--tso-navy);
+  padding: 88px 24px 72px;
+}
+.tso-hero-inner {
+  max-width: 1100px; margin: 0 auto;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 48px;
+}
+.tso-hero-copy { flex: 1 1 auto; max-width: 60%; min-width: 0; }
+.tso-eyebrow {
+  color: color-mix(in srgb, var(--tso-red) 60%, ${brand.colors.white});
+  font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  margin: 0 0 16px;
+}
+/* Circular white backing so the seal's navy outer ring doesn't vanish into the navy hero. */
+.tso-seal-wrap {
+  flex: 0 0 auto;
+  width: clamp(210px, 24vw, 300px);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: ${brand.colors.white};
+  display: flex; align-items: center; justify-content: center;
+  padding: 14px;
+  box-shadow: 0 12px 44px rgba(0,0,0,.30);
+}
+.tso-seal { width: 100%; height: auto; display: block; object-fit: contain; }
+.tso-rule { height: 5px; background: var(--tso-red); }
+.tso-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.tso-pill {
+  font-size: 12px; font-weight: 700; letter-spacing: .5px;
+  padding: 6px 14px; border-radius: 999px;
+  color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.28);
+  white-space: nowrap;
+}
+/* Red top border + hover lift. border-top-color is restored on hover so the
+   red edge survives the navy border-color change. */
+.tso-news-card:hover { transform: translateY(-3px); border-color: var(--tso-navy); border-top-color: var(--tso-red); }
+
+@media (max-width: 900px) {
+  .tso-hero { padding: 64px 20px 56px; }
+  .tso-hero-inner { flex-direction: column; gap: 36px; }
+  .tso-hero-copy { max-width: 100%; }
+  .tso-seal-wrap { width: clamp(150px, 42vw, 210px); align-self: center; }
+}
+`;
 
 export const metadata = {
   title: `${brand.unionName} — ${brand.organizationName}`,
@@ -20,30 +83,29 @@ export default async function PublicHome() {
 
   return (
     <>
-      {/* Hero */}
-      <section style={{ padding: "96px 24px 80px", background: "linear-gradient(180deg, #F1F4F9 0%, #FFFFFF 70%)" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ maxWidth: 760 }}>
-            <p style={{
-              fontSize: 12, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
-              color: brand.colors.accent, margin: "0 0 16px",
-            }}>
+      <style dangerouslySetInnerHTML={{ __html: heroCss }} />
+
+      {/* Hero — heritage/ceremonial: solid navy, seal on a white circular backing */}
+      <section className="tso-hero">
+        <div className="tso-hero-inner">
+          <div className="tso-hero-copy">
+            <p className="tso-eyebrow">
               {brand.organizationName}
             </p>
             <h1 style={{
               fontSize: "clamp(40px, 6.5vw, 64px)", fontWeight: 800, letterSpacing: -1,
-              lineHeight: 1.05, color: brand.colors.navy, margin: "0 0 20px",
+              lineHeight: 1.05, color: brand.colors.white, margin: "0 0 20px",
             }}>
               {brand.unionName}
             </h1>
             <p style={{
-              fontSize: 20, lineHeight: 1.55, color: brand.colors.mutedForeground,
+              fontSize: 20, lineHeight: 1.55, color: "rgba(255,255,255,.78)",
               margin: "0 0 12px", fontWeight: 500,
             }}>
-              Representing NYC transit supervisors across MaBSTOA, MTA Bus, MSII, Queens, and TSC.
+              Representing NYC transit supervisors across the five divisions of the MTA bus and rail system.
             </p>
             <p style={{
-              fontSize: 16, lineHeight: 1.7, color: brand.colors.mutedForeground,
+              fontSize: 16, lineHeight: 1.7, color: "rgba(255,255,255,.62)",
               margin: "0 0 36px", maxWidth: 640,
             }}>
               We advocate for the rights, safety, and dignity of every TSO member —
@@ -54,13 +116,35 @@ export default async function PublicHome() {
               <Link href="/login" style={ctaPrimary}>
                 Member Sign In →
               </Link>
-              <Link href="/about" style={ctaSecondary}>
+              <Link href="/about" style={ctaSecondaryOnNavy}>
                 About the Union
               </Link>
             </div>
+
+            {/* Divisions represented — static, non-interactive */}
+            <div className="tso-pills">
+              {DIVISIONS.map(d => (
+                <span key={d} className="tso-pill">{d}</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="tso-seal-wrap">
+            <Image
+              src="/branding/tso-logo.png"
+              alt={`${brand.organizationName} official seal`}
+              width={938}
+              height={938}
+              sizes="(max-width: 900px) 210px, 300px"
+              className="tso-seal"
+              priority
+            />
           </div>
         </div>
       </section>
+
+      {/* Ceremonial red band between hero and news */}
+      <div className="tso-rule" />
 
       {/* Recent News */}
       {recent.length > 0 && (
@@ -77,9 +161,13 @@ export default async function PublicHome() {
                 <Link
                   key={n.id}
                   href={`/news/${n.publicSlug}`}
+                  className="tso-news-card"
                   style={{
-                    display: "block", padding: 22, borderRadius: 14,
+                    display: "block", padding: 22,
+                    // Single-sided red top border: square that edge, keep the rest rounded.
+                    borderRadius: 14, borderTopLeftRadius: 0, borderTopRightRadius: 0,
                     background: "#FFFFFF", border: `1px solid #E5E7EB`,
+                    borderTop: `3px solid ${brand.colors.red}`,
                     textDecoration: "none", color: "inherit",
                     transition: "border-color .15s, transform .15s",
                   }}
@@ -199,9 +287,10 @@ const ctaPrimary: React.CSSProperties = {
   textDecoration: "none", display: "inline-block",
 };
 
-const ctaSecondary: React.CSSProperties = {
-  background: "transparent", color: brand.colors.navy,
+// Outline variant for the reversed (navy) hero.
+const ctaSecondaryOnNavy: React.CSSProperties = {
+  background: "transparent", color: brand.colors.white,
   padding: "14px 28px", borderRadius: 10, fontSize: 15, fontWeight: 700,
-  textDecoration: "none", border: `1.5px solid ${brand.colors.navy}`,
+  textDecoration: "none", border: "1px solid rgba(255,255,255,.3)",
   display: "inline-block",
 };
