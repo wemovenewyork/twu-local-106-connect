@@ -7,10 +7,10 @@ export function PublicFooter() {
 
   return (
     <footer
+      className="tso-footer"
       style={{
         background: brand.colors.navy,
         color: "#fff",
-        marginTop: 64,
       }}
     >
       <div
@@ -43,7 +43,7 @@ export function PublicFooter() {
           </div>
           <p style={{ fontSize: 13, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
             The Transit Supervisors Organization — representing transit
-            supervisors across MaBSTOA, MTA Bus, and Staten Island.
+            supervisors across MaBSTOA, MTA Bus, MSII, Queens, and TSC.
           </p>
         </div>
 

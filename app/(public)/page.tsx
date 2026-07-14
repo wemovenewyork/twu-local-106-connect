@@ -44,7 +44,12 @@ const heroCss = `
   box-shadow: 0 12px 44px rgba(0,0,0,.30);
 }
 .tso-seal { width: 100%; height: auto; display: block; object-fit: contain; }
-.tso-rule { height: 5px; background: var(--tso-red); }
+.tso-rule { height: 5px; background: var(--tso-red); margin: 0; }
+/* The homepage closes on a navy banner, so the footer's default 64px top gap
+   (globals.css .tso-footer) would show as a white seam between two navy blocks.
+   Zero it here only, so the run is: navy banner -> red band -> navy footer.
+   Other public pages end on white content and keep the 64px. */
+body:has(.tso-home) .tso-footer { margin-top: 0; }
 .tso-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
 .tso-pill {
   font-size: 12px; font-weight: 700; letter-spacing: .5px;
@@ -82,7 +87,8 @@ export default async function PublicHome() {
   const recent = await getPublicNews({ limit: 3 });
 
   return (
-    <>
+    // tso-home marks this page for the footer-flush override in heroCss.
+    <div className="tso-home">
       <style dangerouslySetInnerHTML={{ __html: heroCss }} />
 
       {/* Hero — heritage/ceremonial: solid navy, seal on a white circular backing */}
@@ -252,7 +258,11 @@ export default async function PublicHome() {
           </div>
         </div>
       </section>
-    </>
+
+      {/* Ceremonial red band closing the page — bookends the rule under the hero.
+          Sits flush between the navy banner above and the navy footer below. */}
+      <div className="tso-rule" />
+    </div>
   );
 }
 
