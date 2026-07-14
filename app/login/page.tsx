@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import { CURRENT_TERMS_VERSION } from "@/lib/termsVersion";
 import { C } from "@/constants/colors";
+import { brand } from "@/config/brand";
 import MagneticButton from "@/components/ui/MagneticButton";
 
 interface DivisionOption {
@@ -89,7 +90,10 @@ export default function LoginPage() {
       if (user.termsVersion !== CURRENT_TERMS_VERSION) {
         setShowTerms(true);
       } else if (!user.divisionId) {
-        router.replace("/setup-profile");
+        // No division means not yet approved (division is admin-assigned at
+        // approval). Go straight to /pending-approval — /setup-profile is now
+        // only a forwarder that would bounce them to the same place.
+        router.replace("/pending-approval");
       } else {
         router.replace("/dashboard");
       }
@@ -494,11 +498,19 @@ export default function LoginPage() {
                 try {
                   await api.post("/auth/accept-terms", { version: CURRENT_TERMS_VERSION });
                 } catch { /* non-fatal — proceed anyway */ }
-                const dest = user?.division?.code ? `/division/${user.division.code}` : user?.divisionId ? "/divisions" : "/setup-profile";
-                window.location.href = dest;
+                // Land on the dashboard, matching the normal login path — not the
+                // swap-centric /division view (leftover fork behaviour from when
+                // /division was the member home). A user with no division isn't
+                // approved yet, so go straight to /pending-approval; /setup-profile
+                // is now only a forwarder that would bounce them there anyway.
+                //
+                // Full reload (not router.replace) is deliberate: it makes AuthContext
+                // refetch the user with the new termsVersion, so the terms gate can't
+                // re-trigger on stale client state.
+                window.location.href = user?.divisionId ? "/dashboard" : "/pending-approval";
               }}
               disabled={!termsChecked || acceptingTerms}
-              style={{ width: "100%", padding: 16, borderRadius: 14, border: "none", cursor: termsChecked ? "pointer" : "not-allowed", background: termsChecked ? `linear-gradient(135deg,${C.gold},${C.gold}cc)` : "rgba(255,255,255,.08)", fontSize: 16, fontWeight: 800, color: termsChecked ? C.bg : C.m, transition: "all .2s" }}
+              style={{ width: "100%", padding: 16, borderRadius: 14, border: "none", cursor: termsChecked ? "pointer" : "not-allowed", background: termsChecked ? `linear-gradient(135deg,${brand.colors.red},${brand.colors.red}cc)` : "rgba(255,255,255,.08)", fontSize: 16, fontWeight: 800, color: termsChecked ? C.white : C.m, transition: "all .2s" }}
             >
               {acceptingTerms ? "Saving..." : "I Agree"}
             </button>
