@@ -143,7 +143,10 @@ export default function ContractSearchClient() {
 
 function SearchResultCard({ result, query }: { result: SearchResult; query: string }) {
   const router = useRouter();
-  const href = `/portal/search/document/${result.documentId}?chunk=${result.chunkIndex}&q=${encodeURIComponent(query)}`;
+  // Carry the matching page through to the viewer so the PDF opens at the hit
+  // rather than page 1. Omitted entirely when null — never sent as "null".
+  const pageParam = result.pageNumber != null ? `&page=${result.pageNumber}` : "";
+  const href = `/portal/search/document/${result.documentId}?chunk=${result.chunkIndex}&q=${encodeURIComponent(query)}${pageParam}`;
 
   return (
     <button

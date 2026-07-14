@@ -19,11 +19,32 @@ interface DocumentDetail {
   division?: { id: string; code: string; name: string } | null;
 }
 
+/**
+ * Append the `#page=N` PDF fragment, which native viewers (Chrome/Safari/Firefox)
+ * use to open at a given page.
+ *
+ * The fragment must be the LAST thing in the URL — after any existing `?query`.
+ * Blob URLs currently carry no query string, but appending naively would break
+ * the moment one does (e.g. a signed URL), so build it properly:
+ *   - strip any pre-existing fragment so we never emit two `#`
+ *   - keep any query string intact, with the fragment after it
+ *   - ignore anything that isn't a positive integer (guards against "null",
+ *     "undefined", or a junk ?page= value arriving from the URL bar)
+ */
+function withPageFragment(url: string, page: string | null): string {
+  if (!page) return url;
+  const n = Number(page);
+  if (!Number.isInteger(n) || n < 1) return url;
+  const base = url.split("#")[0];
+  return `${base}#page=${n}`;
+}
+
 export default function ContractViewerPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const searchParams = useSearchParams();
   const q = searchParams.get("q") ?? "";
+  const page = searchParams.get("page");
   const router = useRouter();
   const { user, loading } = useAuth();
 
@@ -50,6 +71,8 @@ export default function ContractViewerPage() {
   if (loading || !user) return null;
 
   const backHref = q ? `/portal/search?q=${encodeURIComponent(q)}` : "/portal/search";
+  // Same URL for the iframe and "Open ↗", so both land on the matching page.
+  const viewerUrl = doc ? withPageFragment(doc.fileUrl, page) : "";
 
   if (error) {
     return (
@@ -100,7 +123,7 @@ export default function ContractViewerPage() {
         </div>
         {doc && (
           <a
-            href={doc.fileUrl}
+            href={viewerUrl}
             target="_blank"
             rel="noopener noreferrer"
             style={{ padding: "7px 12px", borderRadius: 10, border: `1px solid ${C.bd}`, background: C.s, color: C.m, textDecoration: "none", fontSize: 12, fontWeight: 600, flexShrink: 0 }}
@@ -114,7 +137,8 @@ export default function ContractViewerPage() {
       <div style={{ flex: 1, minHeight: 0 }}>
         {doc ? (
           <iframe
-            src={doc.fileUrl}
+            key={viewerUrl}
+            src={viewerUrl}
             title={doc.title}
             style={{ width: "100%", height: "calc(100vh - 56px - 50px)", border: "none", background: "#1A1F4D", display: "block" }}
           />
