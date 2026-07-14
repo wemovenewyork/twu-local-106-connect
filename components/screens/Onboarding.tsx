@@ -1,32 +1,37 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { C } from "@/constants/colors";
 import { brand } from "@/config/brand";
 
-/* ─── Per-step animated illustrations ─────────────────────────────────────── */
+/* ─── Slide illustration ───────────────────────────────────────────────────── */
 
-function IllustrationSwap() {
+// The TSO seal. It sits on a white circular backing because the seal art is
+// transparent and its outer ring is navy — on this dialog's navy backdrop the
+// ring would otherwise dissolve into the background and leave the ring text
+// floating with no edge. Same treatment as the public hero.
+function IllustrationSeal() {
   return (
-    <div style={{ position: "relative", width: 260, height: 160, margin: "0 auto" }}>
-      <style>{`
-        @keyframes rowIn { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes arrowPulse { 0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.15)} }
-      `}</style>
-      {[
-        { from: "Mon", to: "Tue",  delay: "0s",   color: C.blue },
-        { from: "Wed", to: "Fri",  delay: ".15s",  color: C.gold },
-        { from: "Sat", to: "Sun",  delay: ".3s",   color: "#00C9A7" },
-      ].map((r, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, marginBottom: 18, animation: `rowIn .5s ease ${r.delay} both` }}>
-          <div style={{ padding: "6px 16px", borderRadius: 10, background: r.color + "18", border: `1px solid ${r.color}44`, fontSize: 13, fontWeight: 700, color: r.color, minWidth: 56, textAlign: "center" }}>{r.from}</div>
-          <svg width="28" height="16" viewBox="0 0 28 16" fill="none" style={{ animation: "arrowPulse 1.8s ease-in-out infinite", animationDelay: r.delay }}>
-            <path d="M0 5h20M16 1l4 4-4 4" stroke={r.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M28 11H8M12 7l-4 4 4 4" stroke={r.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <div style={{ padding: "6px 16px", borderRadius: 10, background: r.color + "18", border: `1px solid ${r.color}44`, fontSize: 13, fontWeight: 700, color: r.color, minWidth: 56, textAlign: "center" }}>{r.to}</div>
-        </div>
-      ))}
+    <div
+      style={{
+        width: 148, height: 148, margin: "0 auto",
+        borderRadius: "50%", background: brand.colors.white,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: 10, boxSizing: "border-box",
+        boxShadow: "0 10px 36px rgba(0,0,0,.30)",
+        animation: "fadeUp .5s ease both",
+      }}
+    >
+      <Image
+        src="/branding/tso-logo.png"
+        alt={`${brand.organizationName} seal`}
+        width={938}
+        height={938}
+        sizes="148px"
+        style={{ width: "100%", height: "auto", objectFit: "contain", display: "block" }}
+        priority
+      />
     </div>
   );
 }
@@ -45,7 +50,7 @@ const STEPS = [
     color: brand.colors.red,
     title: "Welcome to\nTWU Local 106 Connect",
     body: "Your members-only home for shift swaps, union news, your contract, and reaching your rep — everything TSO members need, in one place.",
-    Illustration: IllustrationSwap,
+    Illustration: IllustrationSeal,
   },
 ];
 
