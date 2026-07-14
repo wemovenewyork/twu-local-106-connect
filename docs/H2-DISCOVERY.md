@@ -155,7 +155,64 @@ to catch.
 
 ---
 
-## Decisions needed before Phase 2
+## 7. Phase 3 caught a SECOND out-of-band artifact (not known at GATE 1)
+
+The first scratch↔dev comparison came back **not empty**. One index existed on
+dev but not on the freshly-migrated scratch branch:
+
+```sql
+CREATE UNIQUE INDEX "swap_agreements_swap_id_active_key"
+  ON "swap_agreements" ("swap_id")
+  WHERE status IN ('pending', 'userA_confirmed');
+```
+
+**Why `migrate diff` never emitted it:** it is a *partial* (WHERE-filtered)
+unique index. Prisma cannot express partial indexes in `schema.prisma`, so they
+are invisible to the differ — exactly like the tsvector column. It was created
+by raw SQL in the archived migration `20260414_agreement_unique_active`.
+
+**It is load-bearing, not cosmetic.** `app/api/swaps/[id]/agreement/route.ts`
+relies on the resulting `P2002` unique violation to close a race window where two
+members could each open an agreement on the same swap:
+
+```ts
+if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+  return err("An agreement is already in progress for this swap", 409);
+}
+```
+
+Without this index, a database built from the baseline would **silently permit
+duplicate active agreements**. It has been appended to the baseline, and the
+scratch↔dev diff is now empty.
+
+> Lesson: there were **two** raw-SQL artifacts, not one. The audit only knew
+> about the tsvector column. Any future `db push`-era squash must diff the
+> catalogs (columns, indexes, constraints, enums) rather than trusting
+> `migrate diff`, which is blind to anything Prisma's DSL cannot express.
+
+---
+
+## Follow-ups (separate work orders — NOT part of H2)
+
+- **Performance: add GIN index on `document_chunks.search_vector`.** Contract
+  search currently does a sequential scan + per-query `to_tsvector`; fine at
+  current scale, degrades as the corpus grows. Own work order, own branch,
+  post-launch. H2 deliberately reproduces production exactly, which means no GIN
+  index.
+
+---
+
+## Decisions taken at GATE 1 (approved)
+
+1. **`search_queries.created_at`** → option (a): added `@db.Timestamptz(3)` to
+   the schema field. The DB was already `timestamptz`; this makes schema and prod
+   *converge*, which is required for Phase 3's diff to come back empty. Annotation
+   only — no data change, no column-type change. This is the only edit made to
+   `prisma/schema.prisma`.
+2. **GIN index** → confirmed omitted; baseline reproduces production exactly.
+   Logged as a follow-up above.
+
+## Original decision request (kept for the record)
 
 1. **`search_queries.created_at`** — is this drift intentional/known, or a
    surprise? Two ways forward:

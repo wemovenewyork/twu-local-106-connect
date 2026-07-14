@@ -712,3 +712,18 @@ ALTER TABLE "pages" ADD CONSTRAINT "pages_author_id_fkey" FOREIGN KEY ("author_i
 ALTER TABLE "document_chunks"
   ADD COLUMN "search_vector" tsvector
   GENERATED ALWAYS AS (to_tsvector('english', content)) STORED;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Second out-of-band artifact: PARTIAL unique index. Prisma cannot express
+-- partial (WHERE-filtered) indexes in schema.prisma, so `migrate diff` never
+-- emits it — it was created by raw SQL in the (now archived) migration
+-- 20260414_agreement_unique_active. Caught by the Phase 3 scratch<->dev diff.
+--
+-- This is load-bearing, not cosmetic: app/api/swaps/[id]/agreement/route.ts
+-- relies on the resulting P2002 unique violation to close a race window where
+-- two members could both open an agreement on the same swap. Without this index
+-- a fresh database silently permits duplicate active agreements.
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE UNIQUE INDEX IF NOT EXISTS "swap_agreements_swap_id_active_key"
+  ON "swap_agreements" ("swap_id")
+  WHERE status IN ('pending', 'userA_confirmed');
