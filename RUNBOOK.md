@@ -55,11 +55,70 @@ Only use Option C if the bad commit contains secrets that must be scrubbed from 
 
 ---
 
+## Migrations
+
+**How deploys apply them.** The `vercel-build` script is
+`prisma migrate deploy && next build`. Every production deploy applies any pending
+migration *before* the app builds. A failed migration fails the build, so a broken
+migration never reaches users.
+
+**The baseline.** `prisma/migrations/` holds a single squashed baseline,
+`00000000000000_init_local106`, which reproduces production exactly. The
+depot-era WMNY migrations were archived to `docs/migrations-wmny-archive/`
+(kept for the audit trail, never applied again). Background: `docs/H2-DISCOVERY.md`.
+
+**Two artifacts Prisma cannot express** live as raw SQL at the end of the
+baseline's `migration.sql`, and must survive any future squash:
+
+1. `document_chunks.search_vector` — a **STORED GENERATED** tsvector column
+   (`GENERATED ALWAYS AS (to_tsvector('english', content)) STORED`). Powers
+   contract search.
+2. `swap_agreements_swap_id_active_key` — a **partial** unique index
+   (`WHERE status IN ('pending','userA_confirmed')`). Enforces the
+   duplicate-agreement race guard that `app/api/swaps/[id]/agreement/route.ts`
+   depends on via its `P2002` catch.
+
+> ⚠️ **`prisma migrate diff` cannot see either of them.** It is blind to anything
+> outside Prisma's DSL. If you ever squash migrations again, diff the
+> **pg_catalog** instead: `scripts/h2-catalog-compare.ts` (columns, indexes,
+> constraints, enums). Trusting the differ silently drops both artifacts — and
+> dropping #2 reintroduces a data-integrity race.
+
+### Check migration state
+
+```bash
+DATABASE_URL="<direct-url>" npx prisma migrate status
+# healthy: "Database schema is up to date!"
+```
+
+### Adding a schema change
+
+```bash
+npx prisma migrate dev --name descriptive_name   # local; creates the migration
+git add prisma/migrations/ prisma/schema.prisma
+```
+
+Never use `db push` against a shared or production database — it mutates the
+schema without leaving a migration behind. That is how this repo's history
+drifted out of sync with production in the first place.
+
+### PITR first — before anything destructive
+
+Before any migration that drops or alters a column, **record a Neon restore
+point** (Neon console → project → Branches → note the timestamp/LSN) and confirm
+the PITR window covers today. Restoring is the only real undo; the section below
+is a manual, best-effort path.
+
+---
+
 ## Database Rollback
 
-Migrations are in `prisma/migrations/`. They are **not automatically reversible**.
+Migrations are **not automatically reversible**.
 
-### To undo the most recent migration:
+Preferred: **Neon PITR restore** to the timestamp recorded above (console →
+Restore). This is the only reliable undo for a destructive migration.
+
+### Manual reverse migration (best-effort):
 1. Write a reverse migration SQL manually (e.g. `DROP TABLE blocks;` to undo `20260416_block_enforcement`)
 2. Save it as `prisma/migrations/YYYYMMDD_rollback_<name>/migration.sql`
 3. Apply with:

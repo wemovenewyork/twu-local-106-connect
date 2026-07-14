@@ -459,7 +459,11 @@ model SearchQuery {
   query       String
   resultCount Int      @map("result_count")
   // No userId: search queries are anonymized for privacy.
-  createdAt   DateTime @default(now()) @map("created_at")
+  // @db.Timestamptz(3) documents reality: this column is already timestamptz in
+  // the database (the only application column that is — every other timestamp is
+  // plain `timestamp`). Annotation only; no data or column-type change. Without
+  // it the baseline would emit TIMESTAMP(3) and never reproduce production.
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   @@map("search_queries")
   @@index([createdAt])
