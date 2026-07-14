@@ -8,7 +8,6 @@ import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import { CURRENT_TERMS_VERSION } from "@/lib/termsVersion";
 import { C } from "@/constants/colors";
-import Intro from "@/components/screens/Intro";
 import MagneticButton from "@/components/ui/MagneticButton";
 
 interface DivisionOption {
@@ -40,10 +39,6 @@ export default function LoginPage() {
   const { login, user, loading } = useAuth();
   const router = useRouter();
 
-  const [showIntro, setShowIntro] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return !sessionStorage.getItem("intro-seen");
-  });
   const [mode, setMode] = useState<"signin" | "register">("signin");
   const [em, setEm] = useState(""); const [pw, setPw] = useState("");
   const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [pw2, setPw2] = useState("");
@@ -176,8 +171,6 @@ export default function LoginPage() {
       setErrWithShake(e instanceof Error ? e.message : "Registration failed");
     } finally { setSubmitting(false); }
   };
-
-  if (showIntro) return <Intro onDone={() => { sessionStorage.setItem("intro-seen", "1"); setShowIntro(false); }} />;
 
   if (registeredEmail) {
     return (
