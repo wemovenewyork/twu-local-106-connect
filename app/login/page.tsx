@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { useAuth } from "@/lib/AuthContext";
 import { api } from "@/lib/api";
 import { CURRENT_TERMS_VERSION } from "@/lib/termsVersion";
 import { C } from "@/constants/colors";
-import Intro from "@/components/screens/Intro";
+import { brand } from "@/config/brand";
 import MagneticButton from "@/components/ui/MagneticButton";
 
 interface DivisionOption {
@@ -39,10 +40,6 @@ export default function LoginPage() {
   const { login, user, loading } = useAuth();
   const router = useRouter();
 
-  const [showIntro, setShowIntro] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return !sessionStorage.getItem("intro-seen");
-  });
   const [mode, setMode] = useState<"signin" | "register">("signin");
   const [em, setEm] = useState(""); const [pw, setPw] = useState("");
   const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [pw2, setPw2] = useState("");
@@ -93,7 +90,10 @@ export default function LoginPage() {
       if (user.termsVersion !== CURRENT_TERMS_VERSION) {
         setShowTerms(true);
       } else if (!user.divisionId) {
-        router.replace("/setup-profile");
+        // No division means not yet approved (division is admin-assigned at
+        // approval). Go straight to /pending-approval — /setup-profile is now
+        // only a forwarder that would bounce them to the same place.
+        router.replace("/pending-approval");
       } else {
         router.replace("/dashboard");
       }
@@ -176,8 +176,6 @@ export default function LoginPage() {
     } finally { setSubmitting(false); }
   };
 
-  if (showIntro) return <Intro onDone={() => { sessionStorage.setItem("intro-seen", "1"); setShowIntro(false); }} />;
-
   if (registeredEmail) {
     return (
       <main id="main-content" tabIndex={-1} className="page-enter" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px" }}>
@@ -247,7 +245,7 @@ export default function LoginPage() {
 
         <p style={{ fontSize: 11, color: "rgba(255,255,255,.35)", textAlign: "center", marginBottom: 16, lineHeight: 1.5 }}>
           Not affiliated with the MTA, NYCT, or any labor union. Unofficial peer-to-peer tool.{" "}
-          <a href="/disclaimer" style={{ color: "rgba(255,255,255,.45)", textDecoration: "underline" }}>Disclaimer</a>
+          <Link href="/disclaimer" style={{ color: "rgba(255,255,255,.45)", textDecoration: "underline" }}>Disclaimer</Link>
         </p>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, background: C.s, borderRadius: 12, padding: 4, marginBottom: 18 }}>
@@ -500,11 +498,19 @@ export default function LoginPage() {
                 try {
                   await api.post("/auth/accept-terms", { version: CURRENT_TERMS_VERSION });
                 } catch { /* non-fatal — proceed anyway */ }
-                const dest = user?.division?.code ? `/division/${user.division.code}` : user?.divisionId ? "/divisions" : "/setup-profile";
-                window.location.href = dest;
+                // Land on the dashboard, matching the normal login path — not the
+                // swap-centric /division view (leftover fork behaviour from when
+                // /division was the member home). A user with no division isn't
+                // approved yet, so go straight to /pending-approval; /setup-profile
+                // is now only a forwarder that would bounce them there anyway.
+                //
+                // Full reload (not router.replace) is deliberate: it makes AuthContext
+                // refetch the user with the new termsVersion, so the terms gate can't
+                // re-trigger on stale client state.
+                window.location.href = user?.divisionId ? "/dashboard" : "/pending-approval";
               }}
               disabled={!termsChecked || acceptingTerms}
-              style={{ width: "100%", padding: 16, borderRadius: 14, border: "none", cursor: termsChecked ? "pointer" : "not-allowed", background: termsChecked ? `linear-gradient(135deg,${C.gold},${C.gold}cc)` : "rgba(255,255,255,.08)", fontSize: 16, fontWeight: 800, color: termsChecked ? C.bg : C.m, transition: "all .2s" }}
+              style={{ width: "100%", padding: 16, borderRadius: 14, border: "none", cursor: termsChecked ? "pointer" : "not-allowed", background: termsChecked ? `linear-gradient(135deg,${brand.colors.red},${brand.colors.red}cc)` : "rgba(255,255,255,.08)", fontSize: 16, fontWeight: 800, color: termsChecked ? C.white : C.m, transition: "all .2s" }}
             >
               {acceptingTerms ? "Saving..." : "I Agree"}
             </button>

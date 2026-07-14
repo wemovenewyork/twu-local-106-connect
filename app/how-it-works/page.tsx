@@ -11,69 +11,32 @@ const STEPS = [
   {
     n: "01",
     color: C.gold,
-    title: "Get Your Invite",
-    desc: "TWU Local 106 Connect is supervisor-to-supervisor. Every new member joins with an invite code from a fellow Local 106 member. No management, no gatekeeping.",
-    detail: "When you join, you automatically receive 3 invite codes to share with colleagues at your division.",
-    visual: <InviteVisual />,
+    title: "Create your account",
+    desc: "Sign up with your name and email, and select your division.",
+    visual: <DivisionVisual />,
   },
   {
     n: "02",
     color: C.blue,
-    title: "Set Your Division",
-    desc: "Pick your home division. Your swap board is shared only with members at your location — keeping everything relevant and local.",
-    detail: "You can update your division once every 7 days if you transfer.",
-    visual: <DivisionVisual />,
+    title: "Verify your email",
+    desc: "Click the link we send you to confirm your address.",
   },
   {
     n: "03",
     color: "#00C9A7",
-    title: "Post a Swap",
-    desc: "Choose your swap type — a work day, a day off, or a vacation week. Add your shift details and hit post. It's live in seconds.",
-    detail: "Work swaps include your run number, route, start time, and clear time. Days-off and vacation swaps show the dates you want to trade.",
-    visual: <PostVisual />,
+    title: "Division admin approval",
+    desc: "Your division admin confirms you're a Local 106 member. You'll get an email the moment you're approved. No codes, no passwords to share — your admin knows who belongs.",
   },
   {
     n: "04",
     color: "#C084FC",
-    title: "Get Matched",
-    desc: "Browse open swaps from your division. Our auto-matcher also scans the board and flags members whose schedules complement yours.",
-    detail: "A Mutual Match means both your schedules work for each other — the hardest part is already done.",
-    visual: <MatchVisual />,
-  },
-  {
-    n: "05",
-    color: C.gold,
-    title: "Message & Agree",
-    desc: "Message the other member directly to confirm details. When you're both ready, submit a formal swap agreement — one tap each.",
-    detail: "Messages are private between the two of you. The agreement records both members' names and the swap details.",
-    visual: <AgreementVisual />,
-  },
-  {
-    n: "06",
-    color: "#2ED573",
-    title: "Print & Present",
-    desc: "Once both members confirm, a timestamped agreement is generated. Show the agreement on your phone to your supervisor or manager — they handle approval the same way they always have.",
-    detail: "The agreement still requires supervisor approval per your division's procedures — TWU Local 106 Connect coordinates the swap, it doesn't replace management sign-off.",
-    visual: <PrintVisual />,
+    title: "You're in",
+    desc: "Post and browse shift swaps in your division, read union news, search your contract, and request overtime — from any phone.",
+    visual: <PostVisual />,
   },
 ];
 
 /* ─── Mini visuals ─────────────────────────────────────────────────────────── */
-
-function InviteVisual() {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
-      <div style={{ padding: "10px 20px", borderRadius: 12, background: `${C.gold}18`, border: `1px solid ${C.gold}44`, fontFamily: "monospace", fontSize: 15, fontWeight: 800, color: C.gold, letterSpacing: 3 }}>L106-K7X4</div>
-      <div style={{ fontSize: 11, color: C.m }}>Your invite code</div>
-      <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-        {["K4J2","M9P1","R3N8"].map(c => (
-          <div key={c} style={{ padding: "5px 10px", borderRadius: 8, background: "rgba(255,255,255,.04)", border: `1px solid rgba(255,255,255,.08)`, fontSize: 11, color: "rgba(255,255,255,.4)", letterSpacing: 1 }}>L106-{c}</div>
-        ))}
-      </div>
-      <div style={{ fontSize: 11, color: C.m, marginTop: 2 }}>3 codes to share with colleagues</div>
-    </div>
-  );
-}
 
 function DivisionVisual() {
   const divisions = ["Queens Village", "East New York", "Flatbush", "Gun Hill", "Spring Creek"];
@@ -121,75 +84,6 @@ function PostVisual() {
   );
 }
 
-function MatchVisual() {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%", maxWidth: 260 }}>
-      {[
-        { op: "Member A", day: "Mon Off → wants to work", color: C.blue, match: true },
-        { op: "Member B", day: "Mon Work → wants off", color: "#00C9A7", match: true },
-      ].map((r, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, background: `${r.color}10`, border: `1px solid ${r.color}33` }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: `${r.color}20`, border: `1px solid ${r.color}55`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 800, color: r.color, flexShrink: 0 }}>{i === 0 ? "A" : "B"}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: C.white }}>{r.op}</div>
-            <div style={{ fontSize: 10, color: C.m, marginTop: 1 }}>{r.day}</div>
-          </div>
-        </div>
-      ))}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 10, background: `${C.gold}12`, border: `1px solid ${C.gold}33` }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.gold, boxShadow: `0 0 8px ${C.gold}` }} />
-        <div style={{ fontSize: 12, color: C.gold, fontWeight: 700 }}>Mutual Match detected</div>
-      </div>
-    </div>
-  );
-}
-
-function AgreementVisual() {
-  return (
-    <div style={{ width: "100%", maxWidth: 260 }}>
-      <div style={{ borderRadius: 14, border: `1px solid rgba(192,132,252,.2)`, background: "rgba(192,132,252,.05)", padding: 14 }}>
-        <div style={{ fontSize: 10, color: "#C084FC", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>Swap Agreement</div>
-        {[
-          { label: "Member A", value: "John D." },
-          { label: "Member B", value: "Maria S." },
-          { label: "Swap Date", value: "Monday, April 14" },
-        ].map(f => (
-          <div key={f.label} style={{ marginBottom: 8, display: "flex", justifyContent: "space-between", fontSize: 11 }}>
-            <span style={{ color: C.m }}>{f.label}</span>
-            <span style={{ color: C.white, fontWeight: 600 }}>{f.value}</span>
-          </div>
-        ))}
-        <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
-          <div style={{ flex: 1, padding: "7px", borderRadius: 8, background: "rgba(0,201,167,.12)", border: "1px solid rgba(0,201,167,.3)", fontSize: 11, fontWeight: 700, color: "#00C9A7", textAlign: "center" }}>✓ Confirmed</div>
-          <div style={{ flex: 1, padding: "7px", borderRadius: 8, background: "rgba(0,201,167,.12)", border: "1px solid rgba(0,201,167,.3)", fontSize: 11, fontWeight: 700, color: "#00C9A7", textAlign: "center" }}>✓ Confirmed</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PrintVisual() {
-  return (
-    <div style={{ width: "100%", maxWidth: 240 }}>
-      <div style={{ borderRadius: 14, border: "1px solid rgba(46,213,115,.25)", background: "rgba(46,213,115,.05)", padding: 14 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(46,213,115,.15)", border: "1px solid rgba(46,213,115,.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#2ED573" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: "#2ED573" }}>Agreement Locked</div>
-        </div>
-        <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,.06)", marginBottom: 6 }} />
-        <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,.06)", width: "75%", marginBottom: 6 }} />
-        <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,.06)", width: "60%", marginBottom: 14 }} />
-        <div style={{ display: "flex", gap: 6 }}>
-          <div style={{ flex: 1, padding: "8px", borderRadius: 8, background: C.gold, fontSize: 11, fontWeight: 700, color: C.bg, textAlign: "center" }}>Print PDF</div>
-          <div style={{ flex: 1, padding: "8px", borderRadius: 8, border: `1px solid ${C.bd}`, background: "rgba(255,255,255,.03)", fontSize: 11, fontWeight: 600, color: C.m, textAlign: "center" }}>Share</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ─── Step card with scroll-triggered reveal ───────────────────────────────── */
 
 function StepCard({ step, index }: { step: typeof STEPS[0]; index: number }) {
@@ -227,14 +121,15 @@ function StepCard({ step, index }: { step: typeof STEPS[0]; index: number }) {
       <div style={{ fontSize: 11, fontWeight: 800, color: step.color, letterSpacing: 2, marginBottom: 14, opacity: .7 }}>STEP {step.n}</div>
 
       {/* Visual */}
-      <div style={{ marginBottom: 20 }}>
-        {step.visual}
-      </div>
+      {step.visual && (
+        <div style={{ marginBottom: 20 }}>
+          {step.visual}
+        </div>
+      )}
 
       {/* Text */}
       <h3 style={{ fontSize: 20, fontWeight: 800, color: C.white, marginBottom: 8, lineHeight: 1.25 }}>{step.title}</h3>
-      <p style={{ fontSize: 14, color: C.m, lineHeight: 1.7, marginBottom: 10 }}>{step.desc}</p>
-      <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", lineHeight: 1.6, borderTop: "1px solid rgba(255,255,255,.05)", paddingTop: 10 }}>{step.detail}</p>
+      <p style={{ fontSize: 14, color: C.m, lineHeight: 1.7 }}>{step.desc}</p>
     </div>
   );
 }
@@ -272,7 +167,7 @@ export default function HowItWorksPage() {
             How TWU Local 106<br />Connect Works
           </h1>
           <p style={{ fontSize: 15, color: C.m, lineHeight: 1.7, maxWidth: 340, margin: "0 auto" }}>
-            Six steps from sign-up to confirmed swap — all on your phone, member to member.
+            Four steps from sign-up to swapping — all on your phone, member to member.
           </p>
         </div>
 

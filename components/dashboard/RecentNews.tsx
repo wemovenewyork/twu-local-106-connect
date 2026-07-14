@@ -14,7 +14,7 @@ export default function RecentNews() {
           Recent News
         </h2>
         <button
-          onClick={() => router.push("/news")}
+          onClick={() => router.push("/portal/news")}
           style={{ background: "none", border: "none", color: C.gold, fontSize: 12, fontWeight: 700, cursor: "pointer" }}
         >
           View all →

@@ -18,6 +18,17 @@ const securityHeaders = [
       "font-src 'self'",
       "connect-src 'self' https://*.sentry.io https://browser.sentry-cdn.com https://*.upstash.io https://www.google-analytics.com https://www.googletagmanager.com",
       "worker-src 'self' blob:",
+      // Lets OUR pages embed the Blob-hosted contract PDFs in the viewer's
+      // <iframe>. Without this, frame-src falls back to default-src 'self' and
+      // the cross-origin PDF is blocked. Documents are uploaded with
+      // access: "public" (lib/storage.ts), so they always live on the store's
+      // *.public.blob.vercel-storage.com host.
+      //
+      // This does NOT weaken clickjacking protection: frame-ancestors 'none'
+      // (below) and X-Frame-Options: DENY still stop anyone framing US.
+      // frame-src governs what we may embed; frame-ancestors governs who may
+      // embed us. They are separate directions.
+      "frame-src 'self' https://*.public.blob.vercel-storage.com",
       "frame-ancestors 'none'",
       "form-action 'self'",
     ].join("; "),

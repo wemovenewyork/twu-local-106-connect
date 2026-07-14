@@ -38,7 +38,7 @@ export default function ProfilePage() {
   const { user, logout, updateUser, loading, refreshUser } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<"profile" | "security">("profile");
-  const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [email, setEmail] = useState(""); const [lang, setLang] = useState("en"); const [emailPw, setEmailPw] = useState("");
+  const [fn, setFn] = useState(""); const [ln, setLn] = useState(""); const [email, setEmail] = useState(""); const [emailPw, setEmailPw] = useState("");
   const [curPw, setCurPw] = useState(""); const [newPw, setNewPw] = useState(""); const [newPw2, setNewPw2] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deletePw, setDeletePw] = useState(""); const [deleteErr, setDeleteErr] = useState(""); const [deleting, setDeleting] = useState(false);
@@ -55,7 +55,7 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (user) { setFn(user.firstName); setLn(user.lastName); setEmail(user.email); setLang(user.language || "en"); }
+    if (user) { setFn(user.firstName); setLn(user.lastName); setEmail(user.email); }
     api.get<Division[]>("/divisions").then(setDivisions).catch(() => {});
   }, [user]);
 
@@ -120,7 +120,7 @@ export default function ProfilePage() {
     setSaving(true);
     try {
       const data = await api.put("/users/me", {
-        firstName: fn, lastName: ln, email, language: lang,
+        firstName: fn, lastName: ln, email,
         ...(emailChanged && { currentPassword: emailPw }),
       });
       updateUser(data as Parameters<typeof updateUser>[0]);
@@ -214,32 +214,6 @@ export default function ProfilePage() {
                 <div style={{ fontSize: 11, color: C.m, marginTop: 6 }}>Required to change your email.</div>
               </div>
             )}
-            <div>
-              <label htmlFor="prof-lang" style={lb}>Language</label>
-              <select
-                id="prof-lang"
-                value={lang}
-                onChange={e => setLang(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "12px 14px",
-                  borderRadius: 12,
-                  border: `1px solid ${C.bd}`,
-                  background: C.s,
-                  color: C.white,
-                  fontSize: 16,
-                  cursor: "pointer",
-                }}
-              >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="zh">中文</option>
-                <option value="ht">Kreyòl</option>
-              </select>
-              <div style={{ fontSize: 11, color: C.m, marginTop: 6 }}>
-                Changes apply when you tap Save.
-              </div>
-            </div>
             <div>
               <label htmlFor="prof-division" style={lb}>Home Division</label>
               <div
