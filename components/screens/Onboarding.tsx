@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { C } from "@/constants/colors";
+import { brand } from "@/config/brand";
 
 /* ─── Per-step animated illustrations ─────────────────────────────────────── */
 
@@ -30,139 +31,21 @@ function IllustrationSwap() {
   );
 }
 
-function IllustrationPost() {
-  const [field, setField] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setField(v => (v < 3 ? v + 1 : v)), 600);
-    return () => clearInterval(t);
-  }, []);
-  const fields = ["Work Swap", "Tomorrow · 6:15 AM", "Run 142 · Route B46"];
-  return (
-    <div style={{ width: 240, margin: "0 auto" }}>
-      <style>{`
-        @keyframes cardIn { from{opacity:0;transform:translateY(20px) scale(.95)} to{opacity:1;transform:translateY(0) scale(1)} }
-        @keyframes fieldAppear { from{opacity:0;maxHeight:0} to{opacity:1;maxHeight:40px} }
-        @keyframes btnGlow { 0%,100%{box-shadow:0 0 0 0 rgba(173,27,39,0)} 50%{box-shadow:0 0 20px 4px rgba(173,27,39,.35)} }
-        @keyframes cursor { 0%,100%{opacity:1} 50%{opacity:0} }
-      `}</style>
-      <div style={{ borderRadius: 16, border: `1px solid rgba(255,255,255,.1)`, background: "rgba(255,255,255,.04)", padding: 16, animation: "cardIn .5s ease both" }}>
-        <div style={{ fontSize: 10, color: C.gold, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>New Swap</div>
-        {fields.map((f, i) => (
-          <div key={i} style={{ overflow: "hidden", maxHeight: field > i ? 40 : 0, opacity: field > i ? 1 : 0, transition: "all .4s ease", marginBottom: 8 }}>
-            <div style={{ padding: "8px 12px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: `1px solid rgba(255,255,255,.08)`, fontSize: 12, color: C.white, display: "flex", alignItems: "center", gap: 6 }}>
-              {f}
-              {field === i + 1 && <span style={{ display: "inline-block", width: 1, height: 12, background: C.gold, animation: "cursor .8s step-end infinite" }} />}
-            </div>
-          </div>
-        ))}
-        {field >= 3 && (
-          <div style={{ marginTop: 12, padding: "10px", borderRadius: 12, background: C.gold, fontSize: 13, fontWeight: 700, color: C.bg, textAlign: "center", animation: "cardIn .4s ease both, btnGlow 2s ease-in-out .5s infinite" }}>
-            Post Swap
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function IllustrationMatch() {
-  return (
-    <div style={{ position: "relative", width: 260, height: 140, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <style>{`
-        @keyframes opLeft { from{opacity:0;transform:translateX(-40px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes opRight { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes beamGrow { from{width:0;opacity:0} to{width:80px;opacity:1} }
-        @keyframes matchBadge { 0%{opacity:0;transform:scale(.3) translateY(-50%)} 60%{transform:scale(1.15) translateY(-50%)} 100%{opacity:1;transform:scale(1) translateY(-50%)} }
-        @keyframes sparkle { 0%,100%{opacity:0;transform:scale(0)} 50%{opacity:1;transform:scale(1)} }
-      `}</style>
-      {/* Member A */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, animation: "opLeft .5s ease both" }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg,${C.blue},${C.navy})`, border: `2px solid ${C.blue}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "#fff" }}>A</div>
-        <div style={{ fontSize: 11, color: C.m, fontWeight: 600 }}>Mon Off</div>
-      </div>
-      {/* Beam */}
-      <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", margin: "0 4px" }}>
-        <div style={{ height: 2, background: `linear-gradient(90deg,${C.blue},${C.gold},#00C9A7)`, borderRadius: 2, animation: "beamGrow .6s ease .4s both" }} />
-        <div style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", background: C.gold, color: C.bg, fontSize: 9, fontWeight: 800, padding: "3px 8px", borderRadius: 8, letterSpacing: 1, whiteSpace: "nowrap", animation: "matchBadge .5s cubic-bezier(.34,1.56,.64,1) .8s both" }}>MATCH</div>
-        {/* sparkles */}
-        {[[-20,-16],[20,-16],[-24,8],[24,8]].map(([x,y],i) => (
-          <div key={i} style={{ position: "absolute", top: y, left: x, width: 4, height: 4, borderRadius: "50%", background: C.gold, animation: `sparkle 1.2s ease-in-out ${.9 + i*.15}s infinite` }} />
-        ))}
-      </div>
-      {/* Member B */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, animation: "opRight .5s ease both" }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg,#00C9A7,#007a66)`, border: `2px solid #00C9A7`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 800, color: "#fff" }}>B</div>
-        <div style={{ fontSize: 11, color: C.m, fontWeight: 600 }}>Mon Work</div>
-      </div>
-    </div>
-  );
-}
-
-function IllustrationConfirm() {
-  return (
-    <div style={{ position: "relative", width: 200, height: 160, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <style>{`
-        @keyframes docIn { from{opacity:0;transform:scale(.8) translateY(16px)} to{opacity:1;transform:scale(1) translateY(0)} }
-        @keyframes checkDraw { from{stroke-dashoffset:60} to{stroke-dashoffset:0} }
-        @keyframes sealPop { 0%{opacity:0;transform:scale(.4) rotate(-20deg)} 60%{transform:scale(1.1) rotate(3deg)} 100%{opacity:1;transform:scale(1) rotate(0deg)} }
-        @keyframes confettiA { 0%{opacity:1;transform:translateY(0) rotate(0)} 100%{opacity:0;transform:translateY(-60px) rotate(360deg)} }
-        @keyframes confettiB { 0%{opacity:1;transform:translateY(0) rotate(0)} 100%{opacity:0;transform:translateY(-50px) translateX(20px) rotate(-180deg)} }
-        @keyframes confettiC { 0%{opacity:1;transform:translateY(0) rotate(0)} 100%{opacity:0;transform:translateY(-55px) translateX(-18px) rotate(270deg)} }
-      `}</style>
-      {/* Document */}
-      <div style={{ width: 140, borderRadius: 16, border: `1px solid rgba(192,132,252,.3)`, background: "rgba(192,132,252,.06)", padding: "18px 16px", animation: "docIn .5s ease both", position: "relative" }}>
-        <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,.1)", marginBottom: 8 }} />
-        <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,.07)", width: "70%", marginBottom: 8 }} />
-        <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,.07)", width: "85%", marginBottom: 16 }} />
-        {/* Checkmark circle */}
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "rgba(0,201,167,.12)", border: "2px solid #00C9A7", display: "flex", alignItems: "center", justifyContent: "center", animation: "sealPop .6s cubic-bezier(.34,1.56,.64,1) .4s both" }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M5 13l4 4L19 7" stroke="#00C9A7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="60" strokeDashoffset="0" style={{ animation: "checkDraw .5s ease .8s both", strokeDashoffset: 60 }} />
-            </svg>
-          </div>
-        </div>
-        {/* Confetti */}
-        {[
-          { x: 30, color: C.gold, anim: "confettiA" },
-          { x: 80, color: "#C084FC", anim: "confettiB" },
-          { x: 110, color: "#00C9A7", anim: "confettiC" },
-          { x: 50, color: C.blue, anim: "confettiB" },
-          { x: 100, color: C.gold, anim: "confettiA" },
-        ].map((c, i) => (
-          <div key={i} style={{ position: "absolute", bottom: 24, left: c.x, width: 6, height: 6, borderRadius: 2, background: c.color, animation: `${c.anim} 1s ease-out ${1 + i * .1}s both` }} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 /* ─── Step config ──────────────────────────────────────────────────────────── */
 
+// Single welcome slide. Everything below (progress bar, dots, x/N counter,
+// isLast) derives from STEPS.length, so the carousel collapses to one slide
+// with no changes to the navigation logic.
+//
+// Accent is brand red, not navy: this dialog sits on a navy backdrop
+// (rgba(26,31,77,.98)), so a navy accent would make the progress bar, title
+// gradient, and primary button disappear into it.
 const STEPS = [
   {
-    color: C.gold,
+    color: brand.colors.red,
     title: "Welcome to\nTWU Local 106 Connect",
-    body: "TWU Local 106 Connect is the fastest way for TSO members to swap work days, days off, and vacation weeks — member to member, no paperwork.",
+    body: "Your members-only home for shift swaps, union news, your contract, and reaching your rep — everything TSO members need, in one place.",
     Illustration: IllustrationSwap,
-  },
-  {
-    color: C.blue,
-    title: "Post Your Swap",
-    body: "Choose your swap type, add your shift details, and post it to your division board. Takes under a minute.",
-    Illustration: IllustrationPost,
-  },
-  {
-    color: "#00C9A7",
-    title: "Find Your Match",
-    body: "Browse open swaps or let the auto-matcher pair you with another member whose schedule complements yours.",
-    Illustration: IllustrationMatch,
-  },
-  {
-    color: "#C084FC",
-    title: "Lock It In",
-    body: "Both members confirm. A timestamped agreement is created — show it to your supervisor or manager for approval the same way you always do.",
-    Illustration: IllustrationConfirm,
   },
 ];
 
@@ -321,7 +204,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
             flex: 1, height: 52, borderRadius: 16, border: "none",
             cursor: "pointer", fontSize: 16, fontWeight: 700,
             background: `linear-gradient(135deg,${s.color},${s.color}cc)`,
-            color: C.bg,
+            color: C.white,
             boxShadow: `0 4px 20px ${s.color}40`,
             transition: "background .4s ease, box-shadow .4s ease",
           }}
