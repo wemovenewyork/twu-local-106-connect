@@ -58,9 +58,37 @@ body:has(.tso-home) .tso-footer { margin-top: 0; }
   border: 1px solid rgba(255,255,255,.28);
   white-space: nowrap;
 }
-/* Red top border + hover lift. border-top-color is restored on hover so the
-   red edge survives the navy border-color change. */
-.tso-news-card:hover { transform: translateY(-3px); border-color: var(--tso-navy); border-top-color: var(--tso-red); }
+/* ── Interactive feedback ──────────────────────────────────────────────────
+   Hover- and active-triggered only. Nothing runs on load or scroll: no
+   keyframes, no observers, no staggers. Animates transform / border-color /
+   opacity only — never layout properties. */
+
+/* Shared card treatment: news cards and resource cards behave identically.
+   NB: the borders are declared HERE, not as inline styles. An inline border
+   shorthand sets border-color inline, and inline wins the cascade — so a
+   class-level :hover border-color would silently never apply. */
+.tso-card { border: 1px solid #E5E7EB; transition: transform .15s ease, border-color .15s ease; }
+.tso-card:hover { transform: translateY(-2px); border-color: var(--tso-navy); }
+.tso-card:active { transform: scale(.98); }
+
+/* News cards keep their red top edge, including through hover (the navy
+   border-color above would otherwise overwrite it). */
+.tso-news-card { border-top: 3px solid var(--tso-red); }
+.tso-news-card:hover { border-top-color: var(--tso-red); }
+
+/* Buttons: lift on hover, press on tap. No navy border here — the hero CTAs
+   sit on a navy field, so a navy border would be invisible; the outline
+   variant brightens its white border instead. */
+.tso-cta { transition: transform .12s ease, border-color .12s ease, opacity .12s ease; }
+.tso-cta:hover { transform: translateY(-1px); opacity: .92; }
+.tso-cta:active { transform: scale(.98); }
+.tso-cta-outline { border: 1px solid rgba(255,255,255,.3); }
+.tso-cta-outline:hover { border-color: rgba(255,255,255,.6); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tso-card, .tso-cta { transition: none; }
+  .tso-card:hover, .tso-card:active, .tso-cta:hover, .tso-cta:active { transform: none; }
+}
 
 @media (max-width: 900px) {
   .tso-hero { padding: 64px 20px 56px; }
@@ -119,10 +147,10 @@ export default async function PublicHome() {
               and giving the workforce a unified voice.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-              <Link href="/login" style={ctaPrimary}>
+              <Link href="/login" className="tso-cta" style={ctaPrimary}>
                 Member Sign In →
               </Link>
-              <Link href="/about" style={ctaSecondaryOnNavy}>
+              <Link href="/about" className="tso-cta tso-cta-outline" style={ctaSecondaryOnNavy}>
                 About the Union
               </Link>
             </div>
@@ -167,15 +195,14 @@ export default async function PublicHome() {
                 <Link
                   key={n.id}
                   href={`/news/${n.publicSlug}`}
-                  className="tso-news-card"
+                  className="tso-card tso-news-card"
                   style={{
                     display: "block", padding: 22,
                     // Single-sided red top border: square that edge, keep the rest rounded.
+                    // Border itself is declared in CSS (.tso-card / .tso-news-card).
                     borderRadius: 14, borderTopLeftRadius: 0, borderTopRightRadius: 0,
-                    background: "#FFFFFF", border: `1px solid #E5E7EB`,
-                    borderTop: `3px solid ${brand.colors.red}`,
+                    background: "#FFFFFF",
                     textDecoration: "none", color: "inherit",
-                    transition: "border-color .15s, transform .15s",
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
@@ -246,12 +273,12 @@ export default async function PublicHome() {
             </p>
           </div>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link href="/login" style={{ ...ctaPrimary, background: "#FFFFFF", color: brand.colors.navy }}>
+            <Link href="/login" className="tso-cta" style={{ ...ctaPrimary, background: "#FFFFFF", color: brand.colors.navy }}>
               Sign In
             </Link>
-            <Link href="/login" style={{
+            <Link href="/login" className="tso-cta tso-cta-outline" style={{
               padding: "14px 28px", borderRadius: 10, fontSize: 15, fontWeight: 700,
-              textDecoration: "none", color: "#FFFFFF", border: `1.5px solid rgba(255,255,255,.4)`,
+              textDecoration: "none", color: "#FFFFFF",
             }}>
               Create an Account
             </Link>
@@ -270,9 +297,10 @@ function ResourceCard({ href, title, description }: { href: string; title: strin
   return (
     <Link
       href={href}
+      className="tso-card"
       style={{
         display: "block", padding: 24, borderRadius: 14,
-        background: "#FFFFFF", border: `1px solid #E5E7EB`,
+        background: "#FFFFFF",
         textDecoration: "none", color: "inherit",
       }}
     >
@@ -297,10 +325,12 @@ const ctaPrimary: React.CSSProperties = {
   textDecoration: "none", display: "inline-block",
 };
 
-// Outline variant for the reversed (navy) hero.
+// Outline variant for the reversed (navy) hero. The border lives in CSS
+// (.tso-cta-outline) so its hover state can actually change the border colour —
+// an inline border would win the cascade and block it.
 const ctaSecondaryOnNavy: React.CSSProperties = {
   background: "transparent", color: brand.colors.white,
   padding: "14px 28px", borderRadius: 10, fontSize: 15, fontWeight: 700,
-  textDecoration: "none", border: "1px solid rgba(255,255,255,.3)",
+  textDecoration: "none",
   display: "inline-block",
 };
